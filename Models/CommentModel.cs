@@ -1,4 +1,4 @@
-﻿namespace ReactDemo.Models
+﻿namespace projectideas.Models
 {
 	public class CommentModel
 	{

@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using React.AspNet;
 
-namespace ReactDemo
+namespace projectideas
 {
 	public class Startup
 	{

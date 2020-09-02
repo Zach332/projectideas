@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using ReactDemo.Models;
+using projectideas.Models;
 
-namespace ReactDemo.Controllers
+namespace projectideas.Controllers
 {
 	public class HomeController : Controller
 	{
