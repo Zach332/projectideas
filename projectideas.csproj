@@ -2,9 +2,9 @@
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.0</TargetFramework>
 		<PreserveCompilationContext>true</PreserveCompilationContext>
-		<AssemblyName>tutorial-code</AssemblyName>
+		<AssemblyName>projectideas</AssemblyName>
 		<OutputType>Exe</OutputType>
-		<PackageId>tutorial-code</PackageId>
+		<PackageId>projectideas</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="app.config" />

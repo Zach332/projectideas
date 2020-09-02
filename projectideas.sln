@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tutorial-code", "tutorial-code.csproj", "{F8367AC0-D731-4946-BCA8-972A6DBE9730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "projectideas", "projectideas.csproj", "{F8367AC0-D731-4946-BCA8-972A6DBE9730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
