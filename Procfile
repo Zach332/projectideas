@@ -1,0 +1,1 @@
+web: java -jar target/projectideas-0.0.0.jar
