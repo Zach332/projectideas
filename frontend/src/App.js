@@ -1,28 +1,21 @@
-import React, {Component, useState, useEffect} from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import Navbar from './components/layout/Navbar'
+import ServerTime from './components/ServerTime'
+import About from './components/pages/About'
 
 function App () {
-    const [message, setMessage] = useState("");
-
-    useEffect(() => {
-        fetch('/api/hello')
-            .then(response => response.text())
-            .then(message => {
-                setMessage(message);
-            });
-    },[])
     return (
-        <div className="App">
-        <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo"/>
-        <h1 className="App-title">{message}</h1>
-        </header>
-        <p className="App-intro">
-        To get started, edit <code>src/App.js</code> and save to reload.
-    </p>
-    </div>
-)
+        <Router>
+          <div className="App">
+            <Navbar />
+            <div className="container mx-auto">
+              <Route path="/" exact component={ServerTime} />
+              <Route path="/about" exact component={About} />
+            </div>
+          </div>
+        </Router>
+      );
 }
 
 export default App;
