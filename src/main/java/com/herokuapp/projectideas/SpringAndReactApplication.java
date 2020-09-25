@@ -1,4 +1,4 @@
-package com.heroku.projectideas;
+package com.herokuapp.projectideas;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

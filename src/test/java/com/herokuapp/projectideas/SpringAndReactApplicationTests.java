@@ -1,4 +1,4 @@
-package com.heroku.projectideas;
+package com.herokuapp.projectideas;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
