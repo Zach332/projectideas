@@ -21,7 +21,6 @@ export default function ServerTime() {
 
 	return (
 		<div className="mt-4">
-			Login <a href="/login">here</a>!
 			<div className="card">
 				<h5 className="card-header">Server Time</h5>
 				<div className="card-body">
