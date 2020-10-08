@@ -16,7 +16,7 @@ export default function LoginLanding() {
     onSuccess(params)
     return (
         <div>
-            <img src={CheckMark} alt="Successful login" />
+            <img src={CheckMark} class="mx-auto d-block pt-4" alt="Successful login" />
         </div>
     )
 }
