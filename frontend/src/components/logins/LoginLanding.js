@@ -11,6 +11,8 @@ export default function LoginLanding() {
         console.log(data.code)
         axios.post("/api/login/github", {
             code: data.code
+        }, {
+            'X-XSRF-TOKEN': cookies.get('XSRF-TOKEN')
         })
         .then(res => {
             console.log("Response: "+res);
