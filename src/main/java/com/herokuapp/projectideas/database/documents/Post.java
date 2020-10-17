@@ -14,8 +14,6 @@ public class Post {
     private String authorId;
     private String content;
 
-    public Post() { }
-
     public Post(String authorId, String content) {
         this.id = UUID.randomUUID().toString();
         this.authorId = authorId;
