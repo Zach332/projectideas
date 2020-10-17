@@ -23,19 +23,6 @@ public class DatabaseController {
 
     @Autowired
     private PostRepository postRepository;
-    
-    @GetMapping("/api/test_database")
-    public String testDatabase() {
-        // User user = new User("test-username", "test-email");
-
-        // userRepository.save(user);
-
-        Post post = new Post("7179fa4d-a95a-4b4e-9943-b401e7ace69e", "Hello again, world");
-
-        postRepository.save(post);
-
-        return "Added post entry to database";
-    }
 
     @PostMapping("/api/users")
     public void createUser(@RequestBody UserDTO userDTO) {
