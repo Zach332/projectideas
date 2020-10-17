@@ -31,6 +31,11 @@ public class DatabaseController {
         userRepository.save(user);
     }
 
+    @GetMapping("/api/posts")
+    public Iterable<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
     @GetMapping("/api/posts/{id}")
     public Optional<Post> getPost(@PathVariable String id) {
         return postRepository.findById(id);
