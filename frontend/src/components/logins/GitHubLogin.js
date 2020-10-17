@@ -5,6 +5,7 @@ import GitHubSymbol from "../../GitHub-Mark.png"
 export default function GitHubLogin() {
     const search = toQuery({
         client_id: process.env.REACT_APP_GITHUB_CLIENT_ID,
+        scope: "user:email",
         redirect_uri: process.env.REACT_APP_GITHUB_REDIRECT_URI,
     });
     
