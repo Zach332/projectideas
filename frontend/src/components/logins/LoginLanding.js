@@ -8,11 +8,9 @@ export default function LoginLanding() {
         if (!data.code) {
           onFailure(new Error('\'code\' not found'));
         }
-        console.log(data.code)
         axios.post("/api/login/github", {
             code: data.code
-        })
-        .then(res => {
+        }).then(res => {
             console.log("Response: "+res);
             console.log(res.access_token);
         })
