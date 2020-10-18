@@ -26,7 +26,7 @@ public class GithubAuthenticationController {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class GitHubUserID {
-        String id;
+        public String id;
         public GitHubUserID() {
         }
         public void setId(String id) {
@@ -35,7 +35,7 @@ public class GithubAuthenticationController {
     }
 
     @PostMapping("/api/login/github")
-    public GitHubUserID githubAuthentication(@RequestBody GitHubCode code) throws Exception {
+    public GitHubUserID githubAuthentication(@RequestBody GitHubCode code) {
         FormBody formBody = new FormBody.Builder()
             .add("client_id", System.getenv("REACT_APP_GITHUB_CLIENT_ID"))
             .add("client_secret", System.getenv("GITHUB_CLIENT_SECRET"))
@@ -60,9 +60,9 @@ public class GithubAuthenticationController {
             ObjectMapper mapper = new ObjectMapper();
             GitHubUserID userID = mapper.readValue(userResponse, GitHubUserID.class);
 
-            System.out.println("Returning "+ userID.id);
             return userID;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

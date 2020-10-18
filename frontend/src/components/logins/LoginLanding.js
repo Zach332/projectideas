@@ -12,7 +12,7 @@ export default function LoginLanding() {
         axios.post("/api/login/github", {
             code: data.code
         }).then((response) => {
-            console.log(response.id); 
+            console.log(response.data.id);
         })
     }
     const onFailure = (data) => {
