@@ -2,9 +2,9 @@ package com.herokuapp.projectideas.database;
 
 import java.util.Optional;
 
-import com.herokuapp.projectideas.database.documents.Post;
+import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
-import com.herokuapp.projectideas.database.repositories.PostRepository;
+import com.herokuapp.projectideas.database.repositories.IdeaRepository;
 import com.herokuapp.projectideas.database.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class DatabaseController {
     private UserRepository userRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    private IdeaRepository ideaRepository;
 
     @PostMapping("/api/users")
     public void createUser(@RequestBody UserDTO userDTO) {
@@ -31,34 +31,38 @@ public class DatabaseController {
         userRepository.save(user);
     }
 
-    @GetMapping("/api/posts")
-    public Iterable<Post> getAllPosts() {
-        return postRepository.findAll();
+    @GetMapping("/api/ideas")
+    public Iterable<Idea> getAllIdeas() {
+        return ideaRepository.findAll();
     }
 
-    @GetMapping("/api/posts/{id}")
-    public Optional<Post> getPost(@PathVariable String id) {
-        return postRepository.findById(id);
+    @GetMapping("/api/ideas/{id}")
+    public IdeaDTO getIdea(@PathVariable String id) {
+        Optional<Idea> idea = ideaRepository.findById(id);
+        if (idea.isPresent()) {
+            IdeaDTO ideaDTO = new IdeaDTO(idea.get().getContent());
+            return ideaDTO;
+        }
+        else {
+            return null;
+        }
     }
 
-    @PostMapping("/api/posts")
-    public void createPost(@RequestBody PostDTO postDTO) {
-        Post post = new Post(postDTO.authorId, postDTO.content);
-        postRepository.save(post);
+    @PostMapping("/api/ideas")
+    public void createIdea(@RequestBody IdeaDTO postDTO) {
+        Idea idea = new Idea("test-username", postDTO.content);
+        ideaRepository.save(idea);
     }
 
-    @DeleteMapping("/api/posts/{id}")
-    public void deletePost(@PathVariable String id) {
-        postRepository.deleteById(id);
+    @DeleteMapping("/api/ideas/{id}")
+    public void deleteIdea(@PathVariable String id) {
+        ideaRepository.deleteById(id);
     }
 
-    static class PostDTO {
-        // TODO: The authorId should be retrieved from the client adding the post
-        private String authorId;
+    static class IdeaDTO {
         private String content;
 
-        public PostDTO(String authorId, String content) {
-            this.authorId = authorId;
+        public IdeaDTO(String content) {
             this.content = content;
         }
     }
