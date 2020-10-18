@@ -2,6 +2,9 @@ package com.herokuapp.projectideas;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,16 +16,26 @@ public class GithubAuthenticationController {
     private static final OkHttpClient httpClient = new OkHttpClient();
 
     static class GitHubCode {
+        String code;
         public GitHubCode() {
         }
         public void setCode(String code) {
             this.code = code;
         }
-        String code;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class GitHubUserID {
+        public String id;
+        public GitHubUserID() {
+        }
+        public void setId(String id) {
+            this.id = id;
+        }
     }
 
     @PostMapping("/api/login/github")
-    public String githubAuthentication(@RequestBody GitHubCode code) throws Exception {
+    public GitHubUserID githubAuthentication(@RequestBody GitHubCode code) {
         FormBody formBody = new FormBody.Builder()
             .add("client_id", System.getenv("REACT_APP_GITHUB_CLIENT_ID"))
             .add("client_secret", System.getenv("GITHUB_CLIENT_SECRET"))
@@ -44,8 +57,12 @@ public class GithubAuthenticationController {
             String token = url.queryParameter("access_token");
             String userResponse = getUserData(token);
 
-            return userResponse;
+            ObjectMapper mapper = new ObjectMapper();
+            GitHubUserID userID = mapper.readValue(userResponse, GitHubUserID.class);
+
+            return userID;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
