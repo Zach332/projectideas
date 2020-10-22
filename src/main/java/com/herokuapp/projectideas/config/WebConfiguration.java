@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas;
+package com.herokuapp.projectideas.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
