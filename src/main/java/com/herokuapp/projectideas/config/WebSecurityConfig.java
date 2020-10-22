@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
-@Profile("prod")
+@Profile({"prod", "dev", "default"})
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
