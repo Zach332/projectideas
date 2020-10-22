@@ -20,8 +20,8 @@ export default function Navbar() {
                 </div>
                 <div className="nav navbar-nav navbar-right" id="navbarLogin">
                     <ul className="navbar-nav">
-                        <li class="navbar-btn">
-                            <a href="/login" class="btn btn-outline-success my-2 my-sm-0">Login</a>
+                        <li className="navbar-btn">
+                            <a href="/login" className="btn btn-outline-success my-2 my-sm-0">Login</a>
                         </li>
                     </ul>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Home from './pages/Home'
 
 export default function ServerTime() {
     const [message, setMessage] = useState("");
@@ -30,6 +31,7 @@ export default function ServerTime() {
 					</a>
 				</div>
 			</div>
+			{Home()}
 		</div>
 	);
 }
