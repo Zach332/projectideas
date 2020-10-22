@@ -1,1 +1,1 @@
-web: java -jar target/projectideas-0.0.0.jar --spring.profiles.active=dev_no_csrf_protection
+web: java -jar target/projectideas-0.0.0.jar --spring.profiles.active=prod
