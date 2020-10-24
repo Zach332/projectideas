@@ -6,7 +6,7 @@ import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
 
 import org.springframework.data.annotation.Id;
 
-@Document(collection = "Users")
+@Document(collection = "Users", ru = "400")
 public class User {
 
     @Id

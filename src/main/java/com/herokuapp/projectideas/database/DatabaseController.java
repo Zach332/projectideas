@@ -24,6 +24,16 @@ public class DatabaseController {
     @Autowired
     private IdeaRepository ideaRepository;
 
+    @GetMapping("/api/users")
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @GetMapping("/api/users/{id}")
+    public Optional<User> getUser(@PathVariable String id) {
+        return userRepository.findById(id);
+    }
+
     @PostMapping("/api/users")
     public void createUser(@RequestBody UserDTO userDTO) {
         // TODO: Validate input (e.g. username already taken)
@@ -37,20 +47,13 @@ public class DatabaseController {
     }
 
     @GetMapping("/api/ideas/{id}")
-    public IdeaDTO getIdea(@PathVariable String id) {
-        Optional<Idea> idea = ideaRepository.findById(id);
-        if (idea.isPresent()) {
-            IdeaDTO ideaDTO = new IdeaDTO(idea.get().getContent());
-            return ideaDTO;
-        }
-        else {
-            return null;
-        }
+    public Optional<Idea> getIdea(@PathVariable String id) {
+        return ideaRepository.findById(id);
     }
 
     @PostMapping("/api/ideas")
-    public void createIdea(@RequestBody IdeaDTO postDTO) {
-        Idea idea = new Idea("test-username", postDTO.content);
+    public void createIdea(@RequestBody IdeaDTO ideaDTO) {
+        Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
         ideaRepository.save(idea);
     }
 
@@ -60,20 +63,17 @@ public class DatabaseController {
     }
 
     static class IdeaDTO {
-        private String content;
+        public String authorUsername;
+        public String title;
+        public String content;
 
-        public IdeaDTO(String content) {
-            this.content = content;
-        }
+        public IdeaDTO() { }
     }
 
     static class UserDTO {
-        private String username;
-        private String email;
+        public String username;
+        public String email;
 
-        public UserDTO(String username, String email) {
-            this.username = username;
-            this.email = email;
-        }
+        public UserDTO() { }
     }
 }

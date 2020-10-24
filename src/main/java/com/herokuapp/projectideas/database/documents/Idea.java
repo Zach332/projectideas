@@ -1,22 +1,30 @@
 package com.herokuapp.projectideas.database.documents;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
 
 import org.springframework.data.annotation.Id;
 
-@Document(collection = "Ideas")
+@Document(collection = "Ideas", ru = "400")
 public class Idea {
     
     @Id
     private String id;
-    private String authorId;
+    private long timePosted;
+    private long timeLastEdited;
+    private String authorUsername;
+    private String title;
     private String content;
 
-    public Idea(String authorId, String content) {
+    public Idea(String authorUsername, String title, String content) {
         this.id = UUID.randomUUID().toString();
-        this.authorId = authorId;
+        long now = Instant.now().getEpochSecond();
+        this.timePosted = now;
+        this.timeLastEdited = now;
+        this.authorUsername = authorUsername;
+        this.title = title;
         this.content = content;
     }
 
@@ -24,8 +32,20 @@ public class Idea {
         return id;
     }
 
-    public String getAuthorId() {
-        return authorId;
+    public long getTimePosted() {
+        return timePosted;
+    }
+
+    public long getTimeLastEdited() {
+        return timeLastEdited;
+    }
+
+    public String getAuthorUsername() {
+        return authorUsername;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public String getContent() {
