@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Navbar from './components/layout/Navbar'
-import ServerTime from './components/ServerTime'
+import Home from './components//pages/Home'
 import About from './components/pages/About'
 import Privacy from './components/pages/Privacy'
 import NotFound from './components/pages/NotFound'
@@ -15,7 +15,7 @@ function App () {
             <Navbar />
             <div className="container mx-auto">
               <Switch>
-                <Route path="/" exact component={ServerTime} />
+                <Route path="/" exact component={Home} />
                 <Route path="/login" exact component={GitHubLogin} />
                 <Route path="/login/oauth2/code/github" exact component={LoginLanding} />
                 <Route path="/about" exact component={About} />
