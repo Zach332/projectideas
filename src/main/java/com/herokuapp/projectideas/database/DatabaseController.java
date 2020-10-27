@@ -43,7 +43,8 @@ public class DatabaseController {
 
     @GetMapping("/api/ideas")
     public Iterable<Idea> getAllIdeas() {
-        return ideaRepository.findAll();
+        Iterable<Idea> ideas = ideaRepository.findAll();
+        return ideas;
     }
 
     @GetMapping("/api/ideas/{id}")

@@ -1,7 +1,7 @@
 package com.herokuapp.projectideas.database.repositories;
 
+import com.azure.spring.data.cosmos.repository.CosmosRepository;
 import com.herokuapp.projectideas.database.documents.Idea;
-import com.microsoft.azure.spring.data.cosmosdb.repository.CosmosRepository;
 
 import org.springframework.stereotype.Repository;
 

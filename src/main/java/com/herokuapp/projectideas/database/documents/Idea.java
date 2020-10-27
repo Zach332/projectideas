@@ -3,11 +3,11 @@ package com.herokuapp.projectideas.database.documents;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
+import com.azure.spring.data.cosmos.core.mapping.Container;
 
 import org.springframework.data.annotation.Id;
 
-@Document(collection = "Ideas", ru = "400")
+@Container(containerName = "Ideas")
 public class Idea {
     
     @Id
