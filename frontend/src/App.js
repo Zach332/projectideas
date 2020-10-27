@@ -6,6 +6,7 @@ import About from './components/pages/About'
 import Privacy from './components/pages/Privacy'
 import NotFound from './components/pages/NotFound'
 import Idea from './components/pages/Idea'
+import NewIdea from './components/pages/NewIdea'
 import GitHubLogin from './components/logins/GitHubLogin'
 import LoginLanding from './components/logins/LoginLanding'
 
@@ -19,6 +20,7 @@ function App () {
                 <Route path="/" exact component={Home} />
                 <Route path="/login" exact component={GitHubLogin} />
                 <Route path="/login/oauth2/code/github" exact component={LoginLanding} />
+                <Route path="/new-idea" exact component={NewIdea} />
                 <Route path="/about" exact component={About} />
                 <Route path="/privacy" exact component={Privacy} />
                 <Route path="/idea/:id" exact component={Idea} />
