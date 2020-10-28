@@ -29,7 +29,7 @@ export default function NewIdea() {
 
     if(!submitted) {
         return (
-            <div className="mx-auto">
+            <div className="mx-auto pt-4">
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="title">Title</label>

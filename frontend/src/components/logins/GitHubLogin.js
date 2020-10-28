@@ -13,6 +13,7 @@ export default function GitHubLogin() {
         console.log(search)
         window.location.href = 'https://github.com/login/oauth/authorize?'+search
     }
+    
     return (
         <div class="container">
             <img src={GitHubSymbol} class="mx-auto d-block pt-4" alt="" />
