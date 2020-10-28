@@ -7,7 +7,7 @@ import com.azure.spring.data.cosmos.core.mapping.Container;
 
 import org.springframework.data.annotation.Id;
 
-@Container(containerName = "Ideas")
+@Container(containerName = "Ideas", ru = "400")
 public class Idea {
     
     @Id
