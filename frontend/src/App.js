@@ -13,23 +13,23 @@ import LoginLanding from './components/logins/LoginLanding'
 function App () {
     return (
         <Router>
-          <div className="App">
-            <Navbar />
-            <div className="container mx-auto">
-              <Switch>
-                <Route path="/" exact component={Home} />
-                <Route path="/login" exact component={GitHubLogin} />
-                <Route path="/login/oauth2/code/github" exact component={LoginLanding} />
-                <Route path="/new-idea" exact component={NewIdea} />
-                <Route path="/about" exact component={About} />
-                <Route path="/privacy" exact component={Privacy} />
-                <Route path="/idea/:id" exact component={Idea} />
-                <Route component={NotFound} />
-              </Switch>
+            <div className="App">
+                <Navbar />
+                <div className="container mx-auto">
+                    <Switch>
+                        <Route path="/" exact component={Home} />
+                        <Route path="/login" exact component={GitHubLogin} />
+                        <Route path="/login/oauth2/code/github" exact component={LoginLanding} />
+                        <Route path="/new-idea" exact component={NewIdea} />
+                        <Route path="/about" exact component={About} />
+                        <Route path="/privacy" exact component={Privacy} />
+                        <Route path="/idea/:id" exact component={Idea} />
+                        <Route component={NotFound} />
+                    </Switch>
+                </div>
             </div>
-          </div>
         </Router>
-      );
+    );
 }
 
 export default App;
