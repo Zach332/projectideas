@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.herokuapp.projectideas.database.documents.Idea;
@@ -25,7 +26,7 @@ public class DatabaseController {
     private IdeaRepository ideaRepository;
 
     @GetMapping("/api/users")
-    public Iterable<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -42,7 +43,7 @@ public class DatabaseController {
     }
 
     @GetMapping("/api/ideas")
-    public Iterable<Idea> getAllIdeas() {
+    public List<Idea> getAllIdeas() {
         return ideaRepository.findAll();
     }
 
