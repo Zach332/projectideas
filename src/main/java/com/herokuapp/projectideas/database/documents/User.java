@@ -6,22 +6,30 @@ import com.azure.spring.data.cosmos.core.mapping.Container;
 
 import org.springframework.data.annotation.Id;
 
-@Container(containerName = "Ideas", ru = "400")
+@Container(containerName = "Production", ru = "400")
 public class User {
 
     @Id
     private String id;
+    private String type;
     private String username;
     private String email;
 
+    public User() { }
+
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
+        this.type = "User";
         this.username = username;
         this.email = email;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getUsername() {

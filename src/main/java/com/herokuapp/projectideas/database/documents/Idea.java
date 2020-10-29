@@ -7,19 +7,23 @@ import com.azure.spring.data.cosmos.core.mapping.Container;
 
 import org.springframework.data.annotation.Id;
 
-@Container(containerName = "Ideas", ru = "400")
+@Container(containerName = "Production", ru = "400")
 public class Idea {
     
     @Id
     private String id;
+    private String type;
     private long timePosted;
     private long timeLastEdited;
     private String authorUsername;
     private String title;
     private String content;
 
+    public Idea() { }
+
     public Idea(String authorUsername, String title, String content) {
         this.id = UUID.randomUUID().toString();
+        this.type = "Idea";
         long now = Instant.now().getEpochSecond();
         this.timePosted = now;
         this.timeLastEdited = now;
@@ -30,6 +34,10 @@ public class Idea {
 
     public String getId() {
         return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public long getTimePosted() {
