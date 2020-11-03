@@ -8,8 +8,8 @@ export default function Idea() {
 
     useEffect(() => {
         axios.get("/api/ideas/"+params.id).then((response) => {
+            console.log(response)
             setIdea(response.data)
-            console.log(response.data)
         })
     },[])
 

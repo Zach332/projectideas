@@ -10,15 +10,14 @@ export default function GitHubLogin() {
     });
     
     const onCLick = () => {
-        console.log(search)
         window.location.href = 'https://github.com/login/oauth/authorize?'+search
     }
     
     return (
-        <div class="container">
-            <img src={GitHubSymbol} class="mx-auto d-block pt-4" alt="" />
+        <div className="container">
+            <img src={GitHubSymbol} className="mx-auto d-block pt-4" alt="" />
             <br/>
-            <div class="col-md-12 text-center">
+            <div className="col-md-12 text-center">
                 <button type="btn btn-primary" onClick={onCLick} className="btn btn-outline-primary btn-lg">
                     Login with GitHub
                     <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-box-arrow-in-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

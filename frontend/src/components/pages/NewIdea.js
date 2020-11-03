@@ -1,10 +1,12 @@
 import React from 'react'
 import axios from 'axios'
 import CheckMark from "../../check.svg"
+import { useGlobalState } from '../../State'
 
 export default function NewIdea() {
     const [idea, setIdea] = React.useState([{ title: '' , content: ''}])
     const [submitted, setSubmitted] = React.useState(false)
+    const [ user ] = useGlobalState('user')
 
     const handleInputChange = (event) => {
         const target = event.target;
@@ -19,7 +21,7 @@ export default function NewIdea() {
 
     const handleSubmit = (event) => {
         axios.post("/api/ideas", {
-            authorUsername: 'Seg Fault',
+            authorUsername: user.username,
             title: idea.title,
             content: idea.content
         })
