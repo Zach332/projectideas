@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas;
+package com.herokuapp.projectideas.login;
 
 import java.io.IOException;
 
