@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,17 +26,16 @@ public class GithubAuthenticationController {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class GitHubUserID {
-        public String id;
-        public GitHubUserID() {
-        }
-        public void setId(String id) {
-            this.id = id;
+    static class GithubEmail {
+        public String email;
+        public boolean primary;
+        public boolean verified;
+        public GithubEmail() {
         }
     }
 
     @PostMapping("/api/login/github")
-    public GitHubUserID githubAuthentication(@RequestBody GitHubCode code) {
+    public GithubEmail githubAuthentication(@RequestBody GitHubCode code) {
         FormBody formBody = new FormBody.Builder()
             .add("client_id", System.getenv("REACT_APP_GITHUB_CLIENT_ID"))
             .add("client_secret", System.getenv("GITHUB_CLIENT_SECRET"))
@@ -55,21 +55,22 @@ public class GithubAuthenticationController {
             }
             HttpUrl url = HttpUrl.parse("https://randomaddress.com/search?"+response.body().string());
             String token = url.queryParameter("access_token");
-            String userResponse = getUserData(token);
+            String userResponse = getUserEmail(token);
+            System.out.println(userResponse);
 
             ObjectMapper mapper = new ObjectMapper();
-            GitHubUserID userID = mapper.readValue(userResponse, GitHubUserID.class);
+            GithubEmail[] userID = mapper.readValue(userResponse, GithubEmail[].class);
 
-            return userID;
+            return userID[0];
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    static String getUserData(String token) throws IOException {
+    static String getUserEmail(String token) throws IOException {
         Request request = new Request.Builder()
-            .url("https://api.github.com/user")
+            .url("https://api.github.com/user/emails")
             .header("Authorization","token " + token)
             .build();
 
