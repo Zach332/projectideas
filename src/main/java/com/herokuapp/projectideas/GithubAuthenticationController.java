@@ -58,9 +58,10 @@ public class GithubAuthenticationController {
             System.out.println(userResponse);
 
             ObjectMapper mapper = new ObjectMapper();
-            GithubEmail[] userID = mapper.readValue(userResponse, GithubEmail[].class);
+            GithubEmail[] emails = mapper.readValue(userResponse, GithubEmail[].class);
+            GithubEmail primary = getPrimary(emails);
 
-            return userID[0];
+            return primary;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -80,5 +81,12 @@ public class GithubAuthenticationController {
             }
             return response.body().string();
         }
+    }
+
+    static GithubEmail getPrimary(GithubEmail[] emails) {
+        for(GithubEmail email : emails) {
+            if(email.primary)return email;
+        }
+        return emails[0];
     }
 }
