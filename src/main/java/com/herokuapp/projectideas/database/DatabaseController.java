@@ -24,11 +24,6 @@ public class DatabaseController {
     @Autowired
     private IdeaRepository ideaRepository;
 
-    @GetMapping("api/test/{id}")
-    public Optional<Idea> getIdeaById(@PathVariable String id) {
-        return ideaRepository.findById(id);
-    }
-
     @GetMapping("/api/users")
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
