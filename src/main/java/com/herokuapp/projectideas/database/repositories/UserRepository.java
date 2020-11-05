@@ -1,6 +1,5 @@
 package com.herokuapp.projectideas.database.repositories;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.azure.spring.data.cosmos.repository.CosmosRepository;
@@ -12,8 +11,18 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends CosmosRepository<User, String> {
-    @Query(value = "select * from c where c.type = \"User\"")
-    List<User> findAll();
+
+    @Override
+    @Query(value = "SELECT * FROM c WHERE c.type = 'User' AND c.id = @id")
+    Optional<User> findById(@Param("id") String id);
+
+    @Override
+    @Query(value = "SELECT * FROM c WHERE c.type = 'User'")
+    Iterable<User> findAll();
+
+    @Override
+    @Query(value = "DELETE FROM c WHERE c.type = 'User' AND c.id = @id")
+    void deleteById(@Param("id") String id);
 
     @Query(value = "SELECT * FROM c WHERE c.type = 'User' AND c.email = @email")
     Optional<User> findByEmail(@Param("email") String email);
