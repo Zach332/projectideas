@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.login;
 
 import java.io.RandomAccessFile;
+import java.util.Iterator;
 import java.util.Optional;
 
 import com.herokuapp.projectideas.database.documents.User;
@@ -16,11 +17,11 @@ public class LoginController {
     UserRepository userRepository;
 
     public User getUserByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (!user.isPresent()) {
+        Iterator<User> iterator = userRepository.findByEmail(email).iterator();
+        if (!iterator.hasNext()) {
             return userRepository.save(new User(generateUsername(), email));
         }
-        return user.get();
+        return iterator.next();
     }
 
     private String generateUsername() {
