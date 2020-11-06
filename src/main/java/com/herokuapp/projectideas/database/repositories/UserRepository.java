@@ -16,13 +16,13 @@ public interface UserRepository extends CosmosRepository<User, String> {
     // @Query(value = "SELECT * FROM c WHERE c.type = 'User' AND c.id = @id")
     // Optional<User> findById(@Param("id") String id);
 
-    // @Override
-    // @Query(value = "SELECT * FROM c WHERE c.type = 'User'")
-    // Iterable<User> findAll();
+    @Override
+    @Query(value = "SELECT * FROM c WHERE c.type = 'User'")
+    Iterable<User> findAll();
 
-    // @Override
-    // @Query(value = "DELETE FROM c WHERE c.type = 'User' AND c.id = @id")
-    // void deleteById(@Param("id") String id);
+    @Override
+    @Query(value = "DELETE FROM c WHERE c.type = 'User' AND c.id = @id")
+    void deleteById(@Param("id") String id);
 
     @Query(value = "SELECT * FROM c WHERE c.type = 'User' AND c.email = @email")
     Iterable<User> findByEmail(@Param("email") String email);
