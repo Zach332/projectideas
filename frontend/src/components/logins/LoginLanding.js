@@ -23,7 +23,7 @@ export default function LoginLanding() {
         axios.post("/api/login/github", {
             code: data.code
         }).then((response) => {
-            login(response.data.email, response.data.email)
+            login(response.data.username, response.data.id)
         })
     }
     const onFailure = (data) => {

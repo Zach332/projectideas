@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.herokuapp.projectideas.database.documents.User;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +15,9 @@ import okhttp3.*;
 
 @RestController
 public class GithubAuthenticationController {
+    @Autowired
+    LoginController loginController;
+    
     private static final OkHttpClient httpClient = new OkHttpClient();
 
     static class GitHubCode {
@@ -34,7 +39,7 @@ public class GithubAuthenticationController {
     }
 
     @PostMapping("/api/login/github")
-    public GithubEmail githubAuthentication(@RequestBody GitHubCode code) {
+    public User githubAuthentication(@RequestBody GitHubCode code) {
         FormBody formBody = new FormBody.Builder()
             .add("client_id", System.getenv("REACT_APP_GITHUB_CLIENT_ID"))
             .add("client_secret", System.getenv("GITHUB_CLIENT_SECRET"))
@@ -55,13 +60,12 @@ public class GithubAuthenticationController {
             HttpUrl url = HttpUrl.parse("https://randomaddress.com/search?"+response.body().string());
             String token = url.queryParameter("access_token");
             String userResponse = getUserEmail(token);
-            System.out.println(userResponse);
 
             ObjectMapper mapper = new ObjectMapper();
             GithubEmail[] emails = mapper.readValue(userResponse, GithubEmail[].class);
             GithubEmail primary = getPrimary(emails);
 
-            return primary;
+            return loginController.getUserByEmail(primary.email);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
