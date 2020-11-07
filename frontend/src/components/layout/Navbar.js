@@ -8,9 +8,10 @@ export default function Navbar() {
     let login
     
     if(user.loggedIn) {
+        let profileLink = "/user/"+user.username
         login = (
             <li className="nav-item active">
-                <a className="nav-link" href="/about">{user.username}</a>
+                <a className="nav-link" href={profileLink}>{user.username}</a>
             </li>
         )
     } else {
