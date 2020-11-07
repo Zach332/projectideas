@@ -3,7 +3,6 @@ package com.herokuapp.projectideas.database;
 import java.util.List;
 import java.util.Optional;
 
-import com.azure.core.annotation.Get;
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
 
@@ -23,35 +22,35 @@ public class DatabaseController {
 
     @GetMapping("/api/test")
     public List<Idea> getIdeas() {
-        return database.getIdeas();
+        return database.findAllIdeas();
     }
 
-    // @GetMapping("/api/users")
-    // public Iterable<User> getAllUsers() {
-    //     return userRepository.findAll();
-    // }
+    @GetMapping("/api/users")
+    public List<User> getAllUsers() {
+        return database.findAllUsers();
+    }
 
-    // @GetMapping("/api/users/{id}")
-    // public Optional<User> getUser(@PathVariable String id) {
-    //     return userRepository.findById(id);
-    // }
+    @GetMapping("/api/users/{id}")
+    public Optional<User> getUser(@PathVariable String id) {
+        return database.findUser(id);
+    }
 
     // @PostMapping("/api/users")
     // public void createUser(@RequestBody UserDTO userDTO) {
     //     // TODO: Validate input (e.g. username already taken)
     //     User user = new User(userDTO.username, userDTO.email);
-    //     userRepository.save(user);
+    //     database.save(user);
     // }
 
-    // @GetMapping("/api/ideas")
-    // public Iterable<Idea> getAllIdeas() {
-    //     return ideaRepository.findAll();
-    // }
+    @GetMapping("/api/ideas")
+    public Iterable<Idea> getAllIdeas() {
+        return database.findAllIdeas();
+    }
 
-    // @GetMapping("/api/ideas/{id}")
-    // public Optional<Idea> getIdea(@PathVariable String id) {
-    //     return ideaRepository.findById(id);
-    // }
+    @GetMapping("/api/ideas/{id}")
+    public Optional<Idea> getIdea(@PathVariable String id) {
+        return database.findIdea(id);
+    }
 
     // @PostMapping("/api/ideas")
     // public void createIdea(@RequestBody IdeaDTO ideaDTO) {
@@ -61,7 +60,7 @@ public class DatabaseController {
 
     // @DeleteMapping("/api/ideas/{id}")
     // public void deleteIdea(@PathVariable String id) {
-    //     ideaRepository.deleteById(id);
+    //     database.delete(id);
     // }
 
     static class IdeaDTO {
