@@ -2,14 +2,9 @@ import React, { useEffect } from 'react'
 import CheckMark from "../../check.svg"
 import { toParams } from '../utils/Routing'
 import axios from 'axios'
-import { login, persistenceKey, useGlobalState } from '../../State'
+import { login } from '../../State'
 
 export default function LoginLanding() {
-    const [user] = useGlobalState('user');
-
-    useEffect(() => {
-        localStorage.setItem(persistenceKey, JSON.stringify(user))
-    }, [user]);
 
     useEffect(() => {
         const params = toParams(window.location.search.replace(/^\?/, ''))
