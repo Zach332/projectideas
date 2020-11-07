@@ -16,7 +16,7 @@ export default function Home() {
     }
 
     return (
-        <div className="mx-auto">
+        <div>
             <h1>Home</h1>
             <div className="text-right">
                 <button type="btn btn-primary" onClick={onCLick} className="btn btn-outline-primary btn-lg pull-right">
