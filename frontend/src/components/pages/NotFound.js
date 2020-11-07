@@ -3,7 +3,7 @@ import ChromeDinoGame  from 'react-chrome-dino'
 
 export default function NotFound() {
     return (
-        <div className="mx-auto">
+        <div>
             <h1>Page Not Found</h1>
             <p>
                 The link you used does not appear to be valid. 

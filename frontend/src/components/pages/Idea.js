@@ -15,7 +15,7 @@ export default function Idea() {
 
     
     return (
-        <div className="mx-auto">
+        <div>
             <h1>{idea.title}</h1>
             {idea.content}
         </div>
