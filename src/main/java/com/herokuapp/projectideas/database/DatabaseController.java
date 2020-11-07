@@ -1,11 +1,11 @@
 package com.herokuapp.projectideas.database;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.azure.core.annotation.Get;
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
-import com.herokuapp.projectideas.database.repositories.IdeaRepository;
-import com.herokuapp.projectideas.database.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,50 +17,52 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DatabaseController {
-    
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
-    private IdeaRepository ideaRepository;
+    private Database database;
 
-    @GetMapping("/api/users")
-    public Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    @GetMapping("/api/test")
+    public List<Idea> getIdeas() {
+        return database.getIdeas();
     }
 
-    @GetMapping("/api/users/{id}")
-    public Optional<User> getUser(@PathVariable String id) {
-        return userRepository.findById(id);
-    }
+    // @GetMapping("/api/users")
+    // public Iterable<User> getAllUsers() {
+    //     return userRepository.findAll();
+    // }
 
-    @PostMapping("/api/users")
-    public void createUser(@RequestBody UserDTO userDTO) {
-        // TODO: Validate input (e.g. username already taken)
-        User user = new User(userDTO.username, userDTO.email);
-        userRepository.save(user);
-    }
+    // @GetMapping("/api/users/{id}")
+    // public Optional<User> getUser(@PathVariable String id) {
+    //     return userRepository.findById(id);
+    // }
 
-    @GetMapping("/api/ideas")
-    public Iterable<Idea> getAllIdeas() {
-        return ideaRepository.findAll();
-    }
+    // @PostMapping("/api/users")
+    // public void createUser(@RequestBody UserDTO userDTO) {
+    //     // TODO: Validate input (e.g. username already taken)
+    //     User user = new User(userDTO.username, userDTO.email);
+    //     userRepository.save(user);
+    // }
 
-    @GetMapping("/api/ideas/{id}")
-    public Optional<Idea> getIdea(@PathVariable String id) {
-        return ideaRepository.findById(id);
-    }
+    // @GetMapping("/api/ideas")
+    // public Iterable<Idea> getAllIdeas() {
+    //     return ideaRepository.findAll();
+    // }
 
-    @PostMapping("/api/ideas")
-    public void createIdea(@RequestBody IdeaDTO ideaDTO) {
-        Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
-        ideaRepository.save(idea);
-    }
+    // @GetMapping("/api/ideas/{id}")
+    // public Optional<Idea> getIdea(@PathVariable String id) {
+    //     return ideaRepository.findById(id);
+    // }
 
-    @DeleteMapping("/api/ideas/{id}")
-    public void deleteIdea(@PathVariable String id) {
-        ideaRepository.deleteById(id);
-    }
+    // @PostMapping("/api/ideas")
+    // public void createIdea(@RequestBody IdeaDTO ideaDTO) {
+    //     Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
+    //     ideaRepository.save(idea);
+    // }
+
+    // @DeleteMapping("/api/ideas/{id}")
+    // public void deleteIdea(@PathVariable String id) {
+    //     ideaRepository.deleteById(id);
+    // }
 
     static class IdeaDTO {
         public String authorUsername;

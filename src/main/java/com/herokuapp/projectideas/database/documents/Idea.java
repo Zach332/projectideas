@@ -3,17 +3,9 @@ package com.herokuapp.projectideas.database.documents;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.azure.spring.data.cosmos.core.mapping.Container;
-import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
-
-import org.springframework.data.annotation.Id;
-
-@Container(containerName = "Production", ru = "400", autoCreateContainer = false)
 public class Idea {
     
-    @Id
     private String id;
-    @PartitionKey
     private String type;
     private long timePosted;
     private long timeLastEdited;
