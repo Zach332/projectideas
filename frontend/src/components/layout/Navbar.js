@@ -24,7 +24,7 @@ export default function Navbar() {
     
     return (
         <div>
-            <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+            <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
                 <a className="navbar-brand" href="/">
                     <img src={NameLogo} alt="" />
                 </a>
