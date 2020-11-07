@@ -36,7 +36,7 @@ public class DatabaseController {
     }
 
     @PutMapping("/api/users/{id}")
-    public void updateUsername(@PathVariable String id, @RequestBody UserDTO userDTO) {
+    public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             user.get().setUsername(userDTO.username);
