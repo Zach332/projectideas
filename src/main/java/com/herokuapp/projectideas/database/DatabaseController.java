@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,11 +20,6 @@ public class DatabaseController {
 
     @Autowired
     private Database database;
-
-    @GetMapping("/api/test")
-    public List<Idea> getIdeas() {
-        return database.findAllIdeas();
-    }
 
     @GetMapping("/api/users")
     public List<User> getAllUsers() {
@@ -35,15 +31,25 @@ public class DatabaseController {
         return database.findUser(id);
     }
 
-    // @PostMapping("/api/users")
-    // public void createUser(@RequestBody UserDTO userDTO) {
-    //     // TODO: Validate input (e.g. username already taken)
-    //     User user = new User(userDTO.username, userDTO.email);
-    //     database.save(user);
-    // }
+    @PostMapping("/api/users")
+    public void createUser(@RequestBody UserDTO userDTO) {
+        // TODO: Validate input (e.g. username already taken)
+        User user = new User(userDTO.username, userDTO.email);
+        database.createUser(user);
+    }
+
+    @PutMapping("/api/users/{id}")
+    public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+        Optional<User> user = database.findUser(id);
+        if (user.isPresent()) {
+            user.get().setUsername(userDTO.username);
+            user.get().setEmail(userDTO.email);
+            database.updateUser(id, user.get());
+        }
+    }
 
     @GetMapping("/api/ideas")
-    public Iterable<Idea> getAllIdeas() {
+    public List<Idea> getAllIdeas() {
         return database.findAllIdeas();
     }
 
@@ -52,16 +58,16 @@ public class DatabaseController {
         return database.findIdea(id);
     }
 
-    // @PostMapping("/api/ideas")
-    // public void createIdea(@RequestBody IdeaDTO ideaDTO) {
-    //     Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
-    //     ideaRepository.save(idea);
-    // }
+    @PostMapping("/api/ideas")
+    public void createIdea(@RequestBody IdeaDTO ideaDTO) {
+        Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
+        database.createIdea(idea);
+    }
 
-    // @DeleteMapping("/api/ideas/{id}")
-    // public void deleteIdea(@PathVariable String id) {
-    //     database.delete(id);
-    // }
+    @DeleteMapping("/api/ideas/{id}")
+    public void deleteIdea(@PathVariable String id) {
+        database.deleteIdea(id);
+    }
 
     static class IdeaDTO {
         public String authorUsername;

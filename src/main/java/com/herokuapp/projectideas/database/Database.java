@@ -8,7 +8,9 @@ import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.models.PartitionKey;
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
 
@@ -36,7 +38,7 @@ public class Database {
     }
 
     public Optional<User> findUser(String id) {
-        return optionalQuery("SELECT * FROM c WHERE c.type = 'User' AND c.id = " + id, User.class);
+        return optionalQuery("SELECT * FROM c WHERE c.type = 'User' AND c.id = '" + id + "'", User.class);
     }
 
     public List<Idea> findAllIdeas() {
@@ -44,7 +46,27 @@ public class Database {
     }
 
     public Optional<Idea> findIdea(String id) {
-        return optionalQuery("SELECT * FROM c WHERE c.type = 'User' AND c.id = " + id, Idea.class);
+        return optionalQuery("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + id + "'", Idea.class);
+    }
+
+    public void createUser(User user) {
+        container.createItem(user);
+    }
+
+    public void createIdea(Idea idea) {
+        container.createItem(idea);
+    }
+
+    public void updateUser(String id, User user) {
+        container.replaceItem(user, id, new PartitionKey("User"), new CosmosItemRequestOptions());
+    }
+
+    public void deleteUser(String id) {
+        container.deleteItem(id, new PartitionKey("User"), new CosmosItemRequestOptions());
+    }
+
+    public void deleteIdea(String id) {
+        container.deleteItem(id, new PartitionKey("Idea"), new CosmosItemRequestOptions());
     }
 
     private <T> List<T> listQuery(String query, Class<T> object) {
