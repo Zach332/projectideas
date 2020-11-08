@@ -1,4 +1,5 @@
 import { createGlobalState } from 'react-hooks-global-state';
+import axios from 'axios'
 
 export const persistenceKey = 'projectideas_persistent_storage'
 
@@ -15,7 +16,9 @@ const user = JSON.parse(userFromStorage)
 
 const initialState = userFromStorage === null || !user.id
 	? firstState
-	: { user }
+    : { user }
+    
+axios.defaults.headers.common['authorization'] = initialState.user.id;
 
 const { setGlobalState, useGlobalState } = createGlobalState(initialState);
 
@@ -25,6 +28,7 @@ export const login = (username, id) => {
         username: username,
         id: id
     }))
+    axios.defaults.headers.common['authorization'] = id;
 };
 
 export const logout = () => {
