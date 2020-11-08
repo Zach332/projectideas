@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { login, useGlobalState } from '../../State'
+import { login, logout, useGlobalState } from '../../State'
+import LoginWarning from '../logins/LoginWarning'
 import axios from 'axios'
 
 export default function Profile() {
@@ -61,6 +62,13 @@ export default function Profile() {
         )
     }
 
+    const onCLick = () => {
+        logout()
+    }
+
+    if(!user.loggedIn) {
+        return <LoginWarning />
+    }
     
     return (
         <div>
@@ -75,6 +83,9 @@ export default function Profile() {
                     Primary email from GitHub
                 </small>
             </form>
+                <button type="button" onClick={onCLick} className="btn btn-danger btn-md">
+                    Log Out
+                </button>
         </div>
     )
 }

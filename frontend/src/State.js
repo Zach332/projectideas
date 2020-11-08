@@ -27,4 +27,8 @@ export const login = (username, id) => {
     }))
 };
 
+export const logout = () => {
+    setGlobalState('user', firstState)
+};
+
 export { useGlobalState };

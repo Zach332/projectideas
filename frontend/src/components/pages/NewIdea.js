@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import CheckMark from "../../check.svg"
+import LoginWarning from '../logins/LoginWarning'
 import { useGlobalState } from '../../State'
 
 export default function NewIdea() {
@@ -27,6 +28,10 @@ export default function NewIdea() {
         })
         setSubmitted(true)
         event.preventDefault()
+    }
+
+    if(!user.loggedIn) {
+        return <LoginWarning />
     }
 
     if(!submitted) {
