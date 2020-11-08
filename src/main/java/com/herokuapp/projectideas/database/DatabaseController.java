@@ -2,7 +2,6 @@ package com.herokuapp.projectideas.database;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Map;
 
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
@@ -39,7 +38,7 @@ public class DatabaseController {
 
     @PutMapping("/api/users/{id}")
     public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
-        //todo: validate that username is unique
+        // TODO: validate that username is unique
         Optional<User> user = database.findUser(id);
         if (user.isPresent()) {
             user.get().setUsername(userDTO.username);
