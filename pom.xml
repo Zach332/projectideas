@@ -43,8 +43,8 @@
 
         <dependency>
             <groupId>com.azure</groupId>
-            <artifactId>azure-spring-data-cosmos</artifactId>
-            <version>3.1.0</version>
+            <artifactId>azure-cosmos</artifactId>
+            <version>4.8.0</version>
         </dependency>
 
         <dependency>

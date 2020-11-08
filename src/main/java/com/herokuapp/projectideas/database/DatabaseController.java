@@ -1,12 +1,11 @@
 package com.herokuapp.projectideas.database;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
-import com.herokuapp.projectideas.database.repositories.IdeaRepository;
-import com.herokuapp.projectideas.database.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,58 +21,62 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class DatabaseController {
-    
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
-    private IdeaRepository ideaRepository;
+    private Database database;
 
     @GetMapping("/api/users/{id}")
     public Optional<User> getUser(@PathVariable String id) {
-        return userRepository.findById(id);
+        return database.findUser(id);
+    }
+
+    @PostMapping("/api/users")
+    public void createUser(@RequestBody UserDTO userDTO) {
+        // TODO: Validate input (e.g. username already taken)
+        User user = new User(userDTO.username, userDTO.email);
+        database.createUser(user);
     }
 
     @PutMapping("/api/users/{id}")
     public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
-        Optional<User> user = userRepository.findById(id);
         //todo: validate that username is unique
+        Optional<User> user = database.findUser(id);
         if (user.isPresent()) {
             user.get().setUsername(userDTO.username);
             user.get().setEmail(userDTO.email);
-            userRepository.save(user.get());
+            database.updateUser(id, user.get());
         }
     }
 
     @GetMapping("/api/ideas")
-    public Iterable<Idea> getAllIdeas() {
-        return ideaRepository.findAll();
+    public List<Idea> getAllIdeas() {
+        return database.findAllIdeas();
     }
 
     @GetMapping("/api/ideas/{id}")
     public Optional<Idea> getIdea(@PathVariable String id) {
-        return ideaRepository.findById(id);
+        return database.findIdea(id);
     }
 
     @PostMapping("/api/ideas")
     public void createIdea(@RequestHeader("authorization") String userId, @RequestBody IdeaDTO ideaDTO) {
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> user = database.findUser(userId);
         if(!user.isPresent() || !user.get().getUsername().equals(ideaDTO.authorUsername)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
-        ideaRepository.save(idea);
+        database.createIdea(idea);
     }
 
     @DeleteMapping("/api/ideas/{id}")
     public void deleteIdea(@RequestHeader("authorization") String userId, @PathVariable String id) {
-        Optional<Idea> ideaToDelete = ideaRepository.findById(id);
-        Optional<User> user = userRepository.findById(userId);
+        Optional<Idea> ideaToDelete = database.findIdea(id);
+        Optional<User> user = database.findUser(userId);
         if(!ideaToDelete.isPresent()) { return; }
         if(!user.isPresent() || !user.get().getUsername().equals(ideaToDelete.get().getAuthorUsername())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        ideaRepository.deleteById(id);
+        database.deleteIdea(id);
     }
 
     static class IdeaDTO {

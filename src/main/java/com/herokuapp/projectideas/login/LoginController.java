@@ -1,11 +1,10 @@
 package com.herokuapp.projectideas.login;
 
 import java.io.RandomAccessFile;
-import java.util.Iterator;
 import java.util.Optional;
 
+import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.documents.User;
-import com.herokuapp.projectideas.database.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,14 +13,14 @@ import org.springframework.stereotype.Component;
 public class LoginController {
 
     @Autowired
-    UserRepository userRepository;
+    Database database;
 
     public User getUserByEmail(String email) {
-        Iterator<User> iterator = userRepository.findByEmail(email).iterator();
-        if (!iterator.hasNext()) {
-            return userRepository.save(new User(generateUsername(), email));
+        Optional<User> user = database.findUserByEmail(email);
+        if (!user.isPresent()) {
+            return database.createUser(new User(generateUsername(), email));
         }
-        return iterator.next();
+        return user.get();
     }
 
     private String generateUsername() {
