@@ -43,20 +43,20 @@ export default function User() {
         usernameForm = (
             <form className="form-inline my-5" onSubmit={handleChange}>
                 <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
-                <div className="form-group mx-sm-3 mb-2">
-                    <input type="text" className="form-control" id="username" placeholder={userData.username} readOnly/>
+                <div className="mx-sm-3">
+                    <input type="text" className="form-control" id="username" value={userData.username} readOnly/>
                 </div>
-                <button type="submit" className="btn btn-primary mb-2">Change</button>
+                <button type="submit" className="btn btn-primary">Change</button>
             </form>
         )
     } else {
         usernameForm = (
             <form className="form-inline my-5" onSubmit={handleSubmit}>
                 <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
-                <div className="form-group mx-sm-3 mb-2">
+                <div className="mx-sm-3">
                     <input type="text" className="form-control" id="username" placeholder="AwesomeNewUsername" onChange={handleInputChange} />
                 </div>
-                <button type="submit" className="btn btn-primary mb-2">Submit</button>
+                <button type="submit" className="btn btn-primary">Submit</button>
             </form>
         )
     }
@@ -66,9 +66,15 @@ export default function User() {
         <div>
             <h1>Profile</h1>
             {usernameForm}
-            <p><span className="pr-5"><strong>Email</strong></span> {userData.email}
-                <br></br><small>Primary email from GitHub</small>
-            </p>
+            <form className="form-inline my-5">
+                <label htmlFor="email" className="col-sm-2 col-form-label">Email</label>
+                <div className="mx-sm-3">
+                    <input type="text" className="form-control" id="email" value={userData.email} readOnly/>
+                </div>
+                <small id="emailCOmment" class="form-text text-muted">
+                    Primary email from GitHub
+                </small>
+            </form>
         </div>
     )
 }
