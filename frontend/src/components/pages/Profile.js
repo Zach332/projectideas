@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { login, useGlobalState } from '../../State'
 import axios from 'axios'
 
-export default function User() {
+export default function Profile() {
     const [ user ] = useGlobalState('user')
     const [userData, setUserData] = React.useState([])
     const [changingUsername, setChangingUsername] = React.useState(false)

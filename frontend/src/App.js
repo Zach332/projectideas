@@ -6,7 +6,7 @@ import About from './components/pages/About'
 import Privacy from './components/pages/Privacy'
 import NotFound from './components/pages/NotFound'
 import Idea from './components/pages/Idea'
-import User from './components/pages/User'
+import Profile from './components/pages/Profile'
 import NewIdea from './components/pages/NewIdea'
 import GitHubLogin from './components/logins/GitHubLogin'
 import LoginLanding from './components/logins/LoginLanding'
@@ -25,7 +25,7 @@ function App () {
                         <Route path="/about" exact component={About} />
                         <Route path="/privacy" exact component={Privacy} />
                         <Route path="/idea/:id" exact component={Idea} />
-                        <Route path="/user/:id" exact component={User} />
+                        <Route path="/profile" exact component={Profile} />
                         <Route component={NotFound} />
                     </Switch>
                 </div>
