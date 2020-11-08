@@ -1,11 +1,10 @@
 package com.herokuapp.projectideas.database;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
-import com.herokuapp.projectideas.database.repositories.IdeaRepository;
-import com.herokuapp.projectideas.database.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,59 +17,56 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DatabaseController {
-    
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
-    private IdeaRepository ideaRepository;
+    private Database database;
 
     @GetMapping("/api/users")
-    public Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<User> getAllUsers() {
+        return database.findAllUsers();
     }
 
     @GetMapping("/api/users/{id}")
     public Optional<User> getUser(@PathVariable String id) {
-        return userRepository.findById(id);
-    }
-
-    @PutMapping("/api/users/{id}")
-    public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            user.get().setUsername(userDTO.username);
-            user.get().setEmail(userDTO.email);
-            userRepository.save(user.get());
-        }
+        return database.findUser(id);
     }
 
     @PostMapping("/api/users")
     public void createUser(@RequestBody UserDTO userDTO) {
         // TODO: Validate input (e.g. username already taken)
         User user = new User(userDTO.username, userDTO.email);
-        userRepository.save(user);
+        database.createUser(user);
+    }
+
+    @PutMapping("/api/users/{id}")
+    public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+        Optional<User> user = database.findUser(id);
+        if (user.isPresent()) {
+            user.get().setUsername(userDTO.username);
+            user.get().setEmail(userDTO.email);
+            database.updateUser(id, user.get());
+        }
     }
 
     @GetMapping("/api/ideas")
-    public Iterable<Idea> getAllIdeas() {
-        return ideaRepository.findAll();
+    public List<Idea> getAllIdeas() {
+        return database.findAllIdeas();
     }
 
     @GetMapping("/api/ideas/{id}")
     public Optional<Idea> getIdea(@PathVariable String id) {
-        return ideaRepository.findById(id);
+        return database.findIdea(id);
     }
 
     @PostMapping("/api/ideas")
     public void createIdea(@RequestBody IdeaDTO ideaDTO) {
         Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
-        ideaRepository.save(idea);
+        database.createIdea(idea);
     }
 
     @DeleteMapping("/api/ideas/{id}")
     public void deleteIdea(@PathVariable String id) {
-        ideaRepository.deleteById(id);
+        database.deleteIdea(id);
     }
 
     static class IdeaDTO {

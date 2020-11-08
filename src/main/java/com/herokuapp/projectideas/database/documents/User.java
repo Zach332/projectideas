@@ -2,17 +2,9 @@ package com.herokuapp.projectideas.database.documents;
 
 import java.util.UUID;
 
-import com.azure.spring.data.cosmos.core.mapping.Container;
-import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
-
-import org.springframework.data.annotation.Id;
-
-@Container(containerName = "Production", ru = "400", autoCreateContainer = false)
 public class User {
 
-    @Id
     private String id;
-    @PartitionKey
     private String type;
     private String username;
     private String email;
