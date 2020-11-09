@@ -8,6 +8,10 @@ export default function Profile() {
     const [userData, setUserData] = React.useState([])
     const [changingUsername, setChangingUsername] = React.useState(false)
 
+    if(!user.loggedIn) {
+        return <LoginWarning />
+    }
+
     useEffect(() => {
         axios.get("/api/users/"+user.id).then((response) => {
             setUserData(response.data)
@@ -45,7 +49,7 @@ export default function Profile() {
             <form className="form-inline my-5" onSubmit={handleChange}>
                 <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
                 <div className="mx-sm-3">
-                    <input type="text" className="form-control" id="username" value={userData.username} readOnly/>
+                    <input type="text" className="form-control" id="username" defaultValue={userData.username} readOnly/>
                 </div>
                 <button type="submit" className="btn btn-primary">Change</button>
             </form>
@@ -65,10 +69,6 @@ export default function Profile() {
     const onCLick = () => {
         logout()
     }
-
-    if(!user.loggedIn) {
-        return <LoginWarning />
-    }
     
     return (
         <div>
@@ -77,9 +77,9 @@ export default function Profile() {
             <form className="form-inline my-5">
                 <label htmlFor="email" className="col-sm-2 col-form-label">Email</label>
                 <div className="mx-sm-3">
-                    <input type="text" className="form-control" id="email" value={userData.email} readOnly/>
+                    <input type="text" className="form-control" id="email" defaultValue={userData.email} readOnly/>
                 </div>
-                <small id="emailCOmment" class="form-text text-muted">
+                <small id="emailComment" className="form-text text-muted">
                     Primary email from GitHub
                 </small>
             </form>
