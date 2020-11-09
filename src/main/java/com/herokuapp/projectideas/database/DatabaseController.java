@@ -38,7 +38,7 @@ public class DatabaseController {
 
     @PutMapping("/api/users/{id}")
     public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
-        // TODO: validate that username is unique
+        // TODO: validate that username is unique. Also check that the username actually changed
         Optional<User> user = database.findUser(id);
         if (user.isPresent()) {
             user.get().setUsername(userDTO.username);
