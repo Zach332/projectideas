@@ -3,10 +3,10 @@ import CheckMark from "../../check.svg"
 import XMark from "../../x.svg"
 import { toParams } from '../utils/Routing'
 import axios from 'axios'
-import { login } from '../../State'
+import { login, Status } from '../../State'
 
 export default function LoginLanding() {
-    const [status, setStatus] = React.useState('loading')
+    const [status, setStatus] = React.useState(Status.loading)
 
 
     useEffect(() => {
@@ -22,20 +22,20 @@ export default function LoginLanding() {
             code: data.code
         }).then((response) => {
             login(response.data.username, response.data.id)
-            setStatus('success')
+            setStatus(Status.Success)
         }).catch(err => {
             onFailure(err);
         })
     }
     const onFailure = (error) => {
         console.log("Failure to retrieve code from login data: "+error)
-        setStatus('failure')
+        setStatus(Status.Failure)
     }
 
     let result
-    if(status == 'success') {
+    if(status == Status.Success) {
         result = <img src={CheckMark} className="mx-auto d-block pt-4" alt="Successful login" />
-    } else if(status == 'failure') {
+    } else if(status == Status.Failure) {
         result = (
             <div className="text-center">
                 <img src={XMark} className="mx-auto w-25 d-block py-4" alt="Login failed" />

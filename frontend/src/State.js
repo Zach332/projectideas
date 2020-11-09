@@ -1,6 +1,12 @@
 import { createGlobalState } from 'react-hooks-global-state';
 import axios from 'axios'
 
+export const Status = {
+    Loading: "Loading",
+    Success: "Success",
+    Failure: "Failure"
+}
+
 export const persistenceKey = 'projectideas_persistent_storage'
 
 const firstState = {
