@@ -8,14 +8,12 @@ export default function Profile() {
     const [userData, setUserData] = React.useState([])
     const [changingUsername, setChangingUsername] = React.useState(false)
 
-    if(!user.loggedIn) {
-        return <LoginWarning />
-    }
-
     useEffect(() => {
-        axios.get("/api/users/"+user.id).then((response) => {
-            setUserData(response.data)
-        })
+        if(user.loggedIn) {
+            axios.get("/api/users/"+user.id).then((response) => {
+                setUserData(response.data)
+            })
+        }
     },[])
 
     const handleInputChange = (event) => {
@@ -68,6 +66,10 @@ export default function Profile() {
 
     const onCLick = () => {
         logout()
+    }
+
+    if(!user.loggedIn) {
+        return <LoginWarning />
     }
     
     return (
