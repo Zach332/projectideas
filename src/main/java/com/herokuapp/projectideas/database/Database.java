@@ -35,10 +35,6 @@ public class Database {
         postContainer = database.getContainer("posts");
     }
 
-    public List<User> findAllUsers() {
-        return userContainer.queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(), User.class).stream().collect(Collectors.toList());
-    }
-
     public Optional<User> findUser(String id) {
         return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
     }
@@ -60,7 +56,7 @@ public class Database {
     }
 
     public Idea createIdea(Idea idea) {
-        return userContainer.createItem(idea).getItem();
+        return postContainer.createItem(idea).getItem();
     }
 
     public User updateUser(String id, User user) {
@@ -72,6 +68,6 @@ public class Database {
     }
 
     public void deleteIdea(String id) {
-        userContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
+        postContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 }
