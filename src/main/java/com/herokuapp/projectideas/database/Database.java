@@ -22,62 +22,52 @@ public class Database {
 
     private CosmosClient client;
     private CosmosDatabase database;
-    private CosmosContainer container;
+    private CosmosContainer userContainer;
+    private CosmosContainer postContainer;
 
-    public Database(@Value("${azure.cosmos.uri}") String uri, @Value("${azure.cosmos.key}") String key, @Value("${azure.cosmos.database}") String databaseName, @Value("${azure.cosmos.container}") String containerName) {
+    public Database(@Value("${azure.cosmos.uri}") String uri, @Value("${azure.cosmos.key}") String key, @Value("${azure.cosmos.database}") String databaseName) {
         client = new CosmosClientBuilder()
             .endpoint(uri)
             .key(key)
             .buildClient();
         database = client.getDatabase(databaseName);
-        container = database.getContainer(containerName);
-    }
-
-    public List<User> findAllUsers() {
-        return listQuery("SELECT * FROM c WHERE c.type = 'User'", User.class);
+        userContainer = database.getContainer("users");
+        postContainer = database.getContainer("posts");
     }
 
     public Optional<User> findUser(String id) {
-        return optionalQuery("SELECT * FROM c WHERE c.type = 'User' AND c.id = '" + id + "'", User.class);
+        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
     }
 
     public Optional<User> findUserByEmail(String email) {
-        return optionalQuery("SELECT * FROM c WHERE c.type = 'User' AND c.email = '" + email + "'", User.class);
+        return userContainer.queryItems("SELECT * FROM c WHERE c.email = '" + email + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
     }
 
     public List<Idea> findAllIdeas() {
-        return listQuery("SELECT * FROM c WHERE c.type = 'Idea'", Idea.class);
+        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea'", new CosmosQueryRequestOptions(), Idea.class).stream().collect(Collectors.toList());
     }
 
     public Optional<Idea> findIdea(String id) {
-        return optionalQuery("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + id + "'", Idea.class);
+        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
     }
 
     public User createUser(User user) {
-        return container.createItem(user).getItem();
+        return userContainer.createItem(user).getItem();
     }
 
     public Idea createIdea(Idea idea) {
-        return container.createItem(idea).getItem();
+        return postContainer.createItem(idea).getItem();
     }
 
     public User updateUser(String id, User user) {
-        return container.replaceItem(user, id, new PartitionKey("User"), new CosmosItemRequestOptions()).getItem();
+        return userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions()).getItem();
     }
 
     public void deleteUser(String id) {
-        container.deleteItem(id, new PartitionKey("User"), new CosmosItemRequestOptions());
+        userContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 
     public void deleteIdea(String id) {
-        container.deleteItem(id, new PartitionKey("Idea"), new CosmosItemRequestOptions());
-    }
-
-    private <T> List<T> listQuery(String query, Class<T> object) {
-        return container.queryItems(query, new CosmosQueryRequestOptions(), object).stream().collect(Collectors.toList());
-    }
-
-    private <T> Optional<T> optionalQuery(String query, Class<T> object) {
-        return container.queryItems(query, new CosmosQueryRequestOptions(), object).stream().findFirst();
+        postContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 }

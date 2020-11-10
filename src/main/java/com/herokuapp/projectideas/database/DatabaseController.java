@@ -63,7 +63,7 @@ public class DatabaseController {
         if(!user.isPresent() || !user.get().getUsername().equals(ideaDTO.authorUsername)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        Idea idea = new Idea(ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
+        Idea idea = new Idea(userId, ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
         database.createIdea(idea);
     }
 
