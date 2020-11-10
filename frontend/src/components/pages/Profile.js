@@ -2,8 +2,10 @@ import React, { useEffect } from 'react'
 import { login, logout, useGlobalState } from '../../State'
 import LoginWarning from '../logins/LoginWarning'
 import axios from 'axios'
+import { useToasts } from 'react-toast-notifications'
 
 export default function Profile() {
+    const { addToast } = useToasts()
     const [ user ] = useGlobalState('user')
     const [userData, setUserData] = React.useState([])
     const [changingUsername, setChangingUsername] = React.useState(false)
@@ -32,8 +34,12 @@ export default function Profile() {
             email: userData.email
         }).then((_response) => {
             login(userData.username, user.id)
+            addToast("Username changed successfully", { appearance: 'success', autoDismiss: true })
+            setChangingUsername(false)
+        }).catch(err => {
+            console.log("Error changing username: " + err);
+            addToast("Error changing username. Please try again.", { appearance: 'error' })
         })
-        setChangingUsername(false)
         event.preventDefault()
     }
     const handleChange = (event) => {
