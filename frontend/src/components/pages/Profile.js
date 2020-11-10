@@ -72,6 +72,7 @@ export default function Profile() {
 
     const onCLick = () => {
         logout()
+        addToast("Logged out successfully", { appearance: 'success', autoDismiss: true })
     }
 
     if(!user.loggedIn) {
