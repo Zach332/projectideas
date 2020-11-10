@@ -4,7 +4,8 @@ import axios from 'axios'
 export const Status = {
     Loading: "Loading",
     Success: "Success",
-    Failure: "Failure"
+    Failure: "Failure",
+    NotSubmitted: "NotSubmitted"
 }
 
 export const persistenceKey = 'projectideas_persistent_storage'

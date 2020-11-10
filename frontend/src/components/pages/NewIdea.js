@@ -2,11 +2,13 @@ import React from 'react'
 import axios from 'axios'
 import CheckMark from "../../check.svg"
 import LoginWarning from '../logins/LoginWarning'
-import { useGlobalState } from '../../State'
+import { useGlobalState, Status } from '../../State'
+import { useToasts } from 'react-toast-notifications'
 
 export default function NewIdea() {
+    const { addToast } = useToasts()
     const [idea, setIdea] = React.useState([{ title: '' , content: ''}])
-    const [submitted, setSubmitted] = React.useState(false)
+    const [ status, setStatus] = React.useState(Status.NotSubmitted)
     const [ user ] = useGlobalState('user')
 
     const handleInputChange = (event) => {
@@ -21,12 +23,17 @@ export default function NewIdea() {
     }
 
     const handleSubmit = (event) => {
-        axios.post("/api/ideas", {
+        axios.post("/api/ideass", {
             authorUsername: user.username,
             title: idea.title,
             content: idea.content
+        }).then(() => {
+            setStatus(Status.Success)
+        }).catch(err => {
+            console.log("Error submitting post: " + err);
+            setStatus(Status.Failure)
+            addToast("Your post was not submitted. Please try again.", { appearance: 'error' })
         })
-        setSubmitted(true)
         event.preventDefault()
     }
 
@@ -34,7 +41,7 @@ export default function NewIdea() {
         return <LoginWarning />
     }
 
-    if(!submitted) {
+    if(status === Status.NotSubmitted || status === Status.Failure) {
         return (
             <div className="mx-auto pt-4">
                 <form onSubmit={handleSubmit}>
@@ -50,7 +57,7 @@ export default function NewIdea() {
                 </form>
             </div>
         )
-    } else {
+    } else if(status === Status.Success) {
         return (
             <div>
                 <img src={CheckMark} class="mx-auto d-block pt-4" alt="Successful login" />
