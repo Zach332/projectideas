@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import IdeaCard from '../IdeaCard'
 
 export default function Idea() {
     const [idea, setIdea] = React.useState([])
@@ -15,8 +16,7 @@ export default function Idea() {
     
     return (
         <div>
-            <h1>{idea.title}</h1>
-            {idea.content}
+            <IdeaCard title={idea.title} content={idea.content} />
         </div>
     )
 }

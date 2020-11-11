@@ -4,6 +4,7 @@ import CheckMark from "../../check.svg"
 import LoginWarning from '../logins/LoginWarning'
 import { useGlobalState, Status } from '../../State'
 import { useToasts } from 'react-toast-notifications'
+import IdeaCard from '../IdeaCard'
 
 export default function NewIdea() {
     const { addToast } = useToasts()
@@ -55,6 +56,7 @@ export default function NewIdea() {
                     </div>
                     <button type="submit" className="btn btn-primary">Post Idea</button>
                 </form>
+                <IdeaCard title={idea.title} content={idea.content} />
             </div>
         )
     } else if(status === Status.Success) {
