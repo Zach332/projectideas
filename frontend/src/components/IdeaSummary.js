@@ -1,6 +1,7 @@
 import React from 'react'
 
 export default function IdeaSummary({idea}) {
+    const removeMd = require('remove-markdown');
     var ideaLink = "/idea/"+idea.id
     var date = new Date(idea.timePosted * 1000)
 
@@ -10,7 +11,7 @@ export default function IdeaSummary({idea}) {
                 <h5 className="mb-1">{idea.title}</h5>
                 <small className="text-muted">{date.toLocaleDateString()}</small>
             </div>
-            <p className="mb-1">{idea.content}</p>
+            <p className="mb-1">{removeMd(idea.content)}</p>
             <small className="text-muted">By {idea.authorUsername}</small>
         </a>
 	);
