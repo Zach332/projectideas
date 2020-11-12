@@ -63,7 +63,7 @@ public class Database {
 
     public User updateUser(String id, User user) {
         userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions());
-        return userContainer.queryItems("SELECT * FROM c WHERE c.type = 'User' AND c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
+        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public void deleteUser(String id) {
