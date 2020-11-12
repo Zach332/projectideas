@@ -7,7 +7,7 @@ export default function IdeaCard(props) {
             <div className="card-header">
                 <h1>{props.title}</h1>
             </div>
-            <div className="card-body">
+            <div className="card-body embed-responsive">
                 <ReactMarkdown>{props.content}</ReactMarkdown>
             </div>
         </div>
