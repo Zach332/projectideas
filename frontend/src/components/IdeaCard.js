@@ -3,11 +3,11 @@ import ReactMarkdown from 'react-markdown'
 
 export default function IdeaCard(props) {
     return (
-        <div class="card m-4">
-            <div class="card-header">
+        <div className="card m-4">
+            <div className="card-header">
                 <h1>{props.title}</h1>
             </div>
-            <div class="card-body">
+            <div className="card-body">
                 <ReactMarkdown>{props.content}</ReactMarkdown>
             </div>
         </div>
