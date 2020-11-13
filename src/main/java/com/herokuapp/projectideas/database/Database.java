@@ -52,15 +52,18 @@ public class Database {
     }
 
     public User createUser(User user) {
-        return userContainer.createItem(user).getItem();
+        userContainer.createItem(user);
+        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + user.getId() + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public Idea createIdea(Idea idea) {
-        return postContainer.createItem(idea).getItem();
+        postContainer.createItem(idea);
+        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + idea.getId() + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst().get();
     }
 
     public User updateUser(String id, User user) {
-        return userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions()).getItem();
+        userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions());
+        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public void deleteUser(String id) {
