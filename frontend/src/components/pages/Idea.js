@@ -18,10 +18,10 @@ export default function Idea() {
     return (
         <div class="container-fluid">
             <div class="row">
-                <div class="col-8">
+                <div class="col-lg-8 col-md-8 col-sm-auto mb-2">
                     <IdeaCard title={idea.title} content={idea.content} />
                 </div>
-                <div class="col-md-auto">
+                <div class="col-md-auto col-sm-auto">
                     <ul class="card list-group list-group-flush">
                         <li class="list-group-item">By {idea.authorUsername}<br></br>on {date.toLocaleDateString()}</li>
                         <li class="list-group-item">
