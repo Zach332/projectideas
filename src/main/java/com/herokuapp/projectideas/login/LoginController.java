@@ -1,5 +1,10 @@
 package com.herokuapp.projectideas.login;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.Optional;
 
@@ -17,11 +22,22 @@ public class LoginController {
     @Autowired
     Database database;
 
-    @Value("classpath:adjectives.txt")
-    private Resource adjectivesFile;
+    private File adjectivesTempFile;
+    private File nounsTempFile;
 
-    @Value("classpath:nouns.txt")
-    private Resource nounsFile;
+    public LoginController(@Value("classpath:adjectives.txt") Resource adjectives, @Value("classpath:nouns.txt") Resource nouns) {
+        try {
+            adjectivesTempFile = File.createTempFile("projectideas-adjectives", ".tmp");
+            adjectivesTempFile.deleteOnExit();
+            copyStream(adjectives.getInputStream(), new FileOutputStream(adjectivesTempFile));
+
+            nounsTempFile = File.createTempFile("projectideas-nouns", ".tmp");
+            nounsTempFile.deleteOnExit();
+            copyStream(nouns.getInputStream(), new FileOutputStream(nounsTempFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public User getUserByEmail(String email) {
         Optional<User> user = database.findUserByEmail(email);
@@ -33,8 +49,8 @@ public class LoginController {
 
     private String generateUsername() {
         try {
-            RandomAccessFile adjectives = new RandomAccessFile(adjectivesFile.getFile(), "r");
-            RandomAccessFile nouns = new RandomAccessFile(nounsFile.getFile(), "r");
+            RandomAccessFile adjectives = new RandomAccessFile(adjectivesTempFile, "r");
+            RandomAccessFile nouns = new RandomAccessFile(nounsTempFile, "r");
             long randomLocation = (long) (Math.random() * (adjectives.length()-1));
             adjectives.seek(randomLocation);
             randomLocation = (long) (Math.random() * (nouns.length()-1));
@@ -50,6 +66,14 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
             return "";
+        }
+    }
+
+    private static void copyStream(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
         }
     }
 }
