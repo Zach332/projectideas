@@ -14,9 +14,29 @@ export default function Idea() {
     },[])
 
     
+    var date = new Date(idea.timePosted * 1000)
     return (
-        <div>
-            <IdeaCard title={idea.title} content={idea.content} />
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-8">
+                    <IdeaCard title={idea.title} content={idea.content} />
+                </div>
+                <div class="col-md-auto">
+                    <ul class="card list-group list-group-flush">
+                        <li class="list-group-item">By {idea.authorUsername}<br></br>on {date.toLocaleDateString()}</li>
+                        <li class="list-group-item">
+                            <button type="button" className="btn btn-outline-secondary btn-md">
+                                Message author
+                            </button>
+                        </li>
+                        <li class="list-group-item">
+                            <button type="button" className="btn btn-primary btn-md">
+                                Work on this idea
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     )
 }
