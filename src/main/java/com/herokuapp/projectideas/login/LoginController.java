@@ -22,18 +22,19 @@ public class LoginController {
     @Autowired
     Database database;
 
-    private File adjectivesTempFile;
-    private File nounsTempFile;
+    private File adjectivesFile;
+    private File nounsFile;
 
+    // TODO Annotate this with production config
     public LoginController(@Value("classpath:adjectives.txt") Resource adjectives, @Value("classpath:nouns.txt") Resource nouns) {
         try {
-            adjectivesTempFile = File.createTempFile("projectideas-adjectives", ".tmp");
-            adjectivesTempFile.deleteOnExit();
-            copyStream(adjectives.getInputStream(), new FileOutputStream(adjectivesTempFile));
+            adjectivesFile = File.createTempFile("projectideas-adjectives", ".tmp");
+            adjectivesFile.deleteOnExit();
+            copyStream(adjectives.getInputStream(), new FileOutputStream(adjectivesFile));
 
-            nounsTempFile = File.createTempFile("projectideas-nouns", ".tmp");
-            nounsTempFile.deleteOnExit();
-            copyStream(nouns.getInputStream(), new FileOutputStream(nounsTempFile));
+            nounsFile = File.createTempFile("projectideas-nouns", ".tmp");
+            nounsFile.deleteOnExit();
+            copyStream(nouns.getInputStream(), new FileOutputStream(nounsFile));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,8 +50,8 @@ public class LoginController {
 
     private String generateUsername() {
         try {
-            RandomAccessFile adjectives = new RandomAccessFile(adjectivesTempFile, "r");
-            RandomAccessFile nouns = new RandomAccessFile(nounsTempFile, "r");
+            RandomAccessFile adjectives = new RandomAccessFile(adjectivesFile, "r");
+            RandomAccessFile nouns = new RandomAccessFile(nounsFile, "r");
             long randomLocation = (long) (Math.random() * (adjectives.length()-1));
             adjectives.seek(randomLocation);
             randomLocation = (long) (Math.random() * (nouns.length()-1));
