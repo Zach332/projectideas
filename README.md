@@ -17,4 +17,5 @@ projectideas is a solution that enables developers to work on projects that solv
 
 
 
-projectideas encourages developers to make their solutions inspired by proposals on this platform open source. We do not permit idea proposals that offer or request payment of any kind on our platform.
+
+<sub><sup>projectideas encourages developers to make their solutions inspired by proposals on this platform open source. We do not permit idea proposals that offer or request payment of any kind on our platform.</sub></sup>
