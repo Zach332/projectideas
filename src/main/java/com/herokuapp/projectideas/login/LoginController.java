@@ -13,6 +13,8 @@ import com.herokuapp.projectideas.database.documents.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -25,16 +27,22 @@ public class LoginController {
     private File adjectivesFile;
     private File nounsFile;
 
-    // TODO Annotate this with production config
-    public LoginController(@Value("classpath:adjectives.txt") Resource adjectives, @Value("classpath:nouns.txt") Resource nouns) {
+    public LoginController(@Autowired Environment environment, @Value("classpath:adjectives.txt") Resource adjectives, @Value("classpath:nouns.txt") Resource nouns) {
         try {
-            adjectivesFile = File.createTempFile("projectideas-adjectives", ".tmp");
-            adjectivesFile.deleteOnExit();
-            copyStream(adjectives.getInputStream(), new FileOutputStream(adjectivesFile));
+            if (environment.acceptsProfiles(Profiles.of("prod"))) {
+                adjectivesFile = File.createTempFile("projectideas-adjectives", ".tmp");
+                adjectivesFile.deleteOnExit();
+                copyStream(adjectives.getInputStream(), new FileOutputStream(adjectivesFile));
 
-            nounsFile = File.createTempFile("projectideas-nouns", ".tmp");
-            nounsFile.deleteOnExit();
-            copyStream(nouns.getInputStream(), new FileOutputStream(nounsFile));
+                nounsFile = File.createTempFile("projectideas-nouns", ".tmp");
+                nounsFile.deleteOnExit();
+                copyStream(nouns.getInputStream(), new FileOutputStream(nounsFile));
+            }
+            else {
+                adjectivesFile = adjectives.getFile();
+                nounsFile = nouns.getFile();
+            }
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
