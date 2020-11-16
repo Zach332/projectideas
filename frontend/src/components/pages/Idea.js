@@ -16,20 +16,20 @@ export default function Idea() {
     
     var date = new Date(idea.timePosted * 1000)
     return (
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 col-md-8 col-sm-auto mb-2">
+        <div className="container-fluid">
+            <div className="row justify-content-center">
+                <div className="col-lg-8 col-md-8 col-sm-auto mb-2">
                     <IdeaCard title={idea.title} content={idea.content} />
                 </div>
-                <div class="col-md-auto col-sm-auto">
-                    <ul class="card list-group list-group-flush">
-                        <li class="list-group-item">By {idea.authorUsername}<br></br>on {date.toLocaleDateString()}</li>
-                        <li class="list-group-item">
+                <div className="col-md-auto col-sm-auto">
+                    <ul className="card list-group list-group-flush">
+                        <li className="list-group-item">By {idea.authorUsername}<br></br>on {date.toLocaleDateString()}</li>
+                        <li className="list-group-item">
                             <button type="button" className="btn btn-outline-secondary btn-md">
                                 Message author
                             </button>
                         </li>
-                        <li class="list-group-item">
+                        <li className="list-group-item">
                             <button type="button" className="btn btn-primary btn-md">
                                 Work on this idea
                             </button>
