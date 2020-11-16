@@ -4,9 +4,10 @@ import XMark from "../../x.svg"
 import { toParams } from '../utils/Routing'
 import axios from 'axios'
 import { login, Status } from '../../State'
+import Spinner from '../general/Spinner'
 
 export default function LoginLanding() {
-    const [status, setStatus] = React.useState(Status.loading)
+    const [status, setStatus] = React.useState(Status.Loading)
 
 
     useEffect(() => {
@@ -42,6 +43,10 @@ export default function LoginLanding() {
                 <h2>Login failed</h2>
                 <a className="btn btn-primary mt-4 btn-lg" href="/login" role="button">Try again</a>
             </div>
+        )
+    } else if(status == Status.Loading) {
+        result = (
+            <Spinner />
         )
     }
 
