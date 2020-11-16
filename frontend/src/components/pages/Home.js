@@ -21,7 +21,11 @@ export default function Home() {
 
     let ideaElements
     if(status == Status.Success) {
-        ideaElements = <div>{ideas.map(idea => <IdeaSummary key={idea.id} idea={idea} />)}</div>
+        ideaElements = (
+            <div className="container mx-auto">
+                {ideas.map(idea => <IdeaSummary key={idea.id} idea={idea} />)}
+            </div>
+        )
     } else if(status == Status.Loading) {
         ideaElements = <Spinner />
     }
