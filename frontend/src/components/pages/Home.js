@@ -1,18 +1,29 @@
 import React, { useEffect } from 'react'
 import IdeaSummary from './../IdeaSummary'
 import axios from 'axios'
+import { Status } from '../../State'
+import Spinner from '../general/Spinner'
 
 export default function Home() {
     const [ideas, setIdeas] = React.useState([])
+    const [status, setStatus] = React.useState(Status.Loading)
 
     useEffect(() => {
         axios.get("/api/ideas").then((response) => {
             setIdeas(response.data)
         })
+        setStatus(Status.Success)
     },[])
 
     const onCLick = () => {
         window.location.href = '/new-idea'
+    }
+
+    let ideaElements
+    if(status == Status.Success) {
+        ideaElements = <div>{ideas.map(idea => <IdeaSummary key={idea.id} idea={idea} />)}</div>
+    } else if(status == Status.Loading) {
+        ideaElements = <Spinner />
     }
 
     return (
@@ -26,7 +37,7 @@ export default function Home() {
                     New Idea
                 </button>
             </div>
-            {ideas.map(idea => <IdeaSummary key={idea.id} idea={idea} />)}
+            {ideaElements}
         </div>
     )
 }

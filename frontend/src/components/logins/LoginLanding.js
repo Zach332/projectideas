@@ -45,9 +45,7 @@ export default function LoginLanding() {
             </div>
         )
     } else if(status == Status.Loading) {
-        result = (
-            <Spinner />
-        )
+        result = <Spinner />
     }
 
     return (
