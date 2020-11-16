@@ -17,7 +17,7 @@ export default function Idea() {
     var date = new Date(idea.timePosted * 1000)
     return (
         <div class="container-fluid">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-8 col-md-8 col-sm-auto mb-2">
                     <IdeaCard title={idea.title} content={idea.content} />
                 </div>
