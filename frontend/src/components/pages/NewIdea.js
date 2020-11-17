@@ -56,6 +56,7 @@ export default function NewIdea() {
                     </div>
                     <button type="submit" className="btn btn-primary">Post Idea</button>
                 </form>
+                <p>Basic <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">Markdown</a> is supported. A preview of your idea is below.</p>
                 <IdeaCard title={idea.title} content={idea.content} />
             </div>
         )
