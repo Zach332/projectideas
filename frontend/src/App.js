@@ -9,6 +9,7 @@ import NotFound from './components/pages/NotFound'
 import Idea from './components/pages/Idea'
 import Profile from './components/pages/Profile'
 import NewIdea from './components/pages/NewIdea'
+import Messages from './components/pages/Messages'
 import GitHubLogin from './components/logins/GitHubLogin'
 import LoginLanding from './components/logins/LoginLanding'
 
@@ -28,6 +29,7 @@ function App () {
                             <Route path="/privacy" exact component={Privacy} />
                             <Route path="/idea/:id" exact component={Idea} />
                             <Route path="/profile" exact component={Profile} />
+                            <Route path="/messages" exact component={Messages} />
                             <Route component={NotFound} />
                         </Switch>
                     </div>
