@@ -44,8 +44,8 @@ export default function NewIdea() {
 
     if(status === Status.NotSubmitted || status === Status.Failure) {
         return (
-            <div className="mx-auto pt-4">
-                <form onSubmit={handleSubmit}>
+            <div className="mx-auto">
+                <form className="py-4" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="title">Title</label>
                         <input type="text" className="form-control" id="title" onChange={handleInputChange}/>
@@ -62,7 +62,7 @@ export default function NewIdea() {
     } else if(status === Status.Success) {
         return (
             <div>
-                <img src={CheckMark} className="mx-auto d-block pt-4" alt="Successful login" />
+                <img src={CheckMark} class="mx-auto d-block pt-4" alt="Successful login" />
             </div>
         )
     }
