@@ -62,7 +62,7 @@ export default function NewIdea() {
     } else if(status === Status.Success) {
         return (
             <div>
-                <img src={CheckMark} class="mx-auto d-block pt-4" alt="Successful login" />
+                <img src={CheckMark} className="mx-auto d-block pt-4" alt="Successful login" />
             </div>
         )
     }

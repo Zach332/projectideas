@@ -10,19 +10,19 @@ export default function Navbar() {
     }, [user]);
 
     let login
-    
+    let userLinks
     if(user.loggedIn) {
-        login = (
-            <div className="navbar-nav justify-content-end" id="navbarLogin">
+        userLinks = (
+            <ul className="navbar-nav ml-auto" id="navbarLogin">
                     <a className="nav-item active nav-link" href="/profile">
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-mailbox" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M4 4a3 3 0 0 0-3 3v6h6V7a3 3 0 0 0-3-3zm0-1h8a4 4 0 0 1 4 4v6a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V7a4 4 0 0 1 4-4zm2.646 1A3.99 3.99 0 0 1 8 7v6h7V7a3 3 0 0 0-3-3H6.646z"/>
-                            <path fill-rule="evenodd" d="M11.793 8.5H9v-1h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.354-.146l-.853-.854z"/>
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-mailbox" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fillRule="evenodd" d="M4 4a3 3 0 0 0-3 3v6h6V7a3 3 0 0 0-3-3zm0-1h8a4 4 0 0 1 4 4v6a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V7a4 4 0 0 1 4-4zm2.646 1A3.99 3.99 0 0 1 8 7v6h7V7a3 3 0 0 0-3-3H6.646z"/>
+                            <path fillRule="evenodd" d="M11.793 8.5H9v-1h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.354-.146l-.853-.854z"/>
                             <path d="M5 7c0 .552-.448 0-1 0s-1 .552-1 0a1 1 0 0 1 2 0z"/>
                         </svg>
                     </a>
                     <a className="nav-item active nav-link" href="/profile">{user.username}</a>
-            </div>
+            </ul>
         )
     } else {
         login = (
@@ -49,6 +49,7 @@ export default function Navbar() {
                             <a className="nav-link" href="/about">About</a>
                         </li>
                     </ul>
+                    {userLinks}
                 </div>
                 {login}
             </nav>
