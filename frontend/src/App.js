@@ -10,6 +10,7 @@ import Idea from './components/pages/Idea'
 import Profile from './components/pages/Profile'
 import NewIdea from './components/pages/NewIdea'
 import Messages from './components/pages/Messages'
+import Markdown from './components/pages/Markdown'
 import GitHubLogin from './components/logins/GitHubLogin'
 import LoginLanding from './components/logins/LoginLanding'
 
@@ -30,6 +31,7 @@ function App () {
                             <Route path="/idea/:id" exact component={Idea} />
                             <Route path="/profile" exact component={Profile} />
                             <Route path="/messages" exact component={Messages} />
+                            <Route path="/markdown" exact component={Markdown} />
                             <Route component={NotFound} />
                         </Switch>
                     </div>
