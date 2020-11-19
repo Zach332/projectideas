@@ -2,6 +2,13 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 
 export default function Markdown() {
+    const [ tryIt, setTryIt ] = React.useState('')
+
+    const handleInputChange = (event) => {
+        const target = event.target;
+        setTryIt(target.value);
+    }
+
     return (
         <div>
             <h1>Guide to basic Markdown syntax</h1>
@@ -17,7 +24,6 @@ export default function Markdown() {
                     {tableRow(headings)}
                     {tableRow(bold)}
                     {tableRow(italicized)}
-                    {tableRow(quote)}
                     {tableRow(orderedList)}
                     {tableRow(unorderedList)}
                     {tableRow(code)}
@@ -26,6 +32,28 @@ export default function Markdown() {
                     {tableRow(image)}
                 </tbody>
             </table>
+            <h1>Try it</h1>
+            <div class="container pt-4">
+                <div class="row">
+                    <div>
+                    <h6>Markdown</h6></div>
+                    <div class="col">
+                        <form>
+                            <div className="form-group">
+                                <textarea className="form-control" id="content" rows="20" onChange={handleInputChange}></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <h6>Output</h6>
+                    <div class="col">
+                        <div className="card">
+                            <div className="card-body" >
+                                <ReactMarkdown>{tryIt}</ReactMarkdown>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
@@ -57,7 +85,6 @@ const headings =
 #Not a heading`
 const bold = "**bold text**"
 const italicized = "*italicized text*"
-const quote = "> quote"
 const orderedList =
 `1. First list item
 2. Second list item`

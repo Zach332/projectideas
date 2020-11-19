@@ -61,7 +61,7 @@ export default function NewIdea() {
                     </div>
                     <div className="form-group">
                         <label htmlFor="content">Details</label>
-                        <textarea value={idea.content} className="form-control" id="content" rows="3" onChange={handleInputChange}></textarea>
+                        <textarea value={idea.content} className="form-control" id="content" rows="10" onChange={handleInputChange}></textarea>
                     </div>
                     <button type="submit" className="btn btn-primary">Post Idea</button>
                 </form>
