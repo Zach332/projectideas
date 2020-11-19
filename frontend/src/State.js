@@ -8,22 +8,29 @@ export const Status = {
     NotSubmitted: "NotSubmitted"
 }
 
-export const persistenceKey = 'projectideas_persistent_storage'
+export const userPersistenceKey = 'user_persistent_storage'
+export const newIdeaPersistenceKey = 'new_idea_persistent_storage'
 
 const firstState = {
     user: {
         loggedIn: false,
         id: '',
         username: ''
+    },
+    newIdea: {
+        title: '',
+        content: ''
     }
 };
 
-const userFromStorage = localStorage.getItem(persistenceKey)
+const userFromStorage = localStorage.getItem(userPersistenceKey)
 const user = JSON.parse(userFromStorage)
+const newIdeaFromStorage = localStorage.getItem(newIdeaPersistenceKey)
+const newIdea = JSON.parse(newIdeaFromStorage)
 
 const initialState = userFromStorage === null || !user.id
 	? firstState
-    : { user }
+    : { user , newIdea}
     
 axios.defaults.headers.common['authorization'] = initialState.user.id;
 

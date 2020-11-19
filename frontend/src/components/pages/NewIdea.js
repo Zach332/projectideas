@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios'
 import CheckMark from "../../check.svg"
 import LoginWarning from '../logins/LoginWarning'
-import { useGlobalState, Status } from '../../State'
+import { useGlobalState, Status, newIdeaPersistenceKey } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 import IdeaCard from '../IdeaCard'
 
 export default function NewIdea() {
     const { addToast } = useToasts()
-    const [idea, setIdea] = React.useState([{ title: '' , content: ''}])
+    const [ idea, setIdea ] = React.useState([{ title: '' , content: ''}])
     const [ status, setStatus] = React.useState(Status.NotSubmitted)
     const [ user ] = useGlobalState('user')
+    const [ savedIdea ] = useGlobalState('newIdea')
 
     const handleInputChange = (event) => {
         const target = event.target;
@@ -22,6 +23,14 @@ export default function NewIdea() {
             })
         );
     }
+
+    useEffect(() => {
+        localStorage.setItem(newIdeaPersistenceKey, JSON.stringify(idea))
+    }, [idea]);
+
+    useEffect(() => {
+        setIdea(savedIdea)
+    }, []);
 
     const handleSubmit = (event) => {
         axios.post("/api/ideas", {
@@ -48,11 +57,11 @@ export default function NewIdea() {
                 <form className="py-4" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="title">Title</label>
-                        <input type="text" className="form-control" id="title" onChange={handleInputChange}/>
+                        <input type="text" value={idea.title} className="form-control" id="title" onChange={handleInputChange}/>
                     </div>
                     <div className="form-group">
                         <label htmlFor="content">Details</label>
-                        <textarea className="form-control" id="content" rows="3" onChange={handleInputChange}></textarea>
+                        <textarea value={idea.content} className="form-control" id="content" rows="3" onChange={handleInputChange}></textarea>
                     </div>
                     <button type="submit" className="btn btn-primary">Post Idea</button>
                 </form>

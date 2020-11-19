@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import NameLogo from "../../namelogo.png"
-import { persistenceKey, useGlobalState } from '../../State'
+import { userPersistenceKey, useGlobalState } from '../../State'
 
 export default function Navbar() {
     const [ user ] = useGlobalState('user')
 
     useEffect(() => {
-        localStorage.setItem(persistenceKey, JSON.stringify(user))
+        localStorage.setItem(userPersistenceKey, JSON.stringify(user))
     }, [user]);
 
     let login
