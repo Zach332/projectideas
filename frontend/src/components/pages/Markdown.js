@@ -11,27 +11,29 @@ export default function Markdown() {
 
     return (
         <div>
-            <h1>Guide to basic Markdown syntax</h1>
-            <table className="table">
-                <thead className="thead-dark">
-                    <tr>
-                    <th scope="col">Markdown</th>
-                    <th scope="col">Output</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tableRow(paragraphs)}
-                    {tableRow(headings)}
-                    {tableRow(bold)}
-                    {tableRow(italicized)}
-                    {tableRow(orderedList)}
-                    {tableRow(unorderedList)}
-                    {tableRow(code)}
-                    {tableRow(horizontalRule)}
-                    {tableRow(link)}
-                    {tableRow(image)}
-                </tbody>
-            </table>
+            <h1 className="pb-3">Guide to basic Markdown syntax</h1>
+            <div className="table-responsive-sm">
+                <table className="table">
+                    <thead className="thead-dark">
+                        <tr>
+                        <th scope="col">Markdown</th>
+                        <th scope="col">Output</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tableRow(paragraphs)}
+                        {tableRow(headings)}
+                        {tableRow(bold)}
+                        {tableRow(italicized)}
+                        {tableRow(orderedList)}
+                        {tableRow(unorderedList)}
+                        {tableRow(code)}
+                        {tableRow(horizontalRule)}
+                        {tableRow(link)}
+                        {tableRow(image)}
+                    </tbody>
+                </table>
+            </div>
             <h1>Try it</h1>
             <div className="container-fluid pt-4">
                 <div className="row">
@@ -44,7 +46,7 @@ export default function Markdown() {
                     <div className="col-6">
                         <h6>Output</h6>
                         <div className="card mh-50">
-                            <div clazssName="card-body" >
+                            <div className="card-body" >
                                 <ReactMarkdown>{tryIt}</ReactMarkdown>
                             </div>
                         </div>
