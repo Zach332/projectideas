@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown'
 
 export default function Markdown() {
     const [ tryIt, setTryIt ] = React.useState('')
-    const anchor = document.querySelector('#tryIt')
 
     const handleInputChange = (event) => {
         const target = event.target;
@@ -11,6 +10,7 @@ export default function Markdown() {
     }
 
     const onCLick = () => {
+        const anchor = document.querySelector('#tryIt')
         anchor.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
