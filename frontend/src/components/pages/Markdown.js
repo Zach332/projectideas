@@ -12,8 +12,8 @@ export default function Markdown() {
     return (
         <div>
             <h1>Guide to basic Markdown syntax</h1>
-            <table class="table">
-                <thead class="thead-dark">
+            <table className="table">
+                <thead className="thead-dark">
                     <tr>
                     <th scope="col">Markdown</th>
                     <th scope="col">Output</th>
@@ -33,21 +33,18 @@ export default function Markdown() {
                 </tbody>
             </table>
             <h1>Try it</h1>
-            <div class="container pt-4">
-                <div class="row">
-                    <div>
-                    <h6>Markdown</h6></div>
-                    <div class="col">
+            <div className="container-fluid pt-4">
+                <div className="row">
+                    <div className="col-6">
+                        <h6>Markdown</h6>
                         <form>
-                            <div className="form-group">
-                                <textarea className="form-control" id="content" rows="20" onChange={handleInputChange}></textarea>
-                            </div>
+                            <textarea className="form-control" id="content" rows="20" onChange={handleInputChange}></textarea>
                         </form>
                     </div>
-                    <h6>Output</h6>
-                    <div class="col">
-                        <div className="card">
-                            <div className="card-body" >
+                    <div className="col-6">
+                        <h6>Output</h6>
+                        <div className="card mh-50">
+                            <div clazssName="card-body" >
                                 <ReactMarkdown>{tryIt}</ReactMarkdown>
                             </div>
                         </div>
