@@ -3,15 +3,26 @@ import ReactMarkdown from 'react-markdown'
 
 export default function Markdown() {
     const [ tryIt, setTryIt ] = React.useState('')
+    const anchor = document.querySelector('#tryIt')
 
     const handleInputChange = (event) => {
         const target = event.target;
         setTryIt(target.value);
     }
 
+    const onCLick = () => {
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
     return (
         <div>
             <h1 className="pb-3">Guide to basic Markdown syntax</h1>
+                <button onClick={onCLick} className="btn btn-link btn-lg mb-4">
+                    Try it
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-down-short" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                </button>
             <div className="table-responsive-sm">
                 <table className="table">
                     <thead className="thead-dark">
@@ -35,7 +46,7 @@ export default function Markdown() {
                 </table>
             </div>
             <h1>Try it</h1>
-            <div className="container-fluid pt-4">
+            <div id="tryIt" className="container-fluid pt-4">
                 <div className="row">
                     <div className="col-6">
                         <h6>Markdown</h6>
