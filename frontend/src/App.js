@@ -11,7 +11,7 @@ import Profile from './components/pages/Profile'
 import NewIdea from './components/pages/NewIdea'
 import Messages from './components/pages/Messages'
 import Markdown from './components/pages/Markdown'
-import GitHubLogin from './components/logins/GitHubLogin'
+import GitHubLogin from './components/logins/Login'
 import LoginLanding from './components/logins/LoginLanding'
 
 function App () {
