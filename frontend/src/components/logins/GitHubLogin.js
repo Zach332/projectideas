@@ -1,5 +1,8 @@
 import React from 'react'
+import GoogleLogin from 'react-google-login'
+import axios from 'axios'
 import { toQuery } from '../utils/Routing'
+import { login } from '../../State'
 import GitHubSymbol from "../../GitHub-Mark.png"
 
 export default function GitHubLogin() {
@@ -12,9 +15,28 @@ export default function GitHubLogin() {
     const onCLick = () => {
         window.location.href = 'https://github.com/login/oauth/authorize?'+search
     }
+
+    const responseGoogle = (response) => {
+        console.log(response.profileObj.email);
+        axios.post("/api/login/email", {
+            email: response.profileObj.email
+        }).then((response) => {
+            login(response.data.username, response.data.id)
+        })
+    }
+      
     
     return (
         <div className="container">
+            <div className="text-center p-5">
+                <GoogleLogin
+                    clientId="449086482050-t6e9tflhou1r9b905s42pvjtbvac23hl.apps.googleusercontent.com"
+                    buttonText="Login"
+                    onSuccess={responseGoogle}
+                    onFailure={responseGoogle}
+                    cookiePolicy={'single_host_origin'}
+                />
+            </div>
             <img src={GitHubSymbol} className="mx-auto d-block pt-4" alt="" />
             <br/>
             <div className="col-md-12 text-center">

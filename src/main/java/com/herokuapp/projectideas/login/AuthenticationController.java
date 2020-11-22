@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import okhttp3.*;
 
 @RestController
-public class GithubAuthenticationController {
+public class AuthenticationController {
     @Autowired
     LoginController loginController;
     
@@ -29,6 +29,15 @@ public class GithubAuthenticationController {
         }
     }
 
+    static class Email {
+        String email;
+        public Email() {
+        }
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class GithubEmail {
         public String email;
@@ -36,6 +45,11 @@ public class GithubAuthenticationController {
         public boolean verified;
         public GithubEmail() {
         }
+    }
+
+    @PostMapping("/api/login/email")
+    public User emailAuthentication(@RequestBody Email email) {
+        return loginController.getUserByEmail(email.email);
     }
 
     @PostMapping("/api/login/github")
