@@ -54,7 +54,11 @@ export const login = (username, id) => {
 };
 
 export const logout = () => {
-    setGlobalState('user', firstState)
+    setGlobalState('user', firstUserState)
+};
+
+export const post = () => {
+    setGlobalState('newIdea', firstNewideaState)
 };
 
 export { useGlobalState };

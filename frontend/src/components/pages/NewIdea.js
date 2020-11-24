@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import axios from 'axios'
 import CheckMark from "../../check.svg"
 import LoginWarning from '../logins/LoginWarning'
-import { useGlobalState, Status, newIdeaPersistenceKey } from '../../State'
+import { useGlobalState, Status, newIdeaPersistenceKey, post } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 import IdeaCard from '../IdeaCard'
 
@@ -39,6 +39,8 @@ export default function NewIdea() {
             content: idea.content
         }).then(() => {
             setStatus(Status.Success)
+            post()
+            setIdea({title: '' , content: ''})
         }).catch(err => {
             console.log("Error submitting post: " + err);
             setStatus(Status.Failure)
