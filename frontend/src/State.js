@@ -11,26 +11,34 @@ export const Status = {
 export const userPersistenceKey = 'user_persistent_storage'
 export const newIdeaPersistenceKey = 'new_idea_persistent_storage'
 
-const firstState = {
+const firstUserState = {
     user: {
         loggedIn: false,
         id: '',
         username: ''
-    },
+    }
+};
+
+const firstNewideaState = {
     newIdea: {
         title: '',
         content: ''
     }
-};
+}
 
 const userFromStorage = localStorage.getItem(userPersistenceKey)
-const user = JSON.parse(userFromStorage)
+const userObject = JSON.parse(userFromStorage)
+const user = userFromStorage === null || !userObject.id
+    ? firstUserState
+    : userObject
 const newIdeaFromStorage = localStorage.getItem(newIdeaPersistenceKey)
-const newIdea = JSON.parse(newIdeaFromStorage)
+const newIdeaObject = JSON.parse(newIdeaFromStorage)
+const newIdea = newIdeaFromStorage === null
+    ? firstNewideaState
+    : newIdeaObject
 
-const initialState = userFromStorage === null || !user.id
-	? firstState
-    : { user , newIdea}
+const initialState = { user , newIdea}
+console.log(initialState)
     
 axios.defaults.headers.common['authorization'] = initialState.user.id;
 
