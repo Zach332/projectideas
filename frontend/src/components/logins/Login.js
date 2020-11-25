@@ -1,7 +1,7 @@
 import React from 'react'
 import GoogleLogin from 'react-google-login'
 import axios from 'axios'
-import CheckMark from "../../check.svg"
+import Success from "../Success"
 import XMark from "../../x.svg"
 import { toQuery } from '../utils/Routing'
 import { login, Status } from '../../State'
@@ -38,7 +38,7 @@ export default function Login() {
     }
       
     if(status == Status.Success) {
-        return <img src={CheckMark} className="mx-auto d-block pt-4" alt="Successful login" />
+        return <Success />
     } else if(status == Status.Failure) {
         return (
             <div className="text-center">

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
-import CheckMark from "../../check.svg"
+import Success from "../Success"
 import LoginWarning from '../logins/LoginWarning'
 import { useGlobalState, Status, newIdeaPersistenceKey, post } from '../../State'
 import { useToasts } from 'react-toast-notifications'
@@ -74,7 +74,7 @@ export default function NewIdea() {
     } else if(status === Status.Success) {
         return (
             <div>
-                <img src={CheckMark} className="mx-auto d-block pt-4" alt="Successful login" />
+                <Success />
             </div>
         )
     }

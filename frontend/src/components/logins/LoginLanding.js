@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import CheckMark from "../../check.svg"
+import Success from "../Success"
 import XMark from "../../x.svg"
 import { toParams } from '../utils/Routing'
 import axios from 'axios'
@@ -35,7 +35,7 @@ export default function LoginLanding() {
 
     let result
     if(status == Status.Success) {
-        result = <img src={CheckMark} className="mx-auto d-block pt-4" alt="Successful login" />
+        result = <Success />
     } else if(status == Status.Failure) {
         result = (
             <div className="text-center">
