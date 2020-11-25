@@ -3,8 +3,10 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import IdeaCard from '../IdeaCard'
 import { useGlobalState } from '../../State'
+import { useToasts } from 'react-toast-notifications'
 
 export default function Idea() {
+    const { addToast } = useToasts()
     const [idea, setIdea] = React.useState([])
     const [ user ] = useGlobalState('user')
     let params = useParams()
@@ -14,6 +16,16 @@ export default function Idea() {
             setIdea(response.data)
         })
     },[])
+
+    const deleteIdea = () => {
+        axios.delete("/api/ideas/"+params.id)
+        .then(() => {
+            addToast("Your idea was deleted.", { appearance: 'success', autoDismiss: true })
+        }).catch(err => {
+            console.log("Error deleting idea: " + err);
+            addToast("Your idea was not deleted. Please try again.", { appearance: 'error' })
+        })
+    }
 
     let more
     if(user.username === idea.authorUsername) {
@@ -69,7 +81,7 @@ export default function Idea() {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-danger">Delete</button>
+                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={deleteIdea}>Delete</button>
                         </div>
                     </div>
                 </div>
