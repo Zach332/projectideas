@@ -2,9 +2,11 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import IdeaCard from '../IdeaCard'
+import { useGlobalState } from '../../State'
 
 export default function Idea() {
     const [idea, setIdea] = React.useState([])
+    const [ user ] = useGlobalState('user')
     let params = useParams()
 
     useEffect(() => {
@@ -12,6 +14,23 @@ export default function Idea() {
             setIdea(response.data)
         })
     },[])
+
+    let more
+    if(user.username === idea.authorUsername) {
+        more = (
+            <li className="list-group-item">
+                <div className="dropdown">
+                    <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        More
+                    </button>
+                    <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a className="dropdown-item" href="#">Edit idea</a>
+                        <a className="dropdown-item text-danger" data-toggle="modal" data-target="#deleteConfirmation">Delete idea</a>
+                    </div>
+                    </div>
+            </li>
+        )
+    }
 
     
     var date = new Date(idea.timePosted * 1000)
@@ -30,11 +49,29 @@ export default function Idea() {
                             </button>
                         </li>
                         <li className="list-group-item">
-                            <button type="button" className="btn btn-primary btn-md">
+                            <button type="button" data-toggle="modal" className="btn btn-primary btn-md">
                                 Work on this idea
                             </button>
                         </li>
+                        {more}
                     </ul>
+                </div>
+            </div>
+            <div className="modal fade" id="deleteConfirmation" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title" id="deleteConfirmationLabel">Delete Idea</h4>
+                            <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+                        </div>
+                        <div className="modal-body">
+                            Are you sure you want to delete this idea? The data cannot be recovered.
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
