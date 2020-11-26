@@ -5,7 +5,8 @@ export const Status = {
     Loading: "Loading",
     Success: "Success",
     Failure: "Failure",
-    NotSubmitted: "NotSubmitted"
+    NotSubmitted: "NotSubmitted",
+    NotFound: "NotFound"
 }
 
 export const userPersistenceKey = 'user_persistent_storage'
@@ -38,7 +39,6 @@ const newIdea = newIdeaFromStorage === null
     : newIdeaObject
 
 const initialState = { user , newIdea}
-console.log(initialState)
     
 axios.defaults.headers.common['authorization'] = initialState.user.id;
 

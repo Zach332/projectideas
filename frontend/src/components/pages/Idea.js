@@ -2,18 +2,24 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import IdeaCard from '../IdeaCard'
-import { useGlobalState } from '../../State'
+import NotFound from './NotFound'
+import { useGlobalState, Status } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 
 export default function Idea() {
     const { addToast } = useToasts()
+    const [status, setStatus] = React.useState(Status.Loading)
     const [idea, setIdea] = React.useState([])
     const [ user ] = useGlobalState('user')
     let params = useParams()
 
     useEffect(() => {
         axios.get("/api/ideas/"+params.id).then((response) => {
-            setIdea(response.data)
+            if(!response.data) {
+                setStatus(Status.NotFound)
+            } else {
+                setIdea(response.data)
+            }
         })
     },[])
 
@@ -25,6 +31,10 @@ export default function Idea() {
             console.log("Error deleting idea: " + err);
             addToast("Your idea was not deleted. Please try again.", { appearance: 'error' })
         })
+    }
+
+    if(status === Status.NotFound) {
+        return <NotFound />
     }
 
     let more
@@ -43,7 +53,6 @@ export default function Idea() {
             </li>
         )
     }
-
     
     var date = new Date(idea.timePosted * 1000)
     return (
