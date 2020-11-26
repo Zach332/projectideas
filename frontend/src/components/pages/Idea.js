@@ -69,7 +69,7 @@ export default function Idea() {
                     </ul>
                 </div>
             </div>
-            <div className="modal fade" id="deleteConfirmation" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
+            <div className="modal fade" id="deleteConfirmation" tabIndex="-1" role="dialog" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">

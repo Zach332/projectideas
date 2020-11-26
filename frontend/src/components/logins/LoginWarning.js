@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function LoginWarning() {
     return (
-        <div className="jumbotron bg-light-danger">
+        <div className="jumbotron bg-light-danger" style={{background: 'rgba(233, 86, 86, 0.5)'}}>
             <h1 className="display-4">Login required</h1>
             <p className="lead">You must login to view this page.</p>
             <hr className="my-4"/>
