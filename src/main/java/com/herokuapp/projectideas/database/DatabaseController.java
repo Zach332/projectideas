@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,9 @@ public class DatabaseController {
 
     @GetMapping("/api/ideas")
     public List<Idea> getAllIdeas() {
-        return database.findAllIdeas();
+        List<Idea> allIdeas =  database.findAllIdeas();
+        Collections.reverse(allIdeas);
+        return allIdeas;
     }
 
     @GetMapping("/api/ideas/{id}")
