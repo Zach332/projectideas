@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import Success from "../Success"
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import IdeaCard from '../IdeaCard'
@@ -26,6 +27,7 @@ export default function Idea() {
     const deleteIdea = () => {
         axios.delete("/api/ideas/"+params.id)
         .then(() => {
+            setStatus(Status.Success)
             addToast("Your idea was deleted.", { appearance: 'success', autoDismiss: true })
         }).catch(err => {
             console.log("Error deleting idea: " + err);
@@ -35,6 +37,10 @@ export default function Idea() {
 
     if(status === Status.NotFound) {
         return <NotFound />
+    }
+
+    if(status === Status.Success) {
+        return <Success />
     }
 
     let more
