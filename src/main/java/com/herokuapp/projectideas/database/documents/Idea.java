@@ -3,9 +3,14 @@ package com.herokuapp.projectideas.database.documents;
 import java.time.Instant;
 import java.util.UUID;
 
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class Idea {
     
-    private String id;
+    final private String id = UUID.randomUUID().toString();
     private String type;
     private String ideaId;
     private long timePosted;
@@ -15,10 +20,7 @@ public class Idea {
     private String title;
     private String content;
 
-    public Idea() { }
-
     public Idea(String authorId, String authorUsername, String title, String content) {
-        this.id = UUID.randomUUID().toString();
         this.type = "Idea";
         this.ideaId = this.id;
         long now = Instant.now().getEpochSecond();
@@ -28,41 +30,5 @@ public class Idea {
         this.authorUsername = authorUsername;
         this.title = title;
         this.content = content;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getIdeaId() {
-        return ideaId;
-    }
-
-    public long getTimePosted() {
-        return timePosted;
-    }
-
-    public long getTimeLastEdited() {
-        return timeLastEdited;
-    }
-
-    public String getAuthorId() {
-        return authorId;
-    }
-
-    public String getAuthorUsername() {
-        return authorUsername;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getContent() {
-        return content;
     }
 }

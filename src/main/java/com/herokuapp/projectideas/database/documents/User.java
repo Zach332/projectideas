@@ -3,43 +3,15 @@ package com.herokuapp.projectideas.database.documents;
 import java.time.Instant;
 import java.util.UUID;
 
+import lombok.*;
+
+@RequiredArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class User {
-
-    private String id;
-    private String username;
-    private String email;
-    private long timeCreated;
-
-    public User() { }
-
-    public User(String username, String email) {
-        this.id = UUID.randomUUID().toString();
-        this.username = username;
-        this.email = email;
-        this.timeCreated = Instant.now().getEpochSecond();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public long getTimeCreated() {
-        return timeCreated;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    final private String id = UUID.randomUUID().toString();
+    @NonNull private String username;
+    @NonNull private String email;
+    final private long timeCreated = Instant.now().getEpochSecond();
 }
