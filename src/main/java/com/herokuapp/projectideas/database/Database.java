@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
@@ -67,6 +69,29 @@ public class Database {
     }
 
     public User updateUser(String id, User user) {
+        User oldUser = userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
+
+        // Handle username denormalization
+        if (!user.getUsername().equals(oldUser.getUsername())) {
+            ArrayList<Object> params = new ArrayList<Object>();
+            params.add(user.getId());
+            params.add(user.getUsername());
+            
+            // TODO: Return strings instead of the entire document
+            List<Idea> partitionKeys = postContainer.queryItems("SELECT * FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), Idea.class).stream()
+                .collect(Collectors.toList());
+
+            CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
+
+            for (Idea idea : partitionKeys) {
+                PartitionKey partitionKey = new PartitionKey(idea.getId());
+                options.setPartitionKey(partitionKey);
+                postContainer.getScripts()
+                    .getStoredProcedure("updateUsername")
+                    .execute(params, options);
+            }
+        }
+
         userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions());
         return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
