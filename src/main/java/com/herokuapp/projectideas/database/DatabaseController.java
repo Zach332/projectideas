@@ -75,6 +75,7 @@ public class DatabaseController {
 
     @PostMapping("/api/ideas")
     public void createIdea(@RequestHeader("authorization") String userId, @RequestBody IdeaDTO ideaDTO) {
+        // TODO: Use username from database, not DTO
         Optional<User> user = database.findUser(userId);
         if(!user.isPresent() || !user.get().getUsername().equals(ideaDTO.authorUsername)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -88,7 +89,7 @@ public class DatabaseController {
         Optional<Idea> ideaToDelete = database.findIdea(id);
         Optional<User> user = database.findUser(userId);
         if(!ideaToDelete.isPresent()) { return; }
-        if(!user.isPresent() || !user.get().getUsername().equals(ideaToDelete.get().getAuthorUsername())) {
+        if(!user.isPresent() || !user.get().getId().equals(ideaToDelete.get().getAuthorId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id);
