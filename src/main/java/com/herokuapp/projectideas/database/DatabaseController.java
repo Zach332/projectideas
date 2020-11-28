@@ -39,6 +39,7 @@ public class DatabaseController {
 
     @PutMapping("/api/users/{id}")
     public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+        //No authorization because ID in path verifies identity
         // TODO: validate that username is unique. Also check that the username actually changed
         Optional<User> user = database.findUser(id);
         if (user.isPresent()) {
@@ -58,6 +59,18 @@ public class DatabaseController {
     @GetMapping("/api/ideas/{id}")
     public Optional<Idea> getIdea(@PathVariable String id) {
         return database.findIdea(id);
+    }
+
+    @PutMapping("/api/ideas/{id}")
+    public void updateIdea(@PathVariable String id, @RequestBody IdeaDTO ideaDTO) {
+        //No authorization because ID in path verifies identity
+        // TODO: validate that username is unique. Also check that the username actually changed
+        Optional<Idea> idea = database.findIdea(id);
+        if (idea.isPresent()) {
+            idea.get().setTitle(ideaDTO.title);
+            idea.get().setContent(ideaDTO.content);
+            database.updateIdea(id, idea.get());
+        }
     }
 
     @PostMapping("/api/ideas")

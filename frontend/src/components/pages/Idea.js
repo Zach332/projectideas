@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import IdeaCard from '../IdeaCard'
 import NotFound from './NotFound'
+import EditIdea from './EditIdea'
 import { useGlobalState, Status } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 
@@ -35,12 +36,20 @@ export default function Idea() {
         })
     }
 
+    const edit = () => {
+        setStatus(Status.NotSubmitted)
+    }
+
     if(status === Status.NotFound) {
         return <NotFound />
     }
 
     if(status === Status.Success) {
         return <Success />
+    }
+
+    if(status === Status.NotSubmitted) {
+        return <EditIdea originalIdea={idea} status={status} setStatus={setStatus}/>
     }
 
     let more
@@ -52,7 +61,7 @@ export default function Idea() {
                         More
                     </button>
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a className="dropdown-item" href="#">Edit idea</a>
+                        <a className="dropdown-item" onClick={edit}>Edit idea</a>
                         <a className="dropdown-item text-danger" data-toggle="modal" data-target="#deleteConfirmation">Delete idea</a>
                     </div>
                     </div>

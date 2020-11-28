@@ -89,7 +89,7 @@ export default function Profile() {
                     <input type="text" className="form-control" id="email" defaultValue={userData.email} readOnly/>
                 </div>
                 <small id="emailComment" className="form-text text-muted">
-                    Primary email from GitHub
+                    Primary email from GitHub/Google
                 </small>
             </form>
                 <button type="button" onClick={onCLick} className="btn btn-danger btn-md">
