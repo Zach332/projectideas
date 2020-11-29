@@ -49,7 +49,7 @@ export default function Idea() {
     }
 
     if(status === Status.NotSubmitted) {
-        return <EditIdea originalIdea={idea} status={status} setStatus={setStatus}/>
+        return <EditIdea originalIdea={idea} setStatus={setStatus}/>
     }
 
     let more

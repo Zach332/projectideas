@@ -1,17 +1,23 @@
 import React from 'react'
 import axios from 'axios'
-import Success from "../Success"
+import { useLeavePageWarning } from '../hooks/LeavePageWarning'
 import { Status } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 import IdeaCard from '../IdeaCard'
 
-export default function EditIdea({originalIdea, status, setStatus}) {
+
+
+export default function EditIdea({originalIdea, setStatus}) {
     const { addToast } = useToasts()
     const [ idea, setIdea ] = React.useState(originalIdea)
+    const [ edited, setEdited ] = React.useState(false)
+
+    useLeavePageWarning(edited)
 
     const handleInputChange = (event) => {
         const target = event.target;
         const name = target.id;
+        setEdited(true)
         setIdea(
             idea => ({
                 ...idea,
