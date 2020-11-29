@@ -75,14 +75,15 @@ public class DatabaseController {
     }
 
     @PutMapping("/api/ideas/{id}")
-    public void updateIdea(@PathVariable String id, @RequestBody @JsonView(View.Post.class) Idea idea) {
-        //No authorization because ID in path verifies identity
+    public void updateIdea(@RequestHeader("authorization") String userId, @PathVariable String id, @RequestBody @JsonView(View.Post.class) Idea idea) {
         Optional<Idea> existingIdea = database.findIdea(id);
-        if (existingIdea.isPresent()) {
-            existingIdea.get().setTitle(idea.getTitle());
-            existingIdea.get().setContent(idea.getContent());
-            database.updateIdea(id, existingIdea.get());
+        Optional<User> user = database.findUser(userId);
+        if (!user.isPresent() || !existingIdea.get().getAuthorId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+        existingIdea.get().setTitle(idea.getTitle());
+        existingIdea.get().setContent(idea.getContent());
+        database.updateIdea(id, existingIdea.get());
     }
 
     @DeleteMapping("/api/ideas/{id}")
@@ -90,7 +91,7 @@ public class DatabaseController {
         Optional<Idea> ideaToDelete = database.findIdea(id);
         Optional<User> user = database.findUser(userId);
         if(!ideaToDelete.isPresent()) { return; }
-        if(!user.isPresent() || !user.get().getId().equals(ideaToDelete.get().getAuthorId())) {
+        if(!user.isPresent() || !ideaToDelete.get().getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id);
