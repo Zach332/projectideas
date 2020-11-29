@@ -5,8 +5,6 @@ import { Status } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 import IdeaCard from '../IdeaCard'
 
-
-
 export default function EditIdea({originalIdea, setStatus}) {
     const { addToast } = useToasts()
     const [ idea, setIdea ] = React.useState(originalIdea)
