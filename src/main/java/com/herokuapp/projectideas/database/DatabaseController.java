@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
 
@@ -26,30 +27,31 @@ public class DatabaseController {
     private Database database;
 
     @GetMapping("/api/users/{id}")
+    @JsonView(View.Get.class)
     public Optional<User> getUser(@PathVariable String id) {
         return database.findUser(id);
     }
 
     @PostMapping("/api/users")
-    public void createUser(@RequestBody UserDTO userDTO) {
+    public void createUser(@RequestBody @JsonView(View.Post.class) User user) {
         // TODO: Validate input (e.g. username already taken)
-        User user = new User(userDTO.username, userDTO.email);
-        database.createUser(user);
+        database.createUser(new User(user.getUsername(), user.getEmail()));
     }
 
     @PutMapping("/api/users/{id}")
-    public void updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
-        //No authorization because ID in path verifies identity
+    public void updateUser(@PathVariable String id, @RequestBody @JsonView(View.Post.class) User user) {
+        // No authorization because ID in path verifies identity
         // TODO: validate that username is unique. Also check that the username actually changed
-        Optional<User> user = database.findUser(id);
-        if (user.isPresent()) {
-            user.get().setUsername(userDTO.username);
-            user.get().setEmail(userDTO.email);
-            database.updateUser(id, user.get());
+        Optional<User> existingUser = database.findUser(id);
+        if (existingUser.isPresent()) {
+            existingUser.get().setUsername(user.getUsername());
+            existingUser.get().setEmail(user.getEmail());
+            database.updateUser(id, existingUser.get());
         }
     }
 
     @GetMapping("/api/ideas")
+    @JsonView(View.Get.class)
     public List<Idea> getAllIdeas() {
         List<Idea> allIdeas =  database.findAllIdeas();
         Collections.reverse(allIdeas);
@@ -57,31 +59,30 @@ public class DatabaseController {
     }
 
     @GetMapping("/api/ideas/{id}")
+    @JsonView(View.Get.class)
     public Optional<Idea> getIdea(@PathVariable String id) {
         return database.findIdea(id);
     }
 
-    @PutMapping("/api/ideas/{id}")
-    public void updateIdea(@PathVariable String id, @RequestBody IdeaDTO ideaDTO) {
-        //No authorization because ID in path verifies identity
-        // TODO: validate that username is unique. Also check that the username actually changed
-        Optional<Idea> idea = database.findIdea(id);
-        if (idea.isPresent()) {
-            idea.get().setTitle(ideaDTO.title);
-            idea.get().setContent(ideaDTO.content);
-            database.updateIdea(id, idea.get());
-        }
-    }
-
     @PostMapping("/api/ideas")
-    public void createIdea(@RequestHeader("authorization") String userId, @RequestBody IdeaDTO ideaDTO) {
+    public void createIdea(@RequestHeader("authorization") String userId, @RequestBody @JsonView(View.Post.class) Idea idea) {
         // TODO: Use username from database, not DTO
         Optional<User> user = database.findUser(userId);
-        if(!user.isPresent() || !user.get().getUsername().equals(ideaDTO.authorUsername)) {
+        if (!user.isPresent()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        Idea idea = new Idea(userId, ideaDTO.authorUsername, ideaDTO.title, ideaDTO.content);
-        database.createIdea(idea);
+        database.createIdea(new Idea(userId, user.get().getUsername(), idea.getTitle(), idea.getContent()));
+    }
+
+    @PutMapping("/api/ideas/{id}")
+    public void updateIdea(@PathVariable String id, @RequestBody @JsonView(View.Post.class) Idea idea) {
+        //No authorization because ID in path verifies identity
+        Optional<Idea> existingIdea = database.findIdea(id);
+        if (existingIdea.isPresent()) {
+            existingIdea.get().setTitle(idea.getTitle());
+            existingIdea.get().setContent(idea.getContent());
+            database.updateIdea(id, existingIdea.get());
+        }
     }
 
     @DeleteMapping("/api/ideas/{id}")
@@ -93,20 +94,5 @@ public class DatabaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id);
-    }
-
-    static class IdeaDTO {
-        public String authorUsername;
-        public String title;
-        public String content;
-
-        public IdeaDTO() { }
-    }
-
-    static class UserDTO {
-        public String username;
-        public String email;
-
-        public UserDTO() { }
     }
 }

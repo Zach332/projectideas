@@ -47,6 +47,7 @@ public class AuthenticationController {
         }
     }
 
+    // TODO: Should this be using the database objects?
     @PostMapping("/api/login/email")
     public User emailAuthentication(@RequestBody Email email) {
         return loginController.getUserByEmail(email.email);
