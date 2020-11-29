@@ -34,7 +34,6 @@ export default function NewIdea() {
 
     const handleSubmit = (event) => {
         axios.post("/api/ideas", {
-            authorUsername: user.username,
             title: idea.title,
             content: idea.content
         }).then(() => {
