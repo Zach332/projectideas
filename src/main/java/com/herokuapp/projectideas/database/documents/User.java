@@ -13,7 +13,6 @@ import lombok.*;
 @Setter
 public class User {
 
-    @JsonView(View.Get.class)
     private String id;
     @JsonView(View.Base.class)
     private String username;
