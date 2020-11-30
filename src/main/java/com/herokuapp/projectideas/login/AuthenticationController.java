@@ -47,14 +47,25 @@ public class AuthenticationController {
         }
     }
 
-    // TODO: Should this be using the database objects?
+    static class UserDTO {
+
+        public String id;
+        public String username;
+        public String email;
+        public long timeCreated;
+        public boolean isAdmin;
+    
+        public UserDTO() {
+        }
+    }
+    
     @PostMapping("/api/login/email")
-    public User emailAuthentication(@RequestBody Email email) {
-        return loginController.getUserByEmail(email.email);
+    public UserDTO emailAuthentication(@RequestBody Email email) {
+        return convertUserToDTO(loginController.getUserByEmail(email.email)); 
     }
 
     @PostMapping("/api/login/github")
-    public User githubAuthentication(@RequestBody GitHubCode code) {
+    public UserDTO githubAuthentication(@RequestBody GitHubCode code) {
         FormBody formBody = new FormBody.Builder()
             .add("client_id", System.getenv("REACT_APP_GITHUB_CLIENT_ID"))
             .add("client_secret", System.getenv("GITHUB_CLIENT_SECRET"))
@@ -80,7 +91,7 @@ public class AuthenticationController {
             GithubEmail[] emails = mapper.readValue(userResponse, GithubEmail[].class);
             GithubEmail primary = getPrimary(emails);
 
-            return loginController.getUserByEmail(primary.email);
+            return convertUserToDTO(loginController.getUserByEmail(primary.email));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -107,5 +118,15 @@ public class AuthenticationController {
             if(email.primary)return email;
         }
         return emails[0];
+    }
+
+    static UserDTO convertUserToDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.id = user.getId();
+        userDTO.username = user.getUsername();
+        userDTO.email = user.getEmail();
+        userDTO.timeCreated = user.getTimeCreated();
+        userDTO.isAdmin = user.isAdmin();
+        return userDTO;
     }
 }
