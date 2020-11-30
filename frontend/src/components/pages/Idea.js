@@ -5,6 +5,7 @@ import axios from 'axios'
 import IdeaCard from '../IdeaCard'
 import NotFound from './NotFound'
 import EditIdea from './EditIdea'
+import Comments from '../Comments'
 import { useGlobalState, Status } from '../../State'
 import { useToasts } from 'react-toast-notifications'
 
@@ -92,6 +93,9 @@ export default function Idea() {
                         {more}
                     </ul>
                 </div>
+            </div>
+            <div className="row justify-content-center">
+                <Comments />
             </div>
             <div className="modal fade" id="deleteConfirmation" tabIndex="-1" role="dialog" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
                 <div className="modal-dialog">
