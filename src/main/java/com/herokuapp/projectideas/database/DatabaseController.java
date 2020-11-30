@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.herokuapp.projectideas.database.documents.Comment;
 import com.herokuapp.projectideas.database.documents.Idea;
 import com.herokuapp.projectideas.database.documents.User;
 
@@ -64,6 +65,12 @@ public class DatabaseController {
         return database.findIdea(id);
     }
 
+    @GetMapping("/api/ideas/{ideaId}/comments")
+    @JsonView(View.Get.class)
+    public List<Comment> getCommentsOnIdea(@PathVariable String ideaId) {
+        return database.findAllCommentsOnIdea(ideaId);
+    }
+
     @PostMapping("/api/ideas")
     public void createIdea(@RequestHeader("authorization") String userId, @RequestBody @JsonView(View.Post.class) Idea idea) {
         // TODO: Use username from database, not DTO
@@ -72,6 +79,15 @@ public class DatabaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.createIdea(new Idea(userId, user.get().getUsername(), idea.getTitle(), idea.getContent()));
+    }
+
+    @PostMapping("/api/ideas/{ideaId}/comments")
+    public void createComment(@RequestHeader("authorization") String userId, @PathVariable String ideaId, @RequestBody @JsonView(View.Post.class) Comment comment) {
+        Optional<User> user = database.findUser(userId);
+        if (!user.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        database.createComment(new Comment(ideaId, user.get().getId(), user.get().getUsername(), comment.getContent()));
     }
 
     @PutMapping("/api/ideas/{id}")
@@ -86,6 +102,17 @@ public class DatabaseController {
         database.updateIdea(id, existingIdea.get());
     }
 
+    @PutMapping("/api/ideas/{ideaId}/comments/{commentId}")
+    public void updateComment(@RequestHeader("authorization") String userId, @PathVariable String ideaId, @PathVariable String commentId, @RequestBody @JsonView(View.Post.class) Comment comment) {
+        Optional<Comment> existingComment = database.findCommentOnIdea(ideaId, commentId);
+        Optional<User> user = database.findUser(userId);
+        if (!user.isPresent() || !existingComment.isPresent() || !existingComment.get().getAuthorId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        existingComment.get().setContent(comment.getContent());
+        database.updateComment(existingComment.get());
+    }
+
     @DeleteMapping("/api/ideas/{id}")
     public void deleteIdea(@RequestHeader("authorization") String userId, @PathVariable String id) {
         Optional<Idea> ideaToDelete = database.findIdea(id);
@@ -95,5 +122,18 @@ public class DatabaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id);
+    }
+
+    @DeleteMapping("/api/ideas/{ideaId}/comments/{commentId}")
+    public void deleteComment(@RequestHeader("authorization") String userId, @PathVariable String ideaId, @PathVariable String commentId) {
+        Optional<Comment> commentToDelete = database.findCommentOnIdea(ideaId, commentId);
+        Optional<User> user = database.findUser(userId);
+        if (!commentToDelete.isPresent()) {
+            return;
+        }
+        if (!user.isPresent() || !commentToDelete.isPresent() || !commentToDelete.get().getAuthorId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        database.deleteComment(commentId, ideaId);
     }
 }
