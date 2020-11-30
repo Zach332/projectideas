@@ -13,18 +13,15 @@ export const userPersistenceKey = 'user_persistent_storage'
 export const newIdeaPersistenceKey = 'new_idea_persistent_storage'
 
 const firstUserState = {
-    user: {
-        loggedIn: false,
-        id: '',
-        username: ''
-    }
+    loggedIn: false,
+    id: '',
+    username: '',
+    isAdmin: false
 };
 
 const firstNewideaState = {
-    newIdea: {
-        title: '',
-        content: ''
-    }
+    title: '',
+    content: ''
 }
 
 const userFromStorage = localStorage.getItem(userPersistenceKey)
@@ -44,11 +41,12 @@ axios.defaults.headers.common['authorization'] = initialState.user.id;
 
 const { setGlobalState, useGlobalState } = createGlobalState(initialState);
 
-export const login = (username, id) => {
+export const login = (username, id, isAdmin) => {
     setGlobalState('user', (v) => ({ ...v, 
         loggedIn: true,
         username: username,
-        id: id
+        id: id,
+        isAdmin: isAdmin
     }))
     axios.defaults.headers.common['authorization'] = id;
 };

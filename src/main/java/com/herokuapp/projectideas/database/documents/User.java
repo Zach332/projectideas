@@ -21,11 +21,14 @@ public class User {
     private String email;
     @JsonView(View.Get.class)
     private long timeCreated;
+    @JsonView(View.Get.class)
+    private boolean isAdmin;
 
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
         this.username = username;
         this.email = email;
         this.timeCreated = Instant.now().getEpochSecond();
+        this.isAdmin = false;
     }
 }

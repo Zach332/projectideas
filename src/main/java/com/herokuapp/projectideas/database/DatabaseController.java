@@ -78,7 +78,7 @@ public class DatabaseController {
     public void updateIdea(@RequestHeader("authorization") String userId, @PathVariable String id, @RequestBody @JsonView(View.Post.class) Idea idea) {
         Optional<Idea> existingIdea = database.findIdea(id);
         Optional<User> user = database.findUser(userId);
-        if (!user.isPresent() || !existingIdea.get().getAuthorId().equals(userId)) {
+        if (!user.isPresent() || (!user.get().isAdmin() && !existingIdea.get().getAuthorId().equals(userId))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         existingIdea.get().setTitle(idea.getTitle());
@@ -91,7 +91,7 @@ public class DatabaseController {
         Optional<Idea> ideaToDelete = database.findIdea(id);
         Optional<User> user = database.findUser(userId);
         if(!ideaToDelete.isPresent()) { return; }
-        if(!user.isPresent() || !ideaToDelete.get().getAuthorId().equals(userId)) {
+        if(!user.isPresent() || (!user.get().isAdmin() && !ideaToDelete.get().getAuthorId().equals(userId))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id);
