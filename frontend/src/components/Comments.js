@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import { useToasts } from 'react-toast-notifications'
+import Comment from './Comment'
 
 export default function Comments({ideaId}) {
     const { addToast } = useToasts()
     const [rows, setRows] = React.useState(1)
     const [showButton, setShowButton] = React.useState('hidden')
     const [comment, setComment] = React.useState('')
+    const [comments, setComments] = React.useState([])
 
     const onFocus = () => {
         setRows(5)
@@ -15,8 +17,7 @@ export default function Comments({ideaId}) {
 
     useEffect(() => {
         axios.get("/api/ideas/"+ideaId+"/comments").then((response) => {
-            console.log(response)
-            console.log(response.data)
+            setComments(response.data)
         })
     },[])
 
@@ -38,7 +39,7 @@ export default function Comments({ideaId}) {
     
     return (
         <div className="w-75 mt-5">
-           <form onSubmit={handleSubmit}>
+           <form className="mb-3" onSubmit={handleSubmit}>
                 <div className="form-row align-items-top">
                     <div className="col w-100">
                         <textarea type="text" className="form-control mb-2" id="inlineFormInput" rows={rows} onFocus={onFocus} onChange={handleInputChange} placeholder="Write a comment "/>
@@ -47,7 +48,8 @@ export default function Comments({ideaId}) {
                         <button type="submit" className="btn btn-primary mb-2" style={{visibility:showButton}}>Submit</button>
                     </div>
                 </div>
-            </form> 
+            </form>
+            {comments.map(comment => <Comment key={comment.id} comment={comment} />)}
         </div>
     )
 }
