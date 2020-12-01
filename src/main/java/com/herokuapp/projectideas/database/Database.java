@@ -126,6 +126,7 @@ public class Database {
     }
 
     public void deleteIdea(String id) {
+        // TODO: Delete comments on idea as well
         postContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 

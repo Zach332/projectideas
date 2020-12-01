@@ -2,7 +2,6 @@ package com.herokuapp.projectideas.api;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
@@ -39,8 +38,9 @@ public class IdeaController {
 
     @GetMapping("/api/ideas/{id}")
     @JsonView(View.Get.class)
-    public Optional<Idea> getIdea(@PathVariable String id) {
-        return database.findIdea(id);
+    public Idea getIdea(@PathVariable String id) {
+        return database.findIdea(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Idea " + id + " does not exist."));
     }
 
     @GetMapping("/api/ideas/{ideaId}/comments")
@@ -51,52 +51,50 @@ public class IdeaController {
 
     @PostMapping("/api/ideas")
     public void createIdea(@RequestHeader("authorization") String userId, @RequestBody @JsonView(View.Post.class) Idea idea) {
-        // TODO: Use username from database, not DTO
-        Optional<User> user = database.findUser(userId);
-        if (!user.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        database.createIdea(new Idea(userId, user.get().getUsername(), idea.getTitle(), idea.getContent()));
+        User user = database.findUser(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+        database.createIdea(new Idea(userId, user.getUsername(), idea.getTitle(), idea.getContent()));
     }
 
     @PostMapping("/api/ideas/{ideaId}/comments")
     public void createComment(@RequestHeader("authorization") String userId, @PathVariable String ideaId, @RequestBody @JsonView(View.Post.class) Comment comment) {
-        Optional<User> user = database.findUser(userId);
-        if (!user.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        database.createComment(new Comment(ideaId, user.get().getId(), user.get().getUsername(), comment.getContent()));
+        User user = database.findUser(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+        database.createComment(new Comment(ideaId, user.getId(), user.getUsername(), comment.getContent()));
     }
 
     @PutMapping("/api/ideas/{id}")
     public void updateIdea(@RequestHeader("authorization") String userId, @PathVariable String id, @RequestBody @JsonView(View.Post.class) Idea idea) {
-        Optional<Idea> existingIdea = database.findIdea(id);
-        Optional<User> user = database.findUser(userId);
-        if (!user.isPresent() || (!user.get().isAdmin() && !existingIdea.get().getAuthorId().equals(userId))) {
+        Idea existingIdea = database.findIdea(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Idea " + id + " does not exist."));
+        User user = database.findUser(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+        if (!user.isAdmin() && !existingIdea.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        existingIdea.get().setTitle(idea.getTitle());
-        existingIdea.get().setContent(idea.getContent());
-        database.updateIdea(id, existingIdea.get());
+        existingIdea.setTitle(idea.getTitle());
+        existingIdea.setContent(idea.getContent());
+        database.updateIdea(id, existingIdea);
     }
 
     @PutMapping("/api/ideas/{ideaId}/comments/{commentId}")
     public void updateComment(@RequestHeader("authorization") String userId, @PathVariable String ideaId, @PathVariable String commentId, @RequestBody @JsonView(View.Post.class) Comment comment) {
-        Optional<Comment> existingComment = database.findCommentOnIdea(ideaId, commentId);
-        Optional<User> user = database.findUser(userId);
-        if (!user.isPresent() || !existingComment.isPresent() || !existingComment.get().getAuthorId().equals(userId)) {
+        Comment existingComment = database.findCommentOnIdea(ideaId, commentId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment " + commentId + " does not exist."));
+        if (!existingComment.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        existingComment.get().setContent(comment.getContent());
-        database.updateComment(existingComment.get());
+        existingComment.setContent(comment.getContent());
+        database.updateComment(existingComment);
     }
 
     @DeleteMapping("/api/ideas/{id}")
     public void deleteIdea(@RequestHeader("authorization") String userId, @PathVariable String id) {
-        Optional<Idea> ideaToDelete = database.findIdea(id);
-        Optional<User> user = database.findUser(userId);
-        if(!ideaToDelete.isPresent()) { return; }
-        if(!user.isPresent() || (!user.get().isAdmin() && !ideaToDelete.get().getAuthorId().equals(userId))) {
+        Idea ideaToDelete = database.findIdea(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Idea " + id + " does not exist."));
+        User user = database.findUser(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+        if(!user.isAdmin() && !ideaToDelete.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id);
@@ -104,12 +102,11 @@ public class IdeaController {
 
     @DeleteMapping("/api/ideas/{ideaId}/comments/{commentId}")
     public void deleteComment(@RequestHeader("authorization") String userId, @PathVariable String ideaId, @PathVariable String commentId) {
-        Optional<Comment> commentToDelete = database.findCommentOnIdea(ideaId, commentId);
-        Optional<User> user = database.findUser(userId);
-        if (!commentToDelete.isPresent()) {
-            return;
-        }
-        if (!user.isPresent() || !commentToDelete.isPresent() || (!user.get().isAdmin() && !commentToDelete.get().getAuthorId().equals(userId))) {
+        Comment commentToDelete = database.findCommentOnIdea(ideaId, commentId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment " + commentId + " does not exist."));
+        User user = database.findUser(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+        if (!user.isAdmin() && !commentToDelete.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteComment(commentId, ideaId);

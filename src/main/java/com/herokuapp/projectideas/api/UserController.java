@@ -41,11 +41,9 @@ public class UserController {
         // No authorization because ID in path verifies identity
         User existingUser = database.findUser(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + id + " does not exist."));
-
         if (!existingUser.getUsername().equals(user.getUsername()) && database.containsUserWithUsername(user.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username " + user.getUsername() + " is already taken.");
         }
-
         existingUser.setUsername(user.getUsername());
         existingUser.setEmail(user.getEmail());
         database.updateUser(id, existingUser);
