@@ -65,7 +65,7 @@ export default function Idea() {
                         <a className="dropdown-item" onClick={edit}>Edit idea</a>
                         <a className="dropdown-item text-danger" data-toggle="modal" data-target="#deleteConfirmation">Delete idea</a>
                     </div>
-                    </div>
+                </div>
             </li>
         )
     }
