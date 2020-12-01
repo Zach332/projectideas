@@ -1,7 +1,5 @@
 package com.herokuapp.projectideas.database.documents;
 
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.View;
 
@@ -12,7 +10,7 @@ import lombok.*;
 public abstract class Post {
     
     @JsonView(View.Get.class)
-    String id = UUID.randomUUID().toString();
+    String id;
     String type;
     String ideaId;
     @JsonView(View.Get.class)
