@@ -131,7 +131,7 @@ public class DatabaseController {
         if (!commentToDelete.isPresent()) {
             return;
         }
-        if (!user.isPresent() || !commentToDelete.isPresent() || !commentToDelete.get().getAuthorId().equals(userId)) {
+        if (!user.isPresent() || !commentToDelete.isPresent() || (!user.get().isAdmin() && !commentToDelete.get().getAuthorId().equals(userId))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteComment(commentId, ideaId);
