@@ -9,6 +9,7 @@ export default function Comments({ideaId}) {
     const [showButton, setShowButton] = React.useState('hidden')
     const [comment, setComment] = React.useState('')
     const [comments, setComments] = React.useState([])
+    const [rerender, setRerender] = React.useState(0)
 
     const onFocus = () => {
         setRows(5)
@@ -19,7 +20,7 @@ export default function Comments({ideaId}) {
         axios.get("/api/ideas/"+ideaId+"/comments").then((response) => {
             setComments(response.data)
         })
-    },[])
+    },[rerender])
 
     const handleInputChange = (event) => {
         setComment(event.target.value)
@@ -29,6 +30,7 @@ export default function Comments({ideaId}) {
             content: comment
         }).then(() => {
             setComment('')
+            setRerender(rerender => rerender+1)
             addToast("Your comment was added successfully.", { appearance: 'success' })
         }).catch(err => {
             console.log("Error submitting comment: " + err);
@@ -49,7 +51,7 @@ export default function Comments({ideaId}) {
                     </div>
                 </div>
             </form>
-            {comments.map(comment => <Comment key={comment.id} comment={comment} parentId={ideaId}/>)}
+            {comments.map(comment => <Comment key={comment.id} comment={comment} parentId={ideaId} setRerender={setRerender}/>)}
         </div>
     )
 }

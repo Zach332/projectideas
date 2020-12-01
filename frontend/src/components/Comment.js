@@ -2,12 +2,13 @@ import React from 'react'
 import axios from 'axios'
 import { useToasts } from 'react-toast-notifications'
 
-export default function Comment({comment, parentId}) {
+export default function Comment({comment, parentId, setRerender}) {
     const { addToast } = useToasts()
     const deleteComment = () => {
         axios.delete("/api/ideas/"+parentId+"/comments/"+comment.id)
         .then(() => {
             addToast("Your comment was deleted.", { appearance: 'success', autoDismiss: true })
+            setRerender(rerender => rerender+1)
         }).catch(err => {
             console.log("Error deleting comment: " + err);
             addToast("Your comment was not deleted. Please try again.", { appearance: 'error' })
