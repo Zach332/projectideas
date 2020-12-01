@@ -31,7 +31,7 @@ export default function Comments({ideaId}) {
         }).then(() => {
             setComment('')
             setRerender(rerender => rerender+1)
-            addToast("Your comment was added successfully.", { appearance: 'success' })
+            addToast("Your comment was added successfully.", { appearance: 'success', autoDismiss: true })
         }).catch(err => {
             console.log("Error submitting comment: " + err);
             addToast("Your comment was not submitted. Please try again.", { appearance: 'error' })
