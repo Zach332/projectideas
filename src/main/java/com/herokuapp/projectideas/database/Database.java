@@ -13,9 +13,9 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
-import com.herokuapp.projectideas.database.documents.Comment;
-import com.herokuapp.projectideas.database.documents.Idea;
-import com.herokuapp.projectideas.database.documents.User;
+import com.herokuapp.projectideas.database.document.Comment;
+import com.herokuapp.projectideas.database.document.Idea;
+import com.herokuapp.projectideas.database.document.User;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

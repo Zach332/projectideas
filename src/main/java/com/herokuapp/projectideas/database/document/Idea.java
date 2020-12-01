@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.database.documents;
+package com.herokuapp.projectideas.database.document;
 
 import java.time.Instant;
 import java.util.UUID;

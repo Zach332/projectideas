@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
 import java.util.Optional;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.documents.User;
+import com.herokuapp.projectideas.database.document.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

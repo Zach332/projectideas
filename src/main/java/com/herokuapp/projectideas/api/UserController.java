@@ -3,7 +3,7 @@ package com.herokuapp.projectideas.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.View;
-import com.herokuapp.projectideas.database.documents.User;
+import com.herokuapp.projectideas.database.document.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -6,9 +6,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.View;
-import com.herokuapp.projectideas.database.documents.Comment;
-import com.herokuapp.projectideas.database.documents.Idea;
-import com.herokuapp.projectideas.database.documents.User;
+import com.herokuapp.projectideas.database.document.Comment;
+import com.herokuapp.projectideas.database.document.Idea;
+import com.herokuapp.projectideas.database.document.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

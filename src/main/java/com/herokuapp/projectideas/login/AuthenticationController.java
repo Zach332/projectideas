@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.herokuapp.projectideas.database.documents.User;
+import com.herokuapp.projectideas.database.document.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

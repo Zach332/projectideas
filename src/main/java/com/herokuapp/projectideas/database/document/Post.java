@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.database.documents;
+package com.herokuapp.projectideas.database.document;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.View;
