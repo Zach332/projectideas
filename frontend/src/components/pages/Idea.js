@@ -95,7 +95,7 @@ export default function Idea() {
                 </div>
             </div>
             <div className="row justify-content-center">
-                <Comments />
+                <Comments ideaId={params.id}/>
             </div>
             <div className="modal fade" id="deleteConfirmation" tabIndex="-1" role="dialog" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
                 <div className="modal-dialog">
