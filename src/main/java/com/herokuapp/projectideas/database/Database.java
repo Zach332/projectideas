@@ -126,8 +126,11 @@ public class Database {
     }
 
     public void deleteIdea(String id) {
-        // TODO: Delete comments on idea as well
-        postContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
+        PartitionKey partitionKey = new PartitionKey(id);
+        List<String> ids = postContainer.queryItems("SELECT VALUE c.id FROM c WHERE c.ideaId = '" + id + "'", new CosmosQueryRequestOptions(), String.class).stream().collect(Collectors.toList());
+        for (String postId : ids) {
+            postContainer.deleteItem(postId, partitionKey, new CosmosItemRequestOptions());
+        }
     }
 
     public void deleteComment(String id, String ideaId) {
