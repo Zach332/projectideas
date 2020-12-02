@@ -15,6 +15,12 @@ export default function Comments({ideaId}) {
         setRows(5)
         setShowButton('visible')
     }
+    const onBlur = () => {
+        if(comment === '') {
+            setRows(1)
+            setShowButton('hidden')
+        }
+    }
 
     useEffect(() => {
         axios.get("/api/ideas/"+ideaId+"/comments").then((response) => {
@@ -30,6 +36,7 @@ export default function Comments({ideaId}) {
             content: comment
         }).then(() => {
             setComment('')
+            setRows(1)
             setRerender(rerender => rerender+1)
             addToast("Your comment was added successfully.", { appearance: 'success', autoDismiss: true })
         }).catch(err => {
@@ -44,7 +51,7 @@ export default function Comments({ideaId}) {
            <form className="mb-3" onSubmit={handleSubmit}>
                 <div className="form-row align-items-top">
                     <div className="col w-100">
-                        <textarea type="text" className="form-control mb-2" id="inlineFormInput" rows={rows} onFocus={onFocus} onChange={handleInputChange} placeholder="Write a comment "/>
+                        <textarea type="text" className="form-control mb-2" id="inlineFormInput" value={comment} rows={rows} onBlur={onBlur} onFocus={onFocus} onChange={handleInputChange} placeholder="Write a comment "/>
                     </div>
                     <div className="col-auto align-top">
                         <button type="submit" className="btn btn-primary mb-2" style={{visibility:showButton}}>Submit</button>
