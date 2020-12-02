@@ -49,7 +49,7 @@ export default function Comments({ideaId}) {
     
     return (
         <AnimateSharedLayout>
-            <motion.div layout className="w-75 mt-5">
+            <div layout className="w-75 mt-5">
                 <form className="mb-3" onSubmit={handleSubmit}>
                     <div className="form-row align-items-top">
                         <div className="col w-100">
@@ -60,8 +60,10 @@ export default function Comments({ideaId}) {
                         </div>
                     </div>
                 </form>
-                {comments.map(comment => <Comment key={comment.id} comment={comment} parentId={ideaId} setRerender={setRerender}/>)}
-            </motion.div>
+                <motion.div layout>
+                    {comments.map(comment => <Comment key={comment.id} comment={comment} parentId={ideaId} setRerender={setRerender}/>)}
+                </motion.div>
+            </div>
         </AnimateSharedLayout>
     )
 }
