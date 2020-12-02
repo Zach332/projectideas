@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.20.0",
     "fibers": "^5.0.0",
+    "framer-motion": "^2.9.5",
     "node-sass": "^4.0.0",
     "react": "^16.13.1",
     "react-chrome-dino": "^0.1.3",
