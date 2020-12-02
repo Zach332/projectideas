@@ -15,6 +15,7 @@ import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.herokuapp.projectideas.database.document.Comment;
 import com.herokuapp.projectideas.database.document.Idea;
+import com.herokuapp.projectideas.database.document.Message;
 import com.herokuapp.projectideas.database.document.User;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,10 @@ public class Database {
 
     public Optional<User> findUserByEmail(String email) {
         return userContainer.queryItems("SELECT * FROM c WHERE c.email = '" + email + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
+    }
+
+    public Optional<User> findUserByUsername(String username) {
+        return userContainer.queryItems("SELECT * FROM c WHERE c.username = '" + username + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
     }
 
     public boolean containsUserWithUsername(String username) {
@@ -143,5 +148,31 @@ public class Database {
 
     public void deleteComment(String id, String ideaId) {
         postContainer.deleteItem(id, new PartitionKey(ideaId), new CosmosItemRequestOptions());
+    }
+
+    // Messages
+
+    public void createMessage(Message message) {
+        messageContainer.createItem(message);
+    }
+
+    public Optional<Message> findMessageToUser(String recipientId, String messageId) {
+        return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "' AND c.id = '" + messageId + "'", new CosmosQueryRequestOptions(), Message.class).stream().findFirst();
+    }
+
+    public List<Message> findAllMessagesToUser(String recipientId) {
+        return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "'", new CosmosQueryRequestOptions(), Message.class).stream().collect(Collectors.toList());
+    }
+
+    public List<Message> findAllUnreadMessagesToUser(String recipientId) {
+        return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "' AND c.unread = true", new CosmosQueryRequestOptions(), Message.class).stream().collect(Collectors.toList());
+    }
+
+    public void updateMessage(String recipientId, String messageId, Message message) {
+        messageContainer.replaceItem(message, messageId, new PartitionKey(recipientId), new CosmosItemRequestOptions());
+    }
+
+    public void deleteMessage(String id, String recipientId) {
+        messageContainer.deleteItem(id, new PartitionKey(recipientId), new CosmosItemRequestOptions());
     }
 }
