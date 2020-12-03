@@ -49,7 +49,7 @@ export default function Comments({ideaId}) {
     
     return (
         <AnimateSharedLayout>
-            <div layout className="w-75 mt-5">
+            <div className="w-75 mt-5">
                 <form className="mb-3" onSubmit={handleSubmit}>
                     <div className="form-row align-items-top">
                         <div className="col w-100">

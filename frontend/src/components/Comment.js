@@ -19,7 +19,7 @@ export default function Comment({comment, parentId, setRerender}) {
     }
 
 	return (
-        <div className="list-group-item flex-column align-items-start my-2 rounded border">
+        <motion.div layout className="list-group-item flex-column align-items-start my-2 rounded border">
             {(user.username === comment.authorUsername || user.isAdmin) &&
                 <div className="dropdown">
                     <button className="btn btn-sm btn-outline-secondary float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -34,6 +34,6 @@ export default function Comment({comment, parentId, setRerender}) {
             }
             <p className="mb-1">{comment.content}</p>
             <small className="text-muted">{comment.authorUsername}</small>
-        </div>
+        </motion.div>
 	);
 }
