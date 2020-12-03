@@ -25,7 +25,7 @@ export default function Login() {
         axios.post("/api/login/email", {
             email: response.profileObj.email
         }).then((response) => {
-            login(response.data.username, response.data.id, response.data.isAdmin)
+            login(response.data.username, response.data.id, response.data.admin)
             setStatus(Status.Success)
         }).catch(err => {
             onFailure(err);

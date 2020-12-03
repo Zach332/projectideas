@@ -33,7 +33,7 @@ export default function Profile() {
             username: userData.username,
             email: userData.email
         }).then((_response) => {
-            login(userData.username, user.id, user.isAdmin)
+            login(userData.username, user.id, user.admin)
             addToast("Username changed successfully", { appearance: 'success', autoDismiss: true })
             setChangingUsername(false)
         }).catch(err => {

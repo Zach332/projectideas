@@ -54,7 +54,7 @@ export default function Idea() {
     }
 
     let more
-    if(user.username === idea.authorUsername || user.isAdmin) {
+    if(user.username === idea.authorUsername || user.admin) {
         more = (
             <li className="list-group-item">
                 <div className="dropdown">
