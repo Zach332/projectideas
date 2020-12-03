@@ -43,9 +43,8 @@ public class Database {
 
     // Users
 
-    public User createUser(User user) {
+    public void createUser(User user) {
         userContainer.createItem(user);
-        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + user.getId() + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public Optional<User> findUser(String id) {
@@ -98,9 +97,8 @@ public class Database {
 
     // Ideas
 
-    public Idea createIdea(Idea idea) {
+    public void createIdea(Idea idea) {
         postContainer.createItem(idea);
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + idea.getId() + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst().get();
     }
 
     public List<Idea> findAllIdeas() {
@@ -128,9 +126,8 @@ public class Database {
 
     // Comments
 
-    public Comment createComment(Comment comment) {
+    public void createComment(Comment comment) {
         postContainer.createItem(comment);
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + comment.getIdeaId() + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst().get();
     }
 
     public List<Comment> findAllCommentsOnIdea(String ideaId) {
