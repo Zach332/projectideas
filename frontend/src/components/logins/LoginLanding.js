@@ -22,7 +22,7 @@ export default function LoginLanding() {
         axios.post("/api/login/github", {
             code: data.code
         }).then((response) => {
-            login(response.data.username, response.data.id, response.data.isAdmin)
+            login(response.data.username, response.data.id, response.data.admin)
             setStatus(Status.Success)
         }).catch(err => {
             onFailure(err);

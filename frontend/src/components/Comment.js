@@ -20,7 +20,7 @@ export default function Comment({comment, parentId, setRerender}) {
 
 	return (
         <motion.div layout className="list-group-item flex-column align-items-start my-2 rounded border">
-            {(user.username === comment.authorUsername || user.isAdmin) &&
+            {(user.username === comment.authorUsername || user.admin) &&
                 <div className="dropdown">
                     <button className="btn btn-sm btn-outline-secondary float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
