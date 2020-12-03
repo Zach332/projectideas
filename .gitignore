@@ -6,3 +6,4 @@ target
 .classpath
 .factorypath
 .vscode
+node_modules

@@ -1,62 +1,60 @@
-import { createGlobalState } from 'react-hooks-global-state';
-import axios from 'axios'
+import { createGlobalState } from "react-hooks-global-state";
+import axios from "axios";
 
 export const Status = {
     Loading: "Loading",
     Success: "Success",
     Failure: "Failure",
     NotSubmitted: "NotSubmitted",
-    NotFound: "NotFound"
-}
+    NotFound: "NotFound",
+};
 
-export const userPersistenceKey = 'user_persistent_storage'
-export const newIdeaPersistenceKey = 'new_idea_persistent_storage'
+export const userPersistenceKey = "user_persistent_storage";
+export const newIdeaPersistenceKey = "new_idea_persistent_storage";
 
 const firstUserState = {
     loggedIn: false,
-    id: '',
-    username: '',
-    isAdmin: false
+    id: "",
+    username: "",
+    isAdmin: false,
 };
 
 const firstNewideaState = {
-    title: '',
-    content: ''
-}
+    title: "",
+    content: "",
+};
 
-const userFromStorage = localStorage.getItem(userPersistenceKey)
-const userObject = JSON.parse(userFromStorage)
-const user = userFromStorage === null || !userObject.id
-    ? firstUserState
-    : userObject
-const newIdeaFromStorage = localStorage.getItem(newIdeaPersistenceKey)
-const newIdeaObject = JSON.parse(newIdeaFromStorage)
-const newIdea = newIdeaFromStorage === null
-    ? firstNewideaState
-    : newIdeaObject
+const userFromStorage = localStorage.getItem(userPersistenceKey);
+const userObject = JSON.parse(userFromStorage);
+const user =
+    userFromStorage === null || !userObject.id ? firstUserState : userObject;
+const newIdeaFromStorage = localStorage.getItem(newIdeaPersistenceKey);
+const newIdeaObject = JSON.parse(newIdeaFromStorage);
+const newIdea = newIdeaFromStorage === null ? firstNewideaState : newIdeaObject;
 
-const initialState = { user , newIdea}
-    
-axios.defaults.headers.common['authorization'] = initialState.user.id;
+const initialState = { user, newIdea };
+
+axios.defaults.headers.common["authorization"] = initialState.user.id;
 
 const { setGlobalState, useGlobalState } = createGlobalState(initialState);
 
 export const login = (username, id, isAdmin) => {
-    setGlobalState('user', (v) => ({ ...v, 
+    setGlobalState("user", (v) => ({
+        ...v,
         loggedIn: true,
         username: username,
         id: id,
-        isAdmin: isAdmin
-    }))
-    axios.defaults.headers.common['authorization'] = id;
+        isAdmin: isAdmin,
+    }));
+    axios.defaults.headers.common["authorization"] = id;
 };
 
 export const logout = () => {
-    setGlobalState('user', firstUserState)
+    setGlobalState("user", firstUserState);
 };
 
 export const post = () => {
-    setGlobalState('newIdea', firstNewideaState)
+    setGlobalState("newIdea", firstNewideaState);
 };
 
 export { useGlobalState };
