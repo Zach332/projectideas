@@ -31,7 +31,7 @@ export default function Login() {
                 login(
                     response.data.username,
                     response.data.id,
-                    response.data.isAdmin
+                    response.data.admin
                 );
                 setStatus(Status.Success);
             })

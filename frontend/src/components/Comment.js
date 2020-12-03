@@ -30,7 +30,7 @@ export default function Comment({ comment, parentId, setRerender }) {
             layout
             className="list-group-item flex-column align-items-start my-2 rounded border"
         >
-            {(user.username === comment.authorUsername || user.isAdmin) && (
+            {(user.username === comment.authorUsername || user.admin) && (
                 <div className="dropdown">
                     <button
                         className="btn btn-sm btn-outline-secondary float-right"

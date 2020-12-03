@@ -16,7 +16,7 @@ const firstUserState = {
     loggedIn: false,
     id: "",
     username: "",
-    isAdmin: false,
+    admin: false,
 };
 
 const firstNewideaState = {
@@ -38,13 +38,13 @@ axios.defaults.headers.common["authorization"] = initialState.user.id;
 
 const { setGlobalState, useGlobalState } = createGlobalState(initialState);
 
-export const login = (username, id, isAdmin) => {
+export const login = (username, id, admin) => {
     setGlobalState("user", (v) => ({
         ...v,
         loggedIn: true,
         username: username,
         id: id,
-        isAdmin: isAdmin,
+        admin: admin,
     }));
     axios.defaults.headers.common["authorization"] = id;
 };

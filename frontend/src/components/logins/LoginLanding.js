@@ -26,7 +26,7 @@ export default function LoginLanding() {
                 login(
                     response.data.username,
                     response.data.id,
-                    response.data.isAdmin
+                    response.data.admin
                 );
                 setStatus(Status.Success);
             })
