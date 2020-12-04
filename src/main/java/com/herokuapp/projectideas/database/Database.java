@@ -43,9 +43,8 @@ public class Database {
 
     // Users
 
-    public User createUser(User user) {
+    public void createUser(User user) {
         userContainer.createItem(user);
-        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + user.getId() + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public Optional<User> findUser(String id) {
@@ -64,7 +63,7 @@ public class Database {
         return userContainer.queryItems("SELECT VALUE COUNT(1) FROM c WHERE c.username = '" + username + "'", new CosmosQueryRequestOptions(), Integer.class).stream().findFirst().get() > 0;
     }
 
-    public User updateUser(String id, User user) {
+    public void updateUser(String id, User user) {
         User oldUser = userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
 
         // Handle username denormalization
@@ -73,14 +72,13 @@ public class Database {
             params.add(user.getId());
             params.add(user.getUsername());
             
-            // TODO: Return strings instead of the entire document
-            List<Idea> partitionKeys = postContainer.queryItems("SELECT * FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), Idea.class).stream()
-                .collect(Collectors.toList());
-
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
-            for (Idea idea : partitionKeys) {
-                PartitionKey partitionKey = new PartitionKey(idea.getId());
+            List<PartitionKey> partitionKeys = postContainer.queryItems("SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), String.class).stream()
+                .map(ideaId -> new PartitionKey(ideaId))
+                .collect(Collectors.toList());
+
+            for (PartitionKey partitionKey : partitionKeys) {
                 options.setPartitionKey(partitionKey);
                 postContainer.getScripts()
                     .getStoredProcedure("updateUsername")
@@ -89,7 +87,6 @@ public class Database {
         }
 
         userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions());
-        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public void deleteUser(String id) {
@@ -98,9 +95,8 @@ public class Database {
 
     // Ideas
 
-    public Idea createIdea(Idea idea) {
+    public void createIdea(Idea idea) {
         postContainer.createItem(idea);
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + idea.getId() + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst().get();
     }
 
     public List<Idea> findAllIdeas() {
@@ -108,14 +104,11 @@ public class Database {
     }
 
     public Optional<Idea> findIdea(String id) {
-        // TODO: Change this to rely on the partition key, not the id field (might have a performance advantage)
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
+        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
     }
 
-    // TODO: Is the id argument necessary?
-    public Idea updateIdea(String id, Idea idea) {
-        postContainer.replaceItem(idea, id, new PartitionKey(id), new CosmosItemRequestOptions());
-        return postContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst().get();
+    public void updateIdea(Idea idea) {
+        postContainer.replaceItem(idea, idea.getId(), new PartitionKey(idea.getId()), new CosmosItemRequestOptions());
     }
 
     public void deleteIdea(String id) {
@@ -128,9 +121,8 @@ public class Database {
 
     // Comments
 
-    public Comment createComment(Comment comment) {
+    public void createComment(Comment comment) {
         postContainer.createItem(comment);
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + comment.getIdeaId() + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst().get();
     }
 
     public List<Comment> findAllCommentsOnIdea(String ideaId) {
@@ -141,9 +133,8 @@ public class Database {
         return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + ideaId + "' AND c.id = '" + commentId + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst();
     }
 
-    public Comment updateComment(Comment comment) {
+    public void updateComment(Comment comment) {
         postContainer.replaceItem(comment, comment.getId(), new PartitionKey(comment.getIdeaId()), new CosmosItemRequestOptions());
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + comment.getIdeaId() + "' AND c.id = '" + comment.getId() + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst().get();
     }
 
     public void deleteComment(String id, String ideaId) {
@@ -168,8 +159,8 @@ public class Database {
         return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "' AND c.unread = true", new CosmosQueryRequestOptions(), Message.class).stream().collect(Collectors.toList());
     }
 
-    public void updateMessage(String recipientId, String messageId, Message message) {
-        messageContainer.replaceItem(message, messageId, new PartitionKey(recipientId), new CosmosItemRequestOptions());
+    public void updateMessage(Message message) {
+        messageContainer.replaceItem(message, message.getId(), new PartitionKey(message.getRecipientId()), new CosmosItemRequestOptions());
     }
 
     public void deleteMessage(String id, String recipientId) {

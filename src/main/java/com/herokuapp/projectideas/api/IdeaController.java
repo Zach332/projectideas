@@ -74,7 +74,7 @@ public class IdeaController {
         }
         existingIdea.setTitle(idea.getTitle());
         existingIdea.setContent(idea.getContent());
-        database.updateIdea(id, existingIdea);
+        database.updateIdea(existingIdea);
     }
 
     @PutMapping("/api/ideas/{ideaId}/comments/{commentId}")
