@@ -72,14 +72,13 @@ public class Database {
             params.add(user.getId());
             params.add(user.getUsername());
             
-            // TODO: Return strings instead of the entire document
-            List<Idea> partitionKeys = postContainer.queryItems("SELECT * FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), Idea.class).stream()
-                .collect(Collectors.toList());
-
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
-            for (Idea idea : partitionKeys) {
-                PartitionKey partitionKey = new PartitionKey(idea.getId());
+            List<PartitionKey> partitionKeys = postContainer.queryItems("SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), String.class).stream()
+                .map(ideaId -> new PartitionKey(ideaId))
+                .collect(Collectors.toList());
+                
+            for (PartitionKey partitionKey : partitionKeys) {
                 options.setPartitionKey(partitionKey);
                 postContainer.getScripts()
                     .getStoredProcedure("updateUsername")
