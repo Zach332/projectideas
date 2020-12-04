@@ -54,7 +54,7 @@ public class MessageController {
         Message existingMessage = database.findMessageToUser(recipientId, messageId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message " + messageId + " does not exist."));
         existingMessage.setUnread(unread);
-        database.updateMessage(recipientId, messageId, existingMessage);
+        database.updateMessage(existingMessage);
     }
 
     @DeleteMapping("/api/messages/{messageId}")
