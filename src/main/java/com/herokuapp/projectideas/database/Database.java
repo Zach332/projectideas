@@ -108,9 +108,8 @@ public class Database {
         return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
     }
 
-    // TODO: Is the id argument necessary?
-    public void updateIdea(String id, Idea idea) {
-        postContainer.replaceItem(idea, id, new PartitionKey(id), new CosmosItemRequestOptions());
+    public void updateIdea(Idea idea) {
+        postContainer.replaceItem(idea, idea.getId(), new PartitionKey(idea.getId()), new CosmosItemRequestOptions());
     }
 
     public void deleteIdea(String id) {
@@ -161,8 +160,8 @@ public class Database {
         return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "' AND c.unread = true", new CosmosQueryRequestOptions(), Message.class).stream().collect(Collectors.toList());
     }
 
-    public void updateMessage(String recipientId, String messageId, Message message) {
-        messageContainer.replaceItem(message, messageId, new PartitionKey(recipientId), new CosmosItemRequestOptions());
+    public void updateMessage(Message message) {
+        messageContainer.replaceItem(message, message.getId(), new PartitionKey(message.getRecipientId()), new CosmosItemRequestOptions());
     }
 
     public void deleteMessage(String id, String recipientId) {
