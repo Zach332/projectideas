@@ -104,8 +104,7 @@ public class Database {
     }
 
     public Optional<Idea> findIdea(String id) {
-        // TODO: Change this to rely on the partition key, not the id field (might have a performance advantage)
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.id = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
+        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
     }
 
     public void updateIdea(Idea idea) {
