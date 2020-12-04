@@ -52,7 +52,7 @@ public class MessageController {
 
     private void markMessage(String recipientId, String messageId, boolean unread) {
         Message existingMessage = database.findMessageToUser(recipientId, messageId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message " + messageId + " does not exist."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message " + messageId + " to user " + recipientId + " does not exist."));
         existingMessage.setUnread(unread);
         database.updateMessage(existingMessage);
     }
