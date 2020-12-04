@@ -63,7 +63,7 @@ public class Database {
         return userContainer.queryItems("SELECT VALUE COUNT(1) FROM c WHERE c.username = '" + username + "'", new CosmosQueryRequestOptions(), Integer.class).stream().findFirst().get() > 0;
     }
 
-    public User updateUser(String id, User user) {
+    public void updateUser(String id, User user) {
         User oldUser = userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
 
         // Handle username denormalization
@@ -77,7 +77,7 @@ public class Database {
             List<PartitionKey> partitionKeys = postContainer.queryItems("SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), String.class).stream()
                 .map(ideaId -> new PartitionKey(ideaId))
                 .collect(Collectors.toList());
-                
+
             for (PartitionKey partitionKey : partitionKeys) {
                 options.setPartitionKey(partitionKey);
                 postContainer.getScripts()
@@ -87,7 +87,6 @@ public class Database {
         }
 
         userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions());
-        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
     }
 
     public void deleteUser(String id) {
@@ -110,9 +109,8 @@ public class Database {
     }
 
     // TODO: Is the id argument necessary?
-    public Idea updateIdea(String id, Idea idea) {
+    public void updateIdea(String id, Idea idea) {
         postContainer.replaceItem(idea, id, new PartitionKey(id), new CosmosItemRequestOptions());
-        return postContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst().get();
     }
 
     public void deleteIdea(String id) {
@@ -137,9 +135,8 @@ public class Database {
         return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + ideaId + "' AND c.id = '" + commentId + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst();
     }
 
-    public Comment updateComment(Comment comment) {
+    public void updateComment(Comment comment) {
         postContainer.replaceItem(comment, comment.getId(), new PartitionKey(comment.getIdeaId()), new CosmosItemRequestOptions());
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + comment.getIdeaId() + "' AND c.id = '" + comment.getId() + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst().get();
     }
 
     public void deleteComment(String id, String ideaId) {
