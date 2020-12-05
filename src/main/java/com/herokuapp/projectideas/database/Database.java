@@ -1,10 +1,5 @@
 package com.herokuapp.projectideas.database;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
@@ -17,7 +12,10 @@ import com.herokuapp.projectideas.database.document.Comment;
 import com.herokuapp.projectideas.database.document.Idea;
 import com.herokuapp.projectideas.database.document.Message;
 import com.herokuapp.projectideas.database.document.User;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -30,11 +28,12 @@ public class Database {
     private CosmosContainer postContainer;
     private CosmosContainer messageContainer;
 
-    public Database(@Value("${azure.cosmos.uri}") String uri, @Value("${azure.cosmos.key}") String key, @Value("${azure.cosmos.database}") String databaseName) {
-        client = new CosmosClientBuilder()
-            .endpoint(uri)
-            .key(key)
-            .buildClient();
+    public Database(
+        @Value("${azure.cosmos.uri}") String uri,
+        @Value("${azure.cosmos.key}") String key,
+        @Value("${azure.cosmos.database}") String databaseName
+    ) {
+        client = new CosmosClientBuilder().endpoint(uri).key(key).buildClient();
         database = client.getDatabase(databaseName);
         userContainer = database.getContainer("users");
         postContainer = database.getContainer("posts");
@@ -48,49 +47,109 @@ public class Database {
     }
 
     public Optional<User> findUser(String id) {
-        return userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
+        return userContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.id = '" + id + "'",
+                new CosmosQueryRequestOptions(),
+                User.class
+            )
+            .stream()
+            .findFirst();
     }
 
     public Optional<User> findUserByEmail(String email) {
-        return userContainer.queryItems("SELECT * FROM c WHERE c.email = '" + email + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
+        return userContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.email = '" + email + "'",
+                new CosmosQueryRequestOptions(),
+                User.class
+            )
+            .stream()
+            .findFirst();
     }
 
     public Optional<User> findUserByUsername(String username) {
-        return userContainer.queryItems("SELECT * FROM c WHERE c.username = '" + username + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst();
+        return userContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.username = '" + username + "'",
+                new CosmosQueryRequestOptions(),
+                User.class
+            )
+            .stream()
+            .findFirst();
     }
 
     public boolean containsUserWithUsername(String username) {
-        return userContainer.queryItems("SELECT VALUE COUNT(1) FROM c WHERE c.username = '" + username + "'", new CosmosQueryRequestOptions(), Integer.class).stream().findFirst().get() > 0;
+        return (
+            userContainer
+                .queryItems(
+                    "SELECT VALUE COUNT(1) FROM c WHERE c.username = '" +
+                    username +
+                    "'",
+                    new CosmosQueryRequestOptions(),
+                    Integer.class
+                )
+                .stream()
+                .findFirst()
+                .get() >
+            0
+        );
     }
 
     public void updateUser(String id, User user) {
-        User oldUser = userContainer.queryItems("SELECT * FROM c WHERE c.id = '" + id + "'", new CosmosQueryRequestOptions(), User.class).stream().findFirst().get();
+        User oldUser = userContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.id = '" + id + "'",
+                new CosmosQueryRequestOptions(),
+                User.class
+            )
+            .stream()
+            .findFirst()
+            .get();
 
         // Handle username denormalization
         if (!user.getUsername().equals(oldUser.getUsername())) {
             ArrayList<Object> params = new ArrayList<Object>();
             params.add(user.getId());
             params.add(user.getUsername());
-            
+
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
-            List<PartitionKey> partitionKeys = postContainer.queryItems("SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" + user.getId() + "'", new CosmosQueryRequestOptions(), String.class).stream()
+            List<PartitionKey> partitionKeys = postContainer
+                .queryItems(
+                    "SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" +
+                    user.getId() +
+                    "'",
+                    new CosmosQueryRequestOptions(),
+                    String.class
+                )
+                .stream()
                 .map(ideaId -> new PartitionKey(ideaId))
                 .collect(Collectors.toList());
 
             for (PartitionKey partitionKey : partitionKeys) {
                 options.setPartitionKey(partitionKey);
-                postContainer.getScripts()
+                postContainer
+                    .getScripts()
                     .getStoredProcedure("updateUsername")
                     .execute(params, options);
             }
         }
 
-        userContainer.replaceItem(user, id, new PartitionKey(id), new CosmosItemRequestOptions());
+        userContainer.replaceItem(
+            user,
+            id,
+            new PartitionKey(id),
+            new CosmosItemRequestOptions()
+        );
     }
 
     public void deleteUser(String id) {
-        userContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
+        userContainer.deleteItem(
+            id,
+            new PartitionKey(id),
+            new CosmosItemRequestOptions()
+        );
     }
 
     // Ideas
@@ -100,22 +159,54 @@ public class Database {
     }
 
     public List<Idea> findAllIdeas() {
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea'", new CosmosQueryRequestOptions(), Idea.class).stream().collect(Collectors.toList());
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea'",
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
     }
 
     public Optional<Idea> findIdea(String id) {
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId = '" + id + "'", new CosmosQueryRequestOptions(), Idea.class).stream().findFirst();
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId = '" +
+                id +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .findFirst();
     }
 
     public void updateIdea(Idea idea) {
-        postContainer.replaceItem(idea, idea.getId(), new PartitionKey(idea.getId()), new CosmosItemRequestOptions());
+        postContainer.replaceItem(
+            idea,
+            idea.getId(),
+            new PartitionKey(idea.getId()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     public void deleteIdea(String id) {
         PartitionKey partitionKey = new PartitionKey(id);
-        List<String> ids = postContainer.queryItems("SELECT VALUE c.id FROM c WHERE c.ideaId = '" + id + "'", new CosmosQueryRequestOptions(), String.class).stream().collect(Collectors.toList());
+        List<String> ids = postContainer
+            .queryItems(
+                "SELECT VALUE c.id FROM c WHERE c.ideaId = '" + id + "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .collect(Collectors.toList());
         for (String postId : ids) {
-            postContainer.deleteItem(postId, partitionKey, new CosmosItemRequestOptions());
+            postContainer.deleteItem(
+                postId,
+                partitionKey,
+                new CosmosItemRequestOptions()
+            );
         }
     }
 
@@ -126,19 +217,51 @@ public class Database {
     }
 
     public List<Comment> findAllCommentsOnIdea(String ideaId) {
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + ideaId + "'", new CosmosQueryRequestOptions(), Comment.class).stream().collect(Collectors.toList()); 
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
+                ideaId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Comment.class
+            )
+            .stream()
+            .collect(Collectors.toList());
     }
 
-    public Optional<Comment> findCommentOnIdea(String ideaId, String commentId) {
-        return postContainer.queryItems("SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" + ideaId + "' AND c.id = '" + commentId + "'", new CosmosQueryRequestOptions(), Comment.class).stream().findFirst();
+    public Optional<Comment> findCommentOnIdea(
+        String ideaId,
+        String commentId
+    ) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
+                ideaId +
+                "' AND c.id = '" +
+                commentId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Comment.class
+            )
+            .stream()
+            .findFirst();
     }
 
     public void updateComment(Comment comment) {
-        postContainer.replaceItem(comment, comment.getId(), new PartitionKey(comment.getIdeaId()), new CosmosItemRequestOptions());
+        postContainer.replaceItem(
+            comment,
+            comment.getId(),
+            new PartitionKey(comment.getIdeaId()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     public void deleteComment(String id, String ideaId) {
-        postContainer.deleteItem(id, new PartitionKey(ideaId), new CosmosItemRequestOptions());
+        postContainer.deleteItem(
+            id,
+            new PartitionKey(ideaId),
+            new CosmosItemRequestOptions()
+        );
     }
 
     // Messages
@@ -147,23 +270,62 @@ public class Database {
         messageContainer.createItem(message);
     }
 
-    public Optional<Message> findMessageToUser(String recipientId, String messageId) {
-        return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "' AND c.id = '" + messageId + "'", new CosmosQueryRequestOptions(), Message.class).stream().findFirst();
+    public Optional<Message> findMessageToUser(
+        String recipientId,
+        String messageId
+    ) {
+        return messageContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.recipientId = '" +
+                recipientId +
+                "' AND c.id = '" +
+                messageId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Message.class
+            )
+            .stream()
+            .findFirst();
     }
 
     public List<Message> findAllMessagesToUser(String recipientId) {
-        return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "'", new CosmosQueryRequestOptions(), Message.class).stream().collect(Collectors.toList());
+        return messageContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.recipientId = '" + recipientId + "'",
+                new CosmosQueryRequestOptions(),
+                Message.class
+            )
+            .stream()
+            .collect(Collectors.toList());
     }
 
     public List<Message> findAllUnreadMessagesToUser(String recipientId) {
-        return messageContainer.queryItems("SELECT * FROM c WHERE c.recipientId = '" + recipientId + "' AND c.unread = true", new CosmosQueryRequestOptions(), Message.class).stream().collect(Collectors.toList());
+        return messageContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.recipientId = '" +
+                recipientId +
+                "' AND c.unread = true",
+                new CosmosQueryRequestOptions(),
+                Message.class
+            )
+            .stream()
+            .collect(Collectors.toList());
     }
 
     public void updateMessage(Message message) {
-        messageContainer.replaceItem(message, message.getId(), new PartitionKey(message.getRecipientId()), new CosmosItemRequestOptions());
+        messageContainer.replaceItem(
+            message,
+            message.getId(),
+            new PartitionKey(message.getRecipientId()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     public void deleteMessage(String id, String recipientId) {
-        messageContainer.deleteItem(id, new PartitionKey(recipientId), new CosmosItemRequestOptions());
+        messageContainer.deleteItem(
+            id,
+            new PartitionKey(recipientId),
+            new CosmosItemRequestOptions()
+        );
     }
 }

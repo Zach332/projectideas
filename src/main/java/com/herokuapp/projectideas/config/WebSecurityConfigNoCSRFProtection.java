@@ -7,7 +7,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @Configuration
 @Profile("dev_no_csrf_protection")
-public class WebSecurityConfigNoCSRFProtection extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfigNoCSRFProtection
+    extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

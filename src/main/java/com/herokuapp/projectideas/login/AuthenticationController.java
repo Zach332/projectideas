@@ -1,38 +1,40 @@
 package com.herokuapp.projectideas.login;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.herokuapp.projectideas.database.document.User;
-
+import java.io.IOException;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import okhttp3.*;
-
 @RestController
 public class AuthenticationController {
+
     @Autowired
     LoginController loginController;
-    
+
     private static final OkHttpClient httpClient = new OkHttpClient();
 
     static class GitHubCode {
+
         String code;
-        public GitHubCode() {
-        }
+
+        public GitHubCode() {}
+
         public void setCode(String code) {
             this.code = code;
         }
     }
 
     static class Email {
+
         String email;
-        public Email() {
-        }
+
+        public Email() {}
+
         public void setEmail(String email) {
             this.email = email;
         }
@@ -40,11 +42,12 @@ public class AuthenticationController {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class GithubEmail {
+
         public String email;
         public boolean primary;
         public boolean verified;
-        public GithubEmail() {
-        }
+
+        public GithubEmail() {}
     }
 
     static class UserDTO {
@@ -54,14 +57,13 @@ public class AuthenticationController {
         public String email;
         public long timeCreated;
         public boolean isAdmin;
-    
-        public UserDTO() {
-        }
+
+        public UserDTO() {}
     }
-    
+
     @PostMapping("/api/login/email")
     public UserDTO emailAuthentication(@RequestBody Email email) {
-        return convertUserToDTO(loginController.getUserByEmail(email.email)); 
+        return convertUserToDTO(loginController.getUserByEmail(email.email));
     }
 
     @PostMapping("/api/login/github")
@@ -83,15 +85,22 @@ public class AuthenticationController {
                 System.out.println("Unexpected code " + response);
                 return null;
             }
-            HttpUrl url = HttpUrl.parse("https://randomaddress.com/search?"+response.body().string());
+            HttpUrl url = HttpUrl.parse(
+                "https://randomaddress.com/search?" + response.body().string()
+            );
             String token = url.queryParameter("access_token");
             String userResponse = getUserEmail(token);
 
             ObjectMapper mapper = new ObjectMapper();
-            GithubEmail[] emails = mapper.readValue(userResponse, GithubEmail[].class);
+            GithubEmail[] emails = mapper.readValue(
+                userResponse,
+                GithubEmail[].class
+            );
             GithubEmail primary = getPrimary(emails);
 
-            return convertUserToDTO(loginController.getUserByEmail(primary.email));
+            return convertUserToDTO(
+                loginController.getUserByEmail(primary.email)
+            );
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -101,7 +110,7 @@ public class AuthenticationController {
     static String getUserEmail(String token) throws IOException {
         Request request = new Request.Builder()
             .url("https://api.github.com/user/emails")
-            .header("Authorization","token " + token)
+            .header("Authorization", "token " + token)
             .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
@@ -114,8 +123,8 @@ public class AuthenticationController {
     }
 
     static GithubEmail getPrimary(GithubEmail[] emails) {
-        for(GithubEmail email : emails) {
-            if(email.primary)return email;
+        for (GithubEmail email : emails) {
+            if (email.primary) return email;
         }
         return emails[0];
     }

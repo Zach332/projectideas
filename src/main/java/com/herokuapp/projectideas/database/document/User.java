@@ -1,11 +1,9 @@
 package com.herokuapp.projectideas.database.document;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.View;
-
+import java.time.Instant;
+import java.util.UUID;
 import lombok.*;
 
 @NoArgsConstructor
@@ -14,12 +12,16 @@ import lombok.*;
 public class User {
 
     private String id;
+
     @JsonView(View.Base.class)
     private String username;
+
     @JsonView(View.Base.class)
     private String email;
+
     @JsonView(View.Get.class)
     private long timeCreated;
+
     @JsonView(View.Get.class)
     private boolean admin;
 

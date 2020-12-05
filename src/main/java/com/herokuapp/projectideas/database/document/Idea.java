@@ -1,22 +1,25 @@
 package com.herokuapp.projectideas.database.document;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.View;
-
+import java.time.Instant;
+import java.util.UUID;
 import lombok.*;
 
 @NoArgsConstructor
 @Getter
 @Setter
 public class Idea extends Post {
-    
+
     @JsonView(View.Base.class)
     private String title;
 
-    public Idea(String authorId, String authorUsername, String title, String content) {
+    public Idea(
+        String authorId,
+        String authorUsername,
+        String title,
+        String content
+    ) {
         this.id = UUID.randomUUID().toString();
         this.type = "Idea";
         this.ideaId = this.id;

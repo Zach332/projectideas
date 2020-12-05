@@ -2,13 +2,17 @@ package com.herokuapp.projectideas.database.document;
 
 import java.time.Instant;
 import java.util.UUID;
-
 import lombok.*;
 
 @NoArgsConstructor
 public class Comment extends Post {
-    
-    public Comment(String ideaId, String authorId, String authorUsername, String content) {
+
+    public Comment(
+        String ideaId,
+        String authorId,
+        String authorUsername,
+        String content
+    ) {
         this.id = UUID.randomUUID().toString();
         this.type = "Comment";
         this.ideaId = ideaId;

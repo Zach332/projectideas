@@ -1,13 +1,11 @@
 package com.herokuapp.projectideas.api;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.View;
 import com.herokuapp.projectideas.database.document.Message;
 import com.herokuapp.projectideas.database.document.User;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,38 +25,85 @@ public class MessageController {
 
     @GetMapping("/api/messages/received")
     @JsonView(View.Get.class)
-    public List<Message> getReceivedMessages(@RequestHeader("authorization") String userId) {
+    public List<Message> getReceivedMessages(
+        @RequestHeader("authorization") String userId
+    ) {
         return database.findAllMessagesToUser(userId);
     }
 
     @PostMapping("/api/messages/{recipientUsername}")
-    public void sendMessage(@RequestHeader("authorization") String userId, @PathVariable("recipientUsername") String recipientUsername, @RequestBody @JsonView(View.Post.class) Message message) {
-        User sender = database.findUser(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
-        User recipient = database.findUserByUsername(recipientUsername)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + recipientUsername + " does not exist."));
-        database.createMessage(new Message(userId, sender.getUsername(), recipient.getId(), message.getContent()));
+    public void sendMessage(
+        @RequestHeader("authorization") String userId,
+        @PathVariable("recipientUsername") String recipientUsername,
+        @RequestBody @JsonView(View.Post.class) Message message
+    ) {
+        User sender = database
+            .findUser(userId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
+            );
+        User recipient = database
+            .findUserByUsername(recipientUsername)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User " + recipientUsername + " does not exist."
+                    )
+            );
+        database.createMessage(
+            new Message(
+                userId,
+                sender.getUsername(),
+                recipient.getId(),
+                message.getContent()
+            )
+        );
     }
 
     @PostMapping("/api/messages/{messageId}/markasread")
-    public void markMessageAsRead(@RequestHeader("authorization") String userId, @PathVariable String messageId) {
+    public void markMessageAsRead(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String messageId
+    ) {
         markMessage(userId, messageId, false);
     }
 
     @PostMapping("/api/messages/{messageId}/markasunread")
-    public void markMessageAsUnread(@RequestHeader("authorization") String userId, @PathVariable String messageId) {
+    public void markMessageAsUnread(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String messageId
+    ) {
         markMessage(userId, messageId, true);
     }
 
-    private void markMessage(String recipientId, String messageId, boolean unread) {
-        Message existingMessage = database.findMessageToUser(recipientId, messageId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message " + messageId + " to user " + recipientId + " does not exist."));
+    private void markMessage(
+        String recipientId,
+        String messageId,
+        boolean unread
+    ) {
+        Message existingMessage = database
+            .findMessageToUser(recipientId, messageId)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Message " +
+                        messageId +
+                        " to user " +
+                        recipientId +
+                        " does not exist."
+                    )
+            );
         existingMessage.setUnread(unread);
         database.updateMessage(existingMessage);
     }
 
     @DeleteMapping("/api/messages/{messageId}")
-    public void deleteMessage(@RequestHeader("authorization") String userId, @PathVariable String messageId) {
+    public void deleteMessage(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String messageId
+    ) {
         database.deleteMessage(messageId, userId);
     }
 }

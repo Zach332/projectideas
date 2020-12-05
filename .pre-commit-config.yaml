@@ -4,6 +4,14 @@ repos:
     hooks:
     -   id: prettier
         types: [javascript]
+-   repo: https://github.com/pre-commit/mirrors-prettier
+    rev: '8e0d199'
+    hooks:
+    -   id: prettier
+        types: [java]
+        additional_dependencies:
+        -   prettier@2.1.2
+        -   prettier-plugin-java@1.0.1
 -   repo: https://github.com/pre-commit/mirrors-eslint
     rev: 'd048c4f'
     hooks:
