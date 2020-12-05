@@ -56,7 +56,7 @@ public class AuthenticationController {
         public String username;
         public String email;
         public long timeCreated;
-        public boolean isAdmin;
+        public boolean admin;
 
         public UserDTO() {}
     }
@@ -135,7 +135,7 @@ public class AuthenticationController {
         userDTO.username = user.getUsername();
         userDTO.email = user.getEmail();
         userDTO.timeCreated = user.getTimeCreated();
-        userDTO.isAdmin = user.isAdmin();
+        userDTO.admin = user.isAdmin();
         return userDTO;
     }
 }
