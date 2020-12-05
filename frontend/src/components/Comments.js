@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import Comment from "./Comment";
+import { useGlobalState } from "../State";
 import { motion, AnimateSharedLayout } from "framer-motion";
 
 export default function Comments({ ideaId }) {
     const { addToast } = useToasts();
+    const [user] = useGlobalState("user");
     const [rows, setRows] = React.useState(1);
     const [showButton, setShowButton] = React.useState("hidden");
     const [comment, setComment] = React.useState("");
@@ -70,7 +72,12 @@ export default function Comments({ ideaId }) {
                                 onBlur={onBlur}
                                 onFocus={onFocus}
                                 onChange={handleInputChange}
-                                placeholder="Write a comment "
+                                disabled={!user.loggedIn}
+                                placeholder={
+                                    user.loggedIn
+                                        ? "Add a comment"
+                                        : "Login to comment"
+                                }
                             />
                         </div>
                         <div className="col-auto align-top">
