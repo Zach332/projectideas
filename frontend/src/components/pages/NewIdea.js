@@ -84,7 +84,11 @@ export default function NewIdea() {
                             onChange={handleInputChange}
                         ></textarea>
                     </div>
-                    <button type="submit" className="btn btn-primary">
+                    <button
+                        type="submit"
+                        disabled={idea.title === ""}
+                        className="btn btn-primary"
+                    >
                         Post Idea
                     </button>
                 </form>

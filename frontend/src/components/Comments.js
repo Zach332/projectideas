@@ -83,6 +83,7 @@ export default function Comments({ ideaId }) {
                         <div className="col-auto align-top">
                             <button
                                 type="submit"
+                                disabled={comment === ""}
                                 className="btn btn-primary mb-2"
                                 style={{ visibility: showButton }}
                             >
