@@ -150,6 +150,8 @@ export default function Idea() {
                         <li className="list-group-item">
                             <button
                                 type="button"
+                                data-toggle="modal"
+                                data-target="#sendMessage"
                                 className="btn btn-outline-secondary btn-md"
                             >
                                 Message author
@@ -158,8 +160,6 @@ export default function Idea() {
                         <li className="list-group-item">
                             <button
                                 type="button"
-                                data-toggle="modal"
-                                data-target="#sendMessage"
                                 className="btn btn-primary btn-md"
                             >
                                 Work on this idea
