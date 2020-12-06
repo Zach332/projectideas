@@ -1,22 +1,19 @@
 import React from "react";
 
-export default function Modal({ title, body, submit, onClick }) {
+export default function Modal({ id, title, body, submit, onClick }) {
     return (
         <div
             className="modal fade"
-            id="deleteConfirmation"
+            id={id}
             tabIndex="-1"
             role="dialog"
-            aria-labelledby="deleteConfirmationLabel"
+            aria-labelledby="modalLabel"
             aria-hidden="true"
         >
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h4
-                            className="modal-title"
-                            id="deleteConfirmationLabel"
-                        >
+                        <h4 className="modal-title" id="modalLabel">
                             {title}
                         </h4>
                         <button

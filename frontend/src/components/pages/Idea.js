@@ -134,6 +134,7 @@ export default function Idea() {
                 <Comments ideaId={params.id} />
             </div>
             <Modal
+                id="deleteConfirmation"
                 title="Delete Idea"
                 body="Are you sure you want to delete this idea? The data cannot be recovered."
                 submit="Delete"
