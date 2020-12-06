@@ -14,6 +14,7 @@ export default function Idea() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
     const [idea, setIdea] = React.useState([]);
+    const [message, setMessage] = React.useState("");
     const [user] = useGlobalState("user");
     let params = useParams();
 
@@ -40,6 +41,29 @@ export default function Idea() {
             .catch((err) => {
                 console.log("Error deleting idea: " + err);
                 addToast("Your idea was not deleted. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
+    const handleMessageChange = (event) => {
+        setMessage(event.target.value);
+    };
+
+    const sendMessage = () => {
+        axios
+            .post("/api/messages/" + idea.authorUsername, {
+                content: message,
+            })
+            .then(() => {
+                addToast("Your message was sent.", {
+                    appearance: "success",
+                });
+                setMessage("");
+            })
+            .catch((err) => {
+                console.log("Error submitting message: " + err);
+                addToast("Your message was not sent. Please try again.", {
                     appearance: "error",
                 });
             });
@@ -96,6 +120,20 @@ export default function Idea() {
         );
     }
 
+    const messageForm = (
+        <div className="mx-auto">
+            <form className="py-4">
+                <textarea
+                    className="form-control"
+                    id="content"
+                    rows="8"
+                    placeholder="Your message"
+                    onChange={handleMessageChange}
+                ></textarea>
+            </form>
+        </div>
+    );
+
     var date = new Date(idea.timePosted * 1000);
     return (
         <div className="container-fluid">
@@ -121,6 +159,7 @@ export default function Idea() {
                             <button
                                 type="button"
                                 data-toggle="modal"
+                                data-target="#sendMessage"
                                 className="btn btn-primary btn-md"
                             >
                                 Work on this idea
@@ -139,6 +178,13 @@ export default function Idea() {
                 body="Are you sure you want to delete this idea? The data cannot be recovered."
                 submit="Delete"
                 onClick={deleteIdea}
+            />
+            <Modal
+                id="sendMessage"
+                title={"Send Message to " + idea.authorUsername}
+                body={messageForm}
+                submit="Send"
+                onClick={sendMessage}
             />
         </div>
     );
