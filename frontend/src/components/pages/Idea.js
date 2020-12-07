@@ -181,7 +181,7 @@ export default function Idea() {
             />
             <Modal
                 id="sendMessage"
-                title={"Send Message to " + idea.authorUsername}
+                title={"Send message to " + idea.authorUsername}
                 body={messageForm}
                 submit="Send"
                 onClick={sendMessage}
