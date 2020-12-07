@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
-@Profile("dev_no_ssl")
+@Profile("no_ssl")
 public class WebSecurityConfigNoSSL extends WebSecurityConfigurerAdapter {
 
     @Override
