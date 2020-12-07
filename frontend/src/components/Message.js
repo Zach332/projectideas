@@ -1,8 +1,33 @@
 import React from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { useToasts } from "react-toast-notifications";
 
-export default function Message({ message }) {
+export default function Message({ message, setRerender }) {
+    const { addToast } = useToasts();
+    const deleteMessage = () => {
+        axios
+            .delete("/api/messages/" + message.id)
+            .then(() => {
+                addToast("The message was deleted.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                setRerender((rerender) => rerender + 1);
+            })
+            .catch((err) => {
+                console.log("Error deleting message: " + err);
+                addToast("The message was not deleted. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
     return (
-        <div className="list-group-item flex-column align-items-start my-2 rounded border">
+        <motion.div
+            layout
+            className="list-group-item flex-column align-items-start my-2 rounded border"
+        >
             <div className="dropdown">
                 <button
                     className="btn btn-sm btn-outline-secondary float-right"
@@ -30,7 +55,12 @@ export default function Message({ message }) {
                     className="dropdown-menu"
                     aria-labelledby="dropdownMenuButton"
                 >
-                    <a className="dropdown-item text-danger">Delete comment</a>
+                    <a
+                        className="dropdown-item text-danger"
+                        onClick={deleteMessage}
+                    >
+                        Delete message
+                    </a>
                 </div>
             </div>
             <h6 className="card-subtitle my-2">
@@ -39,6 +69,6 @@ export default function Message({ message }) {
             <p className="mb-1 ml-2" style={{ "white-space": "pre" }}>
                 {message.content}
             </p>
-        </div>
+        </motion.div>
     );
 }
