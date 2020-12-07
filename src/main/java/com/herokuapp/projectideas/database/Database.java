@@ -31,13 +31,14 @@ public class Database {
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
         @Value("${azure.cosmos.key}") String key,
-        @Value("${azure.cosmos.database}") String databaseName
+        @Value("${projectideas.collectionPrefix}") String collectionPrefix
     ) {
         client = new CosmosClientBuilder().endpoint(uri).key(key).buildClient();
-        database = client.getDatabase(databaseName);
-        userContainer = database.getContainer("users");
-        postContainer = database.getContainer("posts");
-        messageContainer = database.getContainer("messages");
+        database = client.getDatabase("projectideas");
+        userContainer = database.getContainer(collectionPrefix + "_users");
+        postContainer = database.getContainer(collectionPrefix + "_posts");
+        messageContainer =
+            database.getContainer(collectionPrefix + "_messages");
     }
 
     // Users
