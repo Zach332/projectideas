@@ -42,9 +42,18 @@ export default function Profile() {
             })
             .catch((err) => {
                 console.log("Error changing username: " + err);
-                addToast("Error changing username. Please try again.", {
-                    appearance: "error",
-                });
+                if (err.response.status == 409) {
+                    addToast(
+                        "This username is already in use by another user. Please choose another.",
+                        {
+                            appearance: "error",
+                        }
+                    );
+                } else {
+                    addToast("Error changing username. Please try again.", {
+                        appearance: "error",
+                    });
+                }
             });
         event.preventDefault();
     };

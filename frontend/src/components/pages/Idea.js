@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import Success from "../Success";
+import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import IdeaCard from "../IdeaCard";
@@ -17,6 +18,8 @@ export default function Idea() {
     const [message, setMessage] = React.useState("");
     const [user] = useGlobalState("user");
     let params = useParams();
+
+    useLeavePageWarning(message != "");
 
     useEffect(() => {
         axios.get("/api/ideas/" + params.id).then((response) => {
