@@ -7,6 +7,7 @@ import { motion, AnimateSharedLayout } from "framer-motion";
 
 export default function Messages() {
     const [messages, setMessages] = React.useState([]);
+    //const [activeMessage, setActiveMessage] = React.useState([])
     const [user] = useGlobalState("user");
     const [rerender, setRerender] = React.useState(0);
 
@@ -20,17 +21,19 @@ export default function Messages() {
         return <LoginWarning />;
     }
     return (
-        <AnimateSharedLayout>
-            <h1>Messages</h1>
-            <motion.div layout className="container pt-2 mx-auto">
-                {messages.map((message) => (
-                    <Message
-                        key={message.id}
-                        message={message}
-                        setRerender={setRerender}
-                    />
-                ))}
-            </motion.div>
-        </AnimateSharedLayout>
+        <div>
+            <AnimateSharedLayout>
+                <h1>Messages</h1>
+                <motion.div layout className="container pt-2 mx-auto">
+                    {messages.map((message) => (
+                        <Message
+                            key={message.id}
+                            message={message}
+                            setRerender={setRerender}
+                        />
+                    ))}
+                </motion.div>
+            </AnimateSharedLayout>
+        </div>
     );
 }
