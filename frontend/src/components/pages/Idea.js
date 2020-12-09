@@ -129,6 +129,7 @@ export default function Idea() {
             <form className="py-4">
                 <textarea
                     className="form-control"
+                    value={message}
                     id="content"
                     rows="8"
                     placeholder="Your message"
