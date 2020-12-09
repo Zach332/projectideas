@@ -98,7 +98,14 @@ export default function Profile() {
                         onChange={handleInputChange}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={
+                        userData.username.length < 3 ||
+                        userData.username.length > 30
+                    }
+                >
                     Submit
                 </button>
             </form>
