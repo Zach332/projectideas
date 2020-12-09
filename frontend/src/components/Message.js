@@ -109,7 +109,8 @@ export default function Message({ message, setRerender }) {
                     </a>
                     <a
                         className="dropdown-item text-danger"
-                        onClick={deleteMessage}
+                        data-toggle="modal"
+                        data-target={"#deleteMessage" + message.id}
                     >
                         Delete message
                     </a>
@@ -127,6 +128,13 @@ export default function Message({ message, setRerender }) {
                 body={messageForm}
                 submit="Send"
                 onClick={sendMessage}
+            />
+            <Modal
+                id={"deleteMessage" + message.id}
+                title="Delete message"
+                body="Are you sure you want to delete this message?"
+                submit="Delete"
+                onClick={deleteMessage}
             />
         </motion.div>
     );
