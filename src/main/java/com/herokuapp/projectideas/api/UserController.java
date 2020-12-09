@@ -60,14 +60,25 @@ public class UserController {
                         "User " + id + " does not exist."
                     )
             );
-        if (
-            !existingUser.getUsername().equals(user.getUsername()) &&
-            database.containsUserWithUsername(user.getUsername())
-        ) {
-            throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Username " + user.getUsername() + " is already taken."
-            );
+        if (!existingUser.getUsername().equals(user.getUsername())) {
+            if (
+                user.getUsername().length() < 3 ||
+                user.getUsername().length() > 30
+            ) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Username " +
+                    user.getUsername() +
+                    "is too long or too short. " +
+                    "Usernames must be between 3 and 30 characters (inclusive)."
+                );
+            }
+            if (database.containsUserWithUsername(user.getUsername())) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Username " + user.getUsername() + " is already taken."
+                );
+            }
         }
         existingUser.setUsername(user.getUsername());
         existingUser.setEmail(user.getEmail());
