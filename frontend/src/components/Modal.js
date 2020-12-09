@@ -1,6 +1,13 @@
 import React from "react";
 
-export default function Modal({ id, title, body, submit, onClick }) {
+export default function Modal({
+    id,
+    title,
+    body,
+    submit,
+    onClick,
+    customFooter,
+}) {
     return (
         <div
             className="modal fade"
@@ -26,23 +33,25 @@ export default function Modal({ id, title, body, submit, onClick }) {
                         </button>
                     </div>
                     <div className="modal-body">{body}</div>
-                    <div className="modal-footer">
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            data-dismiss="modal"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            data-dismiss="modal"
-                            onClick={onClick}
-                        >
-                            {submit}
-                        </button>
-                    </div>
+                    {customFooter || (
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-default"
+                                data-dismiss="modal"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                data-dismiss="modal"
+                                onClick={onClick}
+                            >
+                                {submit}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

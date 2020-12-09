@@ -7,6 +7,7 @@ import IdeaCard from "../IdeaCard";
 import NotFound from "./NotFound";
 import EditIdea from "./EditIdea";
 import Comments from "../Comments";
+import LoginWarning from "../logins/LoginWarning";
 import Modal from "../Modal";
 import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
@@ -123,7 +124,7 @@ export default function Idea() {
         );
     }
 
-    const messageForm = (
+    const messageForm = user.loggedIn ? (
         <div className="mx-auto">
             <form className="py-4">
                 <textarea
@@ -135,6 +136,8 @@ export default function Idea() {
                 ></textarea>
             </form>
         </div>
+    ) : (
+        <LoginWarning />
     );
 
     var date = new Date(idea.timePosted * 1000);
@@ -188,6 +191,7 @@ export default function Idea() {
                 body={messageForm}
                 submit="Send"
                 onClick={sendMessage}
+                customFooter={user.loggedIn ? null : <div></div>}
             />
         </div>
     );
