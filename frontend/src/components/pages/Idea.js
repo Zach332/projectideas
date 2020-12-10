@@ -62,6 +62,7 @@ export default function Idea() {
             .then(() => {
                 addToast("Your message was sent.", {
                     appearance: "success",
+                    autoDismiss: true,
                 });
                 setMessage("");
             })
@@ -75,6 +76,23 @@ export default function Idea() {
 
     const edit = () => {
         setStatus(Status.NotSubmitted);
+    };
+
+    const saveIdeaToProjects = () => {
+        axios
+            .post("/api/ideas/" + idea.id + "/save", {})
+            .then(() => {
+                addToast("Idea saved to My Projects on your Profile.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error saving idea: " + err);
+                addToast("The idea was not saved. Please try again.", {
+                    appearance: "error",
+                });
+            });
     };
 
     if (status === Status.NotFound) {
@@ -168,6 +186,7 @@ export default function Idea() {
                             <button
                                 type="button"
                                 className="btn btn-primary btn-md"
+                                onClick={saveIdeaToProjects}
                             >
                                 Work on this idea
                             </button>
