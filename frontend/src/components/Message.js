@@ -117,6 +117,11 @@ export default function Message({ message, setRerender }) {
                 </div>
             </div>
             <h6 className="card-subtitle my-2">
+                {message.unread && (
+                    <a href="#" className="badge badge-primary mr-2">
+                        New
+                    </a>
+                )}
                 From {message.senderUsername}
             </h6>
             <p className="mb-1 ml-2" style={{ "white-space": "pre" }}>
