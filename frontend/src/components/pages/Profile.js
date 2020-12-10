@@ -3,11 +3,13 @@ import { login, logout, useGlobalState } from "../../State";
 import LoginWarning from "../logins/LoginWarning";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
+import IdeaSummary from "./../IdeaSummary";
 
 export default function Profile() {
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
     const [userData, setUserData] = React.useState([]);
+    const [myProjects, setMyProjects] = React.useState([]);
     const [changingUsername, setChangingUsername] = React.useState(false);
 
     useEffect(() => {
@@ -15,6 +17,12 @@ export default function Profile() {
             axios.get("/api/users/" + user.id).then((response) => {
                 setUserData(response.data);
             });
+            axios
+                .get("/api/users/" + user.id + "/savedIdeas")
+                .then((response) => {
+                    console.log(response.data);
+                    setMyProjects(response.data);
+                });
         }
     }, []);
 
@@ -152,6 +160,18 @@ export default function Profile() {
             >
                 Log Out
             </button>
+            <h2 className="mt-4">My projects</h2>
+            {myProjects.length === 0 ? (
+                <p>
+                    You don&apos;t have any projects. Use the &quot;work on this
+                    idea&quot; button to save an idea here.
+                </p>
+            ) : (
+                myProjects.map((idea) => (
+                    <IdeaSummary key={idea.id} idea={idea} />
+                ))
+            )}
+            <h2 className="mt-4">My ideas</h2>
         </div>
     );
 }
