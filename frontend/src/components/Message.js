@@ -118,9 +118,9 @@ export default function Message({ message, setRerender }) {
             </div>
             <h6 className="card-subtitle my-2">
                 {message.unread && (
-                    <a href="#" className="badge badge-primary mr-2">
+                    <span className="badge badge-pill badge-primary mr-2">
                         New
-                    </a>
+                    </span>
                 )}
                 From {message.senderUsername}
             </h6>
