@@ -12,22 +12,22 @@ import lombok.*;
 public class Message {
 
     @JsonView(View.Get.class)
-    String id;
+    protected String id;
 
-    String senderId;
+    protected String senderId;
 
     @JsonView(View.Get.class)
-    String senderUsername;
+    protected String senderUsername;
 
-    String recipientId;
+    protected String recipientId;
 
     @JsonView(View.Base.class)
-    String content;
+    protected String content;
 
-    long timeSent;
+    protected long timeSent;
 
     @JsonView(View.Get.class)
-    boolean unread;
+    protected boolean unread;
 
     public Message(
         String senderId,

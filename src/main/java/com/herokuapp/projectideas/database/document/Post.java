@@ -9,22 +9,22 @@ import lombok.*;
 public abstract class Post {
 
     @JsonView(View.Get.class)
-    String id;
+    protected String id;
 
-    String type;
-    String ideaId;
-
-    @JsonView(View.Get.class)
-    long timePosted;
+    protected String type;
+    protected String ideaId;
 
     @JsonView(View.Get.class)
-    long timeLastEdited;
-
-    String authorId;
+    protected long timePosted;
 
     @JsonView(View.Get.class)
-    String authorUsername;
+    protected long timeLastEdited;
+
+    protected String authorId;
+
+    @JsonView(View.Get.class)
+    protected String authorUsername;
 
     @JsonView(View.Base.class)
-    String content;
+    protected String content;
 }

@@ -3,7 +3,9 @@ package com.herokuapp.projectideas.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.View;
+import com.herokuapp.projectideas.database.document.Idea;
 import com.herokuapp.projectideas.database.document.User;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,12 @@ public class UserController {
                         "User " + id + " does not exist."
                     )
             );
+    }
+
+    @GetMapping("/api/users/{userId}/savedIdeas")
+    @JsonView(View.Get.class)
+    public List<Idea> getSavedIdeas(@PathVariable String userId) {
+        return database.getSavedIdeasForUser(userId);
     }
 
     @PostMapping("/api/users")

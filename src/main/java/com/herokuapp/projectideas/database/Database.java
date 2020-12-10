@@ -98,15 +98,7 @@ public class Database {
     }
 
     public void updateUser(String id, User user) {
-        User oldUser = userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.id = '" + id + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        User oldUser = findUser(id).get();
 
         // Handle username denormalization
         if (!user.getUsername().equals(oldUser.getUsername())) {
@@ -143,6 +135,54 @@ public class Database {
             new PartitionKey(id),
             new CosmosItemRequestOptions()
         );
+    }
+
+    public void saveIdeaForUser(String ideaId, String userId) {
+        User user = findUser(userId).get();
+        user.getSavedIdeaIds().add(ideaId);
+        userContainer.replaceItem(
+            user,
+            userId,
+            new PartitionKey(userId),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public void unsaveIdeaForUser(String ideaId, String userId) {
+        User user = findUser(userId).get();
+        user.getSavedIdeaIds().remove(ideaId);
+        userContainer.replaceItem(
+            user,
+            userId,
+            new PartitionKey(userId),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public List<Idea> getSavedIdeasForUser(String userId) {
+        List<String> ideaIds = userContainer
+            .queryItems(
+                "SELECT VALUE c FROM c IN u.savedIdeaIds",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+
+        return getIdeasInList(ideaIds);
+    }
+
+    private List<Idea> getIdeasInList(List<String> ideaIds) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.ideaId IN ('" +
+                String.join("', '", ideaIds) +
+                "')",
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
     }
 
     public void deleteUser(String id) {

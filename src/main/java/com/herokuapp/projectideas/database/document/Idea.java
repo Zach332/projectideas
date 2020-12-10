@@ -12,7 +12,7 @@ import lombok.*;
 public class Idea extends Post {
 
     @JsonView(View.Base.class)
-    private String title;
+    protected String title;
 
     public Idea(
         String authorId,

@@ -146,6 +146,22 @@ public class IdeaController {
         database.updateComment(existingComment);
     }
 
+    @PostMapping("/api/ideas/{ideaId}/save")
+    public void saveIdea(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId
+    ) {
+        database.saveIdeaForUser(ideaId, userId);
+    }
+
+    @PostMapping("/api/ideas/{ideaId}/unsave")
+    public void unsaveIdea(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId
+    ) {
+        database.unsaveIdeaForUser(ideaId, userId);
+    }
+
     @DeleteMapping("/api/ideas/{id}")
     public void deleteIdea(
         @RequestHeader("authorization") String userId,
