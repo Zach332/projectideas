@@ -162,7 +162,9 @@ public class Database {
     public List<Idea> getSavedIdeasForUser(String userId) {
         List<String> ideaIds = userContainer
             .queryItems(
-                "SELECT VALUE c FROM c IN u.savedIdeaIds",
+                "SELECT VALUE c.savedIdeaIds FROM c WHERE c.id = '" +
+                userId +
+                "'",
                 new CosmosQueryRequestOptions(),
                 String.class
             )
