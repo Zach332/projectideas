@@ -25,6 +25,19 @@ export default function Comments({ ideaId }) {
         }
     };
 
+    const setNewComment = (quoteUsername, quoteContent) => {
+        setComment(
+            (comment) =>
+                comment +
+                "> *" +
+                quoteUsername +
+                ":*\n" +
+                quoteContent.replace(/^/gm, "> ")
+        );
+        setRows(5);
+        setShowButton("visible");
+    };
+
     useEffect(() => {
         axios.get("/api/ideas/" + ideaId + "/comments").then((response) => {
             setComments(response.data);
@@ -99,6 +112,7 @@ export default function Comments({ ideaId }) {
                             comment={comment}
                             parentId={ideaId}
                             setRerender={setRerender}
+                            setNewComment={setNewComment}
                         />
                     ))}
                 </motion.div>

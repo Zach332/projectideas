@@ -5,7 +5,12 @@ import { useToasts } from "react-toast-notifications";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
-export default function Comment({ comment, parentId, setRerender }) {
+export default function Comment({
+    comment,
+    parentId,
+    setRerender,
+    setNewComment,
+}) {
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
 
@@ -25,6 +30,10 @@ export default function Comment({ comment, parentId, setRerender }) {
                 </div>
             );
         },
+    };
+
+    const quote = () => {
+        setNewComment(comment.authorUsername, comment.content);
     };
 
     const deleteComment = () => {
@@ -78,6 +87,9 @@ export default function Comment({ comment, parentId, setRerender }) {
                         className="dropdown-menu"
                         aria-labelledby="dropdownMenuButton"
                     >
+                        <a className="dropdown-item" onClick={quote}>
+                            Quote
+                        </a>
                         <a
                             className="dropdown-item text-danger"
                             onClick={deleteComment}
