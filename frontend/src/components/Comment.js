@@ -12,12 +12,17 @@ export default function Comment({ comment, parentId, setRerender }) {
     const renderers = {
         blockquote: function addBlockquoteStyling(props) {
             return (
-                <blockquote
-                    className="blockquote mx-5 pl-2"
-                    style={{ background: "#ededed" }}
-                >
-                    {props.children}
-                </blockquote>
+                <div>
+                    <blockquote
+                        className="blockquote mx-5 pl-2"
+                        style={{
+                            background: "#ededed",
+                            "word-break": "break-all",
+                        }}
+                    >
+                        {props.children}
+                    </blockquote>
+                </div>
             );
         },
     };
