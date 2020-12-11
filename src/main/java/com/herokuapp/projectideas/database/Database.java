@@ -12,11 +12,14 @@ import com.herokuapp.projectideas.database.document.Comment;
 import com.herokuapp.projectideas.database.document.Idea;
 import com.herokuapp.projectideas.database.document.Message;
 import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.event.MessageNotification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +30,9 @@ public class Database {
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
     private CosmosContainer messageContainer;
+
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -311,6 +317,9 @@ public class Database {
 
     public void createMessage(Message message) {
         messageContainer.createItem(message);
+        eventPublisher.publishEvent(
+            new MessageNotification(this, message.getRecipientId())
+        );
     }
 
     public Optional<Message> findMessageToUser(
@@ -353,6 +362,20 @@ public class Database {
             )
             .stream()
             .collect(Collectors.toList());
+    }
+
+    public int getNumUnreadMessagesToUser(String recipientId) {
+        return messageContainer
+            .queryItems(
+                "SELECT VALUE COUNT(1) FROM c WHERE c.unread = true AND c.recipientId = '" +
+                recipientId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findFirst()
+            .get();
     }
 
     public void updateMessage(Message message) {
