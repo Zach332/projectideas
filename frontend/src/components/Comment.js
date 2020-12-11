@@ -3,10 +3,25 @@ import axios from "axios";
 import { useGlobalState } from "../State";
 import { useToasts } from "react-toast-notifications";
 import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 
 export default function Comment({ comment, parentId, setRerender }) {
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
+
+    const renderers = {
+        blockquote: function addBlockquoteStyling(props) {
+            return (
+                <blockquote
+                    className="blockquote mx-5 pl-2"
+                    style={{ background: "#ededed" }}
+                >
+                    {props.children}
+                </blockquote>
+            );
+        },
+    };
+
     const deleteComment = () => {
         axios
             .delete("/api/ideas/" + parentId + "/comments/" + comment.id)
@@ -67,7 +82,11 @@ export default function Comment({ comment, parentId, setRerender }) {
                     </div>
                 </div>
             )}
-            <p className="mb-1">{comment.content}</p>
+            <p className="mb-1">
+                <ReactMarkdown renderers={renderers}>
+                    {comment.content}
+                </ReactMarkdown>
+            </p>
             <small className="text-muted">{comment.authorUsername}</small>
         </motion.div>
     );
