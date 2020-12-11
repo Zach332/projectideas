@@ -31,6 +31,13 @@ public class MessageController {
         return database.findAllMessagesToUser(userId);
     }
 
+    @GetMapping("/api/messages/numunread")
+    public int getNumUnreadMessagesToUser(
+        @RequestHeader("authorization") String userId
+    ) {
+        return database.getNumUnreadMessagesToUser(userId);
+    }
+
     @PostMapping("/api/messages/{recipientUsername}")
     public void sendMessage(
         @RequestHeader("authorization") String userId,
