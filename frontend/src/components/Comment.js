@@ -88,7 +88,15 @@ export default function Comment({ comment, parentId, setRerender }) {
                 </div>
             )}
             <p className="mb-1">
-                <ReactMarkdown renderers={renderers}>
+                <ReactMarkdown
+                    renderers={renderers}
+                    allowedTypes={[
+                        "paragraph",
+                        "text",
+                        "blockquote",
+                        "emphasis",
+                    ]}
+                >
                     {comment.content}
                 </ReactMarkdown>
             </p>
