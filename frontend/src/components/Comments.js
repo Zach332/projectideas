@@ -13,6 +13,7 @@ export default function Comments({ ideaId }) {
     const [comment, setComment] = React.useState("");
     const [comments, setComments] = React.useState([]);
     const [rerender, setRerender] = React.useState(0);
+    var commentInput;
 
     const onFocus = () => {
         setRows(5);
@@ -35,8 +36,7 @@ export default function Comments({ ideaId }) {
                 quoteContent.replace(/^/gm, "> ") +
                 "\n"
         );
-        setRows(5);
-        setShowButton("visible");
+        commentInput.focus();
     };
 
     useEffect(() => {
@@ -81,6 +81,9 @@ export default function Comments({ ideaId }) {
                                 type="text"
                                 className="form-control mb-2"
                                 id="inlineFormInput"
+                                ref={(ref) => {
+                                    commentInput = ref;
+                                }}
                                 value={comment}
                                 rows={rows}
                                 onBlur={onBlur}
