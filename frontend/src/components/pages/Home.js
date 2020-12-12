@@ -32,6 +32,16 @@ export default function Home() {
         ideaElements = <Spinner />;
     }
 
+    useEffect(() => {
+        var eventSource = new EventSource(
+            "/api/notifications/14023366-4c90-404b-8084-7809f9ec7623"
+        );
+
+        eventSource.onmessage = function (e) {
+            console.log(e.data);
+        };
+    }, []);
+
     return (
         <div>
             <div className="d-flex">
