@@ -18,15 +18,16 @@ export default function Comment({
         blockquote: function addBlockquoteStyling(props) {
             return (
                 <div>
-                    <blockquote
-                        className="blockquote mx-5 pl-2"
+                    <p
+                        className="mx-5 pt-2 pb-1 pl-2"
                         style={{
                             background: "#ededed",
                             "word-break": "break-all",
+                            "line-height": "7px",
                         }}
                     >
                         {props.children}
-                    </blockquote>
+                    </p>
                 </div>
             );
         },
@@ -100,7 +101,12 @@ export default function Comment({
                     )}
                 </div>
             </div>
-            <p className="mb-1">
+            <p
+                className="mb-1"
+                style={{
+                    "line-height": "7px",
+                }}
+            >
                 <ReactMarkdown
                     renderers={renderers}
                     allowedTypes={[

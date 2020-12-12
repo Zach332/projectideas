@@ -50,7 +50,7 @@ export default function Comments({ ideaId }) {
     const handleSubmit = (event) => {
         axios
             .post("/api/ideas/" + ideaId + "/comments", {
-                content: comment,
+                content: comment.replace(/^/gm, "\n"),
             })
             .then(() => {
                 setComment("");
