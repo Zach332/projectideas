@@ -2,7 +2,7 @@ package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.event.MessageNotification;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +13,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 public class NotificationController {
 
-    private final HashMap<String, SseEmitter> emitters = new HashMap<>();
+    private final ConcurrentHashMap<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     @GetMapping(
-        value = "/api/notifications/messages/{userId}",
-        produces = MediaType.TEXT_EVENT_STREAM_VALUE
+        value = "/api/notifications/{userId}",
+        produces = MediaType.TEXT_EVENT_STREAM_VALUE,
+        headers = { "Connection=keep-alive", "Cache-Control=no-cache" }
     )
     public SseEmitter subscribeToMessageNotifications(
         @PathVariable String userId
@@ -25,12 +26,17 @@ public class NotificationController {
         SseEmitter emitter = new SseEmitter();
         this.emitters.put(userId, emitter);
         emitter.onCompletion(() -> this.emitters.remove(userId));
-        emitter.onTimeout(() -> this.emitters.remove(userId));
+        emitter.onTimeout(
+            () -> {
+                emitter.complete();
+                this.emitters.remove(userId);
+            }
+        );
         return emitter;
     }
 
     @EventListener
-    public void onMessageSent(MessageNotification notification) {
+    public void onMessageNotification(MessageNotification notification) {
         String recipientId = notification.getRecipientId();
         SseEmitter emitter = emitters.get(recipientId);
         if (emitter != null) {
