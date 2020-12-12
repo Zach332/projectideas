@@ -29,10 +29,11 @@ export default function Comments({ ideaId }) {
         setComment(
             (comment) =>
                 comment +
-                "> *" +
+                "> " +
                 quoteUsername +
-                ":*\n" +
-                quoteContent.replace(/^/gm, "> ")
+                ":\n" +
+                quoteContent.replace(/^/gm, "> ") +
+                "\n"
         );
         setRows(5);
         setShowButton("visible");
@@ -50,7 +51,7 @@ export default function Comments({ ideaId }) {
     const handleSubmit = (event) => {
         axios
             .post("/api/ideas/" + ideaId + "/comments", {
-                content: comment.replace(/^/gm, "\n"),
+                content: comment,
             })
             .then(() => {
                 setComment("");

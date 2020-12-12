@@ -3,7 +3,6 @@ import axios from "axios";
 import { useGlobalState } from "../State";
 import { useToasts } from "react-toast-notifications";
 import { motion } from "framer-motion";
-import ReactMarkdown from "react-markdown";
 
 export default function Comment({
     comment,
@@ -14,24 +13,22 @@ export default function Comment({
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
 
-    const renderers = {
-        blockquote: function addBlockquoteStyling(props) {
-            return (
-                <div>
-                    <p
-                        className="mx-5 pt-2 pb-1 pl-2"
-                        style={{
-                            background: "#ededed",
-                            "word-break": "break-all",
-                            "line-height": "7px",
-                        }}
-                    >
-                        {props.children}
-                    </p>
+    function addBlockquoteStyling(text) {
+        return text.split("\n").map((text) =>
+            text.startsWith(">") ? (
+                <div
+                    className="mx-5 pl-2"
+                    style={{
+                        background: "#ededed",
+                    }}
+                >
+                    {addBlockquoteStyling(text.replace(/^> ?/gm, ""))}
                 </div>
-            );
-        },
-    };
+            ) : (
+                <div>{text}</div>
+            )
+        );
+    }
 
     const quote = () => {
         setNewComment(comment.authorUsername, comment.content);
@@ -101,23 +98,8 @@ export default function Comment({
                     )}
                 </div>
             </div>
-            <p
-                className="mb-1"
-                style={{
-                    "line-height": "7px",
-                }}
-            >
-                <ReactMarkdown
-                    renderers={renderers}
-                    allowedTypes={[
-                        "paragraph",
-                        "text",
-                        "blockquote",
-                        "emphasis",
-                    ]}
-                >
-                    {comment.content}
-                </ReactMarkdown>
+            <p className="mb-1" style={{}}>
+                <p>{addBlockquoteStyling(comment.content)}</p>
             </p>
             <small className="text-muted">{comment.authorUsername}</small>
         </motion.div>
