@@ -20,9 +20,7 @@ public class NotificationController {
         produces = MediaType.TEXT_EVENT_STREAM_VALUE,
         headers = { "Connection=keep-alive", "Cache-Control=no-cache" }
     )
-    public SseEmitter subscribeToMessageNotifications(
-        @PathVariable String userId
-    ) {
+    public SseEmitter subscribeToNotifications(@PathVariable String userId) {
         SseEmitter emitter = new SseEmitter();
         this.emitters.put(userId, emitter);
         emitter.onCompletion(() -> this.emitters.remove(userId));
