@@ -20,12 +20,19 @@ export default function Comment({
                     className="mx-5 pl-2"
                     style={{
                         background: "#ededed",
+                        "word-break": "break-all",
                     }}
                 >
                     {addBlockquoteStyling(text.replace(/^> ?/gm, ""))}
                 </div>
             ) : (
-                <div>{text}</div>
+                <div
+                    style={{
+                        "word-break": "break-all",
+                    }}
+                >
+                    {text}
+                </div>
             )
         );
     }
