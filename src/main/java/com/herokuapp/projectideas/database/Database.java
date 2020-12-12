@@ -177,7 +177,7 @@ public class Database {
     private List<Idea> getIdeasInList(List<String> ideaIds) {
         return postContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.ideaId IN ('" +
+                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
                 String.join("', '", ideaIds) +
                 "')",
                 new CosmosQueryRequestOptions(),
