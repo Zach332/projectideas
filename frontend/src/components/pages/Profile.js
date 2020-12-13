@@ -168,7 +168,34 @@ export default function Profile() {
                 </p>
             ) : (
                 myProjects.map((idea) => (
-                    <IdeaSummary key={idea.id} idea={idea} />
+                    <div key={idea.id} className="container">
+                        <div className="row">
+                            <div className="col mr-auto">
+                                <IdeaSummary idea={idea} />
+                            </div>
+                            <div className="col-auto my-auto">
+                                <button className="btn btn-sm" type="button">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="25"
+                                        height="25"
+                                        fill="currentColor"
+                                        className="bi bi-dash-circle"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                                        />
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 ))
             )}
             <h2 className="mt-4">My ideas</h2>
