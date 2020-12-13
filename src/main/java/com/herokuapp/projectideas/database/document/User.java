@@ -14,6 +14,7 @@ import lombok.*;
 public class User {
 
     protected String id;
+    protected String type;
 
     @JsonView(View.Base.class)
     protected String username;
@@ -31,6 +32,7 @@ public class User {
 
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
+        this.type = "User";
         this.username = username;
         this.email = email;
         this.timeCreated = Instant.now().getEpochSecond();
