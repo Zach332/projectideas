@@ -375,6 +375,19 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    public List<SentMessage> findAllSentMessages(String senderId) {
+        return userContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'SentMessage' AND c.userId = '" +
+                senderId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                SentMessage.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public void updateReceivedMessage(ReceivedMessage message) {
         userContainer.replaceItem(
             message,

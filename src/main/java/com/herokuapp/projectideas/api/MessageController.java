@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.View;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentMessage;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,14 @@ public class MessageController {
         @RequestHeader("authorization") String userId
     ) {
         return database.findAllReceivedMessages(userId);
+    }
+
+    @GetMapping("/api/messages/sent")
+    @JsonView(View.Get.class)
+    public List<SentMessage> getSentMessages(
+        @RequestHeader("authorization") String userId
+    ) {
+        return database.findAllSentMessages(userId);
     }
 
     // TODO: Refactor to not rely on the ReceivedMessage type
