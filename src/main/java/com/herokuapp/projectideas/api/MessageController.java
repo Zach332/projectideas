@@ -40,7 +40,7 @@ public class MessageController {
         database.createMessage(userId, recipientUsername, message.getContent());
     }
 
-    @PostMapping("/api/messages/{messageId}/markasread")
+    @PostMapping("/api/messages/received/{messageId}/markasread")
     public void markMessageAsRead(
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
@@ -48,7 +48,7 @@ public class MessageController {
         markMessage(userId, messageId, false);
     }
 
-    @PostMapping("/api/messages/{messageId}/markasunread")
+    @PostMapping("/api/messages/received/{messageId}/markasunread")
     public void markMessageAsUnread(
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
@@ -78,7 +78,7 @@ public class MessageController {
         database.updateReceivedMessage(existingMessage);
     }
 
-    @DeleteMapping("/api/messages/{messageId}")
+    @DeleteMapping("/api/messages/received/{messageId}")
     public void deleteMessage(
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
