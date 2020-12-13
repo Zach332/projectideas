@@ -8,10 +8,11 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
-import com.herokuapp.projectideas.database.document.Comment;
-import com.herokuapp.projectideas.database.document.Idea;
-import com.herokuapp.projectideas.database.document.Message;
 import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentMessage;
+import com.herokuapp.projectideas.database.document.post.Comment;
+import com.herokuapp.projectideas.database.document.post.Idea;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,6 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
-    private CosmosContainer messageContainer;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -37,8 +37,6 @@ public class Database {
         database = client.getDatabase("projectideas");
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
-        messageContainer =
-            database.getContainer(collectionPrefix + "_messages");
     }
 
     // Users
@@ -50,7 +48,7 @@ public class Database {
     public Optional<User> findUser(String id) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.id = '" + id + "'",
+                "SELECT * FROM c WHERE c.userId = '" + id + "'",
                 new CosmosQueryRequestOptions(),
                 User.class
             )
@@ -162,7 +160,7 @@ public class Database {
     public List<Idea> getSavedIdeasForUser(String userId) {
         List<String> ideaIds = userContainer
             .queryItems(
-                "SELECT VALUE c.savedIdeaIds FROM c WHERE c.id = '" +
+                "SELECT VALUE c.savedIdeaIds FROM c WHERE c.userId = '" +
                 userId +
                 "'",
                 new CosmosQueryRequestOptions(),
@@ -309,63 +307,85 @@ public class Database {
 
     // Messages
 
-    public void createMessage(Message message) {
-        messageContainer.createItem(message);
+    public void createMessage(
+        String senderId,
+        String recipientUsername,
+        String content
+    ) {
+        User sender = findUser(senderId).get();
+        User recipient = findUserByUsername(recipientUsername).get();
+        ReceivedMessage receivedMessage = new ReceivedMessage(
+            recipient.getId(),
+            sender.getUsername(),
+            content
+        );
+        SentMessage sentMessage = new SentMessage(
+            senderId,
+            recipientUsername,
+            content
+        );
+        // TODO: Handle failure here
+        userContainer.createItem(receivedMessage);
+        userContainer.createItem(sentMessage);
     }
 
-    public Optional<Message> findMessageToUser(
+    public Optional<ReceivedMessage> findReceivedMessage(
         String recipientId,
         String messageId
     ) {
-        return messageContainer
+        return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.recipientId = '" +
+                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
                 recipientId +
                 "' AND c.id = '" +
                 messageId +
                 "'",
                 new CosmosQueryRequestOptions(),
-                Message.class
+                ReceivedMessage.class
             )
             .stream()
             .findFirst();
     }
 
-    public List<Message> findAllMessagesToUser(String recipientId) {
-        return messageContainer
+    public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
+        return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.recipientId = '" + recipientId + "'",
+                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                recipientId +
+                "'",
                 new CosmosQueryRequestOptions(),
-                Message.class
+                ReceivedMessage.class
             )
             .stream()
             .collect(Collectors.toList());
     }
 
-    public List<Message> findAllUnreadMessagesToUser(String recipientId) {
-        return messageContainer
+    public List<ReceivedMessage> findAllUnreadReceivedMessages(
+        String recipientId
+    ) {
+        return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.recipientId = '" +
+                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
                 recipientId +
                 "' AND c.unread = true",
                 new CosmosQueryRequestOptions(),
-                Message.class
+                ReceivedMessage.class
             )
             .stream()
             .collect(Collectors.toList());
     }
 
-    public void updateMessage(Message message) {
-        messageContainer.replaceItem(
+    public void updateReceivedMessage(ReceivedMessage message) {
+        userContainer.replaceItem(
             message,
             message.getId(),
-            new PartitionKey(message.getRecipientId()),
+            new PartitionKey(message.getUserId()),
             new CosmosItemRequestOptions()
         );
     }
 
-    public void deleteMessage(String id, String recipientId) {
-        messageContainer.deleteItem(
+    public void deleteReceivedMessage(String id, String recipientId) {
+        userContainer.deleteItem(
             id,
             new PartitionKey(recipientId),
             new CosmosItemRequestOptions()

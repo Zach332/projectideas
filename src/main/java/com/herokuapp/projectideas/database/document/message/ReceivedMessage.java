@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.database.document;
+package com.herokuapp.projectideas.database.document.message;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.View;
@@ -9,17 +9,20 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Message {
+public class ReceivedMessage {
 
     @JsonView(View.Get.class)
     protected String id;
 
-    protected String senderId;
+    protected String type;
+
+    /**
+     * Id of the user that received the message
+     */
+    protected String userId;
 
     @JsonView(View.Get.class)
     protected String senderUsername;
-
-    protected String recipientId;
 
     @JsonView(View.Base.class)
     protected String content;
@@ -29,16 +32,15 @@ public class Message {
     @JsonView(View.Get.class)
     protected boolean unread;
 
-    public Message(
-        String senderId,
-        String senderUsername,
+    public ReceivedMessage(
         String recipientId,
+        String senderUsername,
         String content
     ) {
         this.id = UUID.randomUUID().toString();
-        this.senderId = senderId;
+        this.type = "ReceivedMessage";
+        this.userId = recipientId;
         this.senderUsername = senderUsername;
-        this.recipientId = recipientId;
         this.content = content;
         this.timeSent = Instant.now().getEpochSecond();
         this.unread = true;

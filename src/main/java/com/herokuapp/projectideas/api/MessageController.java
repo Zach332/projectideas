@@ -3,8 +3,7 @@ package com.herokuapp.projectideas.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.View;
-import com.herokuapp.projectideas.database.document.Message;
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,40 +24,20 @@ public class MessageController {
 
     @GetMapping("/api/messages/received")
     @JsonView(View.Get.class)
-    public List<Message> getReceivedMessages(
+    public List<ReceivedMessage> getReceivedMessages(
         @RequestHeader("authorization") String userId
     ) {
-        return database.findAllMessagesToUser(userId);
+        return database.findAllReceivedMessages(userId);
     }
 
+    // TODO: Refactor to not rely on the ReceivedMessage type
     @PostMapping("/api/messages/{recipientUsername}")
     public void sendMessage(
         @RequestHeader("authorization") String userId,
         @PathVariable("recipientUsername") String recipientUsername,
-        @RequestBody @JsonView(View.Post.class) Message message
+        @RequestBody @JsonView(View.Post.class) ReceivedMessage message
     ) {
-        User sender = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        User recipient = database
-            .findUserByUsername(recipientUsername)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User " + recipientUsername + " does not exist."
-                    )
-            );
-        database.createMessage(
-            new Message(
-                userId,
-                sender.getUsername(),
-                recipient.getId(),
-                message.getContent()
-            )
-        );
+        database.createMessage(userId, recipientUsername, message.getContent());
     }
 
     @PostMapping("/api/messages/{messageId}/markasread")
@@ -82,8 +61,8 @@ public class MessageController {
         String messageId,
         boolean unread
     ) {
-        Message existingMessage = database
-            .findMessageToUser(recipientId, messageId)
+        ReceivedMessage existingMessage = database
+            .findReceivedMessage(recipientId, messageId)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -96,7 +75,7 @@ public class MessageController {
                     )
             );
         existingMessage.setUnread(unread);
-        database.updateMessage(existingMessage);
+        database.updateReceivedMessage(existingMessage);
     }
 
     @DeleteMapping("/api/messages/{messageId}")
@@ -104,6 +83,6 @@ public class MessageController {
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
     ) {
-        database.deleteMessage(messageId, userId);
+        database.deleteReceivedMessage(messageId, userId);
     }
 }
