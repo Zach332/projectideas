@@ -17,18 +17,20 @@ export default function Comment({
         return text.split("\n").map((text) =>
             text.startsWith(">") ? (
                 <div
+                    key={Math.floor(Math.random() * 1000000000)}
                     className="mx-5 pl-2"
                     style={{
                         background: "#ededed",
-                        "word-break": "break-all",
+                        wordBreak: "break-all",
                     }}
                 >
                     {addBlockquoteStyling(text.replace(/^> ?/gm, ""))}
                 </div>
             ) : (
                 <div
+                    key={Math.floor(Math.random() * 1000000000)}
                     style={{
-                        "word-break": "break-all",
+                        wordBreak: "break-all",
                     }}
                 >
                     {text}
@@ -105,9 +107,9 @@ export default function Comment({
                     )}
                 </div>
             </div>
-            <p className="mb-1" style={{}}>
-                <p>{addBlockquoteStyling(comment.content)}</p>
-            </p>
+            <span className="mb-1">
+                {addBlockquoteStyling(comment.content)}
+            </span>
             <small className="text-muted">{comment.authorUsername}</small>
         </motion.div>
     );
