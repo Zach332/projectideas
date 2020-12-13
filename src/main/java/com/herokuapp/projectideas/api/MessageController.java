@@ -88,10 +88,18 @@ public class MessageController {
     }
 
     @DeleteMapping("/api/messages/received/{messageId}")
-    public void deleteMessage(
+    public void deleteReceivedMessage(
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
     ) {
         database.deleteReceivedMessage(messageId, userId);
+    }
+
+    @DeleteMapping("/api/messages/sent/{messageId}")
+    public void deleteSentMessage(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String messageId
+    ) {
+        database.deleteSentMessage(messageId, userId);
     }
 }

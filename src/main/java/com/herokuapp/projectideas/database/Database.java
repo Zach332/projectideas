@@ -404,4 +404,12 @@ public class Database {
             new CosmosItemRequestOptions()
         );
     }
+
+    public void deleteSentMessage(String id, String senderId) {
+        userContainer.deleteItem(
+            id,
+            new PartitionKey(senderId),
+            new CosmosItemRequestOptions()
+        );
+    }
 }
