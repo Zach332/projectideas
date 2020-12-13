@@ -15,6 +15,7 @@ public class User {
 
     protected String id;
     protected String type;
+    protected String userId;
 
     @JsonView(View.Base.class)
     protected String username;
