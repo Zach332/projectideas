@@ -16,7 +16,7 @@ export default function Comments({ ideaId }) {
     var commentInput;
 
     const onFocus = () => {
-        setRows(5);
+        setRows(Math.max(comment.split("\n").length, 5));
         setShowButton("visible");
     };
     const onBlur = () => {
@@ -38,6 +38,10 @@ export default function Comments({ ideaId }) {
         );
         commentInput.focus();
     };
+
+    useEffect(() => {
+        setRows(Math.max(comment.split("\n").length, 5));
+    }, [comment]);
 
     useEffect(() => {
         axios.get("/api/ideas/" + ideaId + "/comments").then((response) => {
