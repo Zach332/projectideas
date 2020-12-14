@@ -54,7 +54,7 @@ public class MessageController {
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
     ) {
-        markMessage(userId, messageId, false);
+        database.markReceivedMessageAsRead(messageId, userId);
     }
 
     @PostMapping("/api/messages/received/{messageId}/markasunread")
@@ -62,29 +62,14 @@ public class MessageController {
         @RequestHeader("authorization") String userId,
         @PathVariable String messageId
     ) {
-        markMessage(userId, messageId, true);
+        database.markReceivedMessageAsUnread(messageId, userId);
     }
 
-    private void markMessage(
-        String recipientId,
-        String messageId,
-        boolean unread
+    @PostMapping("/api/messages/received/markallasread")
+    public void markAllMessagesAsRead(
+        @RequestHeader("authorization") String userId
     ) {
-        ReceivedMessage existingMessage = database
-            .findReceivedMessage(recipientId, messageId)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Message " +
-                        messageId +
-                        " to user " +
-                        recipientId +
-                        " does not exist."
-                    )
-            );
-        existingMessage.setUnread(unread);
-        database.updateReceivedMessage(existingMessage);
+        database.markAllReceivedMessagesAsRead(userId);
     }
 
     @DeleteMapping("/api/messages/received/{messageId}")

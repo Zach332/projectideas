@@ -388,6 +388,46 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    public void markReceivedMessageAsRead(
+        String messageId,
+        String recipientId
+    ) {
+        markReceivedMessage(messageId, recipientId, false);
+    }
+
+    public void markReceivedMessageAsUnread(
+        String messageId,
+        String recipientId
+    ) {
+        markReceivedMessage(messageId, recipientId, true);
+    }
+
+    public void markAllReceivedMessagesAsRead(String recipientId) {
+        userContainer
+            .queryItems(
+                "SELECT VALUE c.id FROM c WHERE c.type = 'ReceivedMessage' AND c.unread = true AND c.userId = '" +
+                recipientId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .forEach(
+                messageId -> markReceivedMessageAsRead(messageId, recipientId)
+            );
+    }
+
+    private void markReceivedMessage(
+        String messageId,
+        String recipientId,
+        boolean unread
+    ) {
+        ReceivedMessage message = findReceivedMessage(recipientId, messageId)
+            .get();
+        message.setUnread(unread);
+        updateReceivedMessage(message);
+    }
+
     public void updateReceivedMessage(ReceivedMessage message) {
         userContainer.replaceItem(
             message,
