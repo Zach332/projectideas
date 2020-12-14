@@ -40,7 +40,9 @@ export default function Comments({ ideaId }) {
     };
 
     useEffect(() => {
-        setRows(Math.max(comment.split("\n").length, 5));
+        if (comment != "") {
+            setRows(Math.max(comment.split("\n").length, 5));
+        }
     }, [comment]);
 
     useEffect(() => {
