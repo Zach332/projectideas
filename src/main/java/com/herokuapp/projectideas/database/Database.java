@@ -388,6 +388,20 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    public int getNumberOfUnreadMessages(String recipientId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'ReceivedMessage' AND c.unread = true AND c.userId = '" +
+                recipientId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+    }
+
     public void markReceivedMessageAsRead(
         String messageId,
         String recipientId

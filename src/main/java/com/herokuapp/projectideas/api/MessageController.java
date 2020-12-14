@@ -39,6 +39,13 @@ public class MessageController {
         return database.findAllSentMessages(userId);
     }
 
+    @GetMapping("/api/messages/numunread")
+    public int getNumberOfUnreadMessages(
+        @RequestHeader("authorization") String userId
+    ) {
+        return database.getNumberOfUnreadMessages(userId);
+    }
+
     // TODO: Refactor to not rely on the ReceivedMessage type
     @PostMapping("/api/messages/{recipientUsername}")
     public void sendMessage(
