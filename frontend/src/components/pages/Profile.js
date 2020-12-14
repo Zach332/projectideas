@@ -10,6 +10,7 @@ export default function Profile() {
     const [user] = useGlobalState("user");
     const [userData, setUserData] = React.useState([]);
     const [myProjects, setMyProjects] = React.useState([]);
+    const [rerender, setRerender] = React.useState(0);
     const [changingUsername, setChangingUsername] = React.useState(false);
 
     useEffect(() => {
@@ -24,7 +25,7 @@ export default function Profile() {
                     setMyProjects(response.data);
                 });
         }
-    }, []);
+    }, [rerender]);
 
     const removeIdeaFromProjects = (ideaId) => {
         axios
@@ -34,6 +35,7 @@ export default function Profile() {
                     appearance: "success",
                     autoDismiss: true,
                 });
+                setRerender((rerender) => rerender + 1);
             })
             .catch((err) => {
                 console.log("Error removing idea: " + err);
