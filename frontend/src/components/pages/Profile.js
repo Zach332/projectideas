@@ -26,6 +26,23 @@ export default function Profile() {
         }
     }, []);
 
+    const removeIdeaFromProjects = (ideaId) => {
+        axios
+            .post("/api/ideas/" + ideaId + "/unsave", {})
+            .then(() => {
+                addToast("Idea removed from My Projects.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error removing idea: " + err);
+                addToast("The idea was not removed. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
     const handleInputChange = (event) => {
         const target = event.target;
         const name = target.id;
@@ -174,7 +191,13 @@ export default function Profile() {
                                 <IdeaSummary idea={idea} />
                             </div>
                             <div className="col-auto my-auto">
-                                <button className="btn btn-sm" type="button">
+                                <button
+                                    className="btn btn-sm"
+                                    type="button"
+                                    onClick={() =>
+                                        removeIdeaFromProjects(idea.id)
+                                    }
+                                >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="25"
