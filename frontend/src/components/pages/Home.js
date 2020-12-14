@@ -11,8 +11,8 @@ export default function Home() {
     useEffect(() => {
         axios.get("/api/ideas").then((response) => {
             setIdeas(response.data);
+            setStatus(Status.Success);
         });
-        setStatus(Status.Success);
     }, []);
 
     const onCLick = () => {
