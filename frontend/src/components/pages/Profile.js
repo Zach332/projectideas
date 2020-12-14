@@ -21,7 +21,6 @@ export default function Profile() {
             axios
                 .get("/api/users/" + user.id + "/savedIdeas")
                 .then((response) => {
-                    console.log(response.data);
                     setMyProjects(response.data);
                 });
         }

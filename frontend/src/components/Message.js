@@ -124,7 +124,7 @@ export default function Message({ message, setRerender }) {
                 )}
                 From {message.senderUsername}
             </h6>
-            <p className="mb-1 ml-2" style={{ "white-space": "pre" }}>
+            <p className="mb-1 ml-2" style={{ whiteSpace: "pre" }}>
                 {message.content}
             </p>
             <Modal

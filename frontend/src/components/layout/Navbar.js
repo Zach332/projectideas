@@ -1,13 +1,21 @@
 import React, { useEffect } from "react";
+import axios from "axios";
 import NameLogo from "../../namelogo.png";
 import { userPersistenceKey, useGlobalState } from "../../State";
 
 export default function Navbar() {
     const [user] = useGlobalState("user");
+    const [unreadMessages, setUnreadMessages] = React.useState(0);
 
     useEffect(() => {
         localStorage.setItem(userPersistenceKey, JSON.stringify(user));
     }, [user]);
+
+    useEffect(() => {
+        axios.get("/api/messages/numunread").then((response) => {
+            setUnreadMessages(response.data);
+        });
+    });
 
     let login;
     let userLinks;
@@ -33,6 +41,11 @@ export default function Navbar() {
                         />
                         <path d="M5 7c0 .552-.448 0-1 0s-1 .552-1 0a1 1 0 0 1 2 0z" />
                     </svg>
+                    {unreadMessages > 0 && (
+                        <span className="badge bg-secondary align-top">
+                            {unreadMessages}
+                        </span>
+                    )}
                 </a>
                 <a className="nav-item active nav-link" href="/profile">
                     {user.username}

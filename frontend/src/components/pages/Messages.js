@@ -14,6 +14,7 @@ export default function Messages() {
     useEffect(() => {
         axios.get("/api/messages/received").then((response) => {
             setMessages(response.data);
+            axios.post("/api/messages/received/markallasread");
         });
     }, [rerender]);
 
