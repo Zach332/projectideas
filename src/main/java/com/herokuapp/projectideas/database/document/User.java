@@ -29,6 +29,7 @@ public class User {
     @JsonView(View.Get.class)
     protected boolean admin;
 
+    protected List<String> postedIdeaIds;
     protected List<String> savedIdeaIds;
 
     public User(String username, String email) {
@@ -38,6 +39,7 @@ public class User {
         this.email = email;
         this.timeCreated = Instant.now().getEpochSecond();
         this.admin = false;
+        this.postedIdeaIds = new ArrayList<String>();
         this.savedIdeaIds = new ArrayList<String>();
     }
 }
