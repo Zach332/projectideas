@@ -137,7 +137,9 @@ public class Database {
 
     public void saveIdeaForUser(String ideaId, String userId) {
         User user = findUser(userId).get();
-        user.getSavedIdeaIds().add(ideaId);
+        if (!user.getSavedIdeaIds().contains(ideaId)) {
+            user.getSavedIdeaIds().add(ideaId);
+        }
         userContainer.replaceItem(
             user,
             userId,
