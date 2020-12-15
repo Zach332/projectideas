@@ -21,7 +21,7 @@ export default function Navbar() {
     let userLinks;
     if (user.loggedIn) {
         userLinks = (
-            <ul className="navbar-nav ml-auto" id="navbarLogin">
+            <ul className="navbar-nav ms-auto" id="navbarLogin">
                 <a className="nav-item active nav-link" href="/messages">
                     <svg
                         width="1em"
@@ -69,15 +69,15 @@ export default function Navbar() {
 
     return (
         <div>
-            <nav className="navbar navbar-expand-sm navbar-dark bg-dark justify-content-between mb-3">
+            <nav className="navbar navbar-expand-sm navbar-dark bg-dark justify-content-between mb-3 px-2">
                 <a className="navbar-brand" href="/">
                     <img src={NameLogo} alt="" />
                 </a>
                 <button
-                    className="navbar-toggler mr-auto"
+                    className="navbar-toggler me-auto"
                     type="button"
-                    data-toggle="collapse"
-                    data-target="#navbarNav"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
                     aria-controls="navbarNav"
                     aria-expanded="false"
                     aria-label="Toggle navigation"

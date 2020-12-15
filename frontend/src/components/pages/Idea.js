@@ -116,7 +116,7 @@ export default function Idea() {
                         className="btn btn-secondary dropdown-toggle"
                         type="button"
                         id="dropdownMenuButton"
-                        data-toggle="dropdown"
+                        data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-expanded="false"
                     >
@@ -131,8 +131,8 @@ export default function Idea() {
                         </a>
                         <a
                             className="dropdown-item text-danger"
-                            data-toggle="modal"
-                            data-target="#deleteConfirmation"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteConfirmation"
                         >
                             Delete idea
                         </a>
@@ -175,8 +175,8 @@ export default function Idea() {
                         <li className="list-group-item">
                             <button
                                 type="button"
-                                data-toggle="modal"
-                                data-target="#sendMessage"
+                                data-bs-toggle="modal"
+                                data-bs-target="#sendMessage"
                                 className="btn btn-outline-secondary btn-md"
                             >
                                 Message author

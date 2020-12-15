@@ -25,11 +25,10 @@ export default function Modal({
                         </h4>
                         <button
                             type="button"
-                            className="close"
-                            data-dismiss="modal"
+                            className="btn btn-close"
+                            data-bs-dismiss="modal"
                         >
-                            <span aria-hidden="true">&times;</span>
-                            <span className="sr-only">Close</span>
+                            <span className="visually-hidden">Close</span>
                         </button>
                     </div>
                     <div className="modal-body">{body}</div>
@@ -38,14 +37,14 @@ export default function Modal({
                             <button
                                 type="button"
                                 className="btn btn-default"
-                                data-dismiss="modal"
+                                data-bs-dismiss="modal"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="button"
                                 className="btn btn-primary"
-                                data-dismiss="modal"
+                                data-bs-dismiss="modal"
                                 onClick={onClick}
                             >
                                 {submit}

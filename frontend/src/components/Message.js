@@ -75,10 +75,10 @@ export default function Message({ message, setRerender }) {
         >
             <div className="dropdown">
                 <button
-                    className="btn btn-sm btn-outline-secondary float-right"
+                    className="btn btn-sm btn-outline-secondary float-end"
                     type="button"
                     id="dropdownMenuButton"
-                    data-toggle="dropdown"
+                    data-bs-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"
                 >
@@ -102,15 +102,15 @@ export default function Message({ message, setRerender }) {
                 >
                     <a
                         className="dropdown-item"
-                        data-toggle="modal"
-                        data-target={"#sendMessage" + message.id}
+                        data-bs-toggle="modal"
+                        data-bs-target={"#sendMessage" + message.id}
                     >
                         Reply
                     </a>
                     <a
                         className="dropdown-item text-danger"
-                        data-toggle="modal"
-                        data-target={"#deleteMessage" + message.id}
+                        data-bs-toggle="modal"
+                        data-bs-target={"#deleteMessage" + message.id}
                     >
                         Delete message
                     </a>
@@ -118,13 +118,13 @@ export default function Message({ message, setRerender }) {
             </div>
             <h6 className="card-subtitle my-2">
                 {message.unread && (
-                    <span className="badge badge-pill badge-primary mr-2">
+                    <span className="badge badge-pill bg-primary me-2">
                         New
                     </span>
                 )}
                 From {message.senderUsername}
             </h6>
-            <p className="mb-1 ml-2" style={{ whiteSpace: "pre" }}>
+            <p className="mb-1 ms-2" style={{ whiteSpace: "pre" }}>
                 {message.content}
             </p>
             <Modal

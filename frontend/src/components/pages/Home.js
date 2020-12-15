@@ -35,7 +35,7 @@ export default function Home() {
     return (
         <div>
             <div className="d-flex">
-                <div className="mr-auto p-2">
+                <div className="me-auto p-2">
                     <h1>Home</h1>
                 </div>
                 <div className="p-2">

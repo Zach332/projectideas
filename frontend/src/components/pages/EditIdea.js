@@ -56,7 +56,7 @@ export default function EditIdea({ originalIdea, setStatus }) {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div className="form-group">
+                <div className="form-group  mt-2 mb-3">
                     <label htmlFor="content">Details</label>
                     <textarea
                         value={idea.content}

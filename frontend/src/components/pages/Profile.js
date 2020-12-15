@@ -91,11 +91,19 @@ export default function Profile() {
     let usernameForm;
     if (!changingUsername) {
         usernameForm = (
-            <form className="form-inline my-5" onSubmit={handleChange}>
-                <label htmlFor="username" className="col-sm-2 col-form-label">
-                    Username
-                </label>
-                <div className="mx-sm-3">
+            <form
+                className="my-5 row row-cols-lg-auto g-3 align-items-center"
+                onSubmit={handleChange}
+            >
+                <div className="col-12">
+                    <label
+                        htmlFor="username"
+                        className="col-sm-2 col-form-label"
+                    >
+                        Username
+                    </label>
+                </div>
+                <div className="mx-sm-3 col-12">
                     <input
                         type="text"
                         className="form-control"
@@ -111,11 +119,19 @@ export default function Profile() {
         );
     } else {
         usernameForm = (
-            <form className="form-inline my-5" onSubmit={handleSubmit}>
-                <label htmlFor="username" className="col-sm-2 col-form-label">
-                    Username
-                </label>
-                <div className="mx-sm-3">
+            <form
+                className="my-5 row row-cols-lg-auto g-3 align-items-center"
+                onSubmit={handleSubmit}
+            >
+                <div className="col-12">
+                    <label
+                        htmlFor="username"
+                        className="col-sm-2 col-form-label"
+                    >
+                        Username
+                    </label>
+                </div>
+                <div className="mx-sm-3 col-12">
                     <input
                         type="text"
                         className="form-control"
@@ -124,16 +140,18 @@ export default function Profile() {
                         onChange={handleInputChange}
                     />
                 </div>
-                <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={
-                        userData.username.length < 3 ||
-                        userData.username.length > 30
-                    }
-                >
-                    Submit
-                </button>
+                <div className="col-12">
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={
+                            userData.username.length < 3 ||
+                            userData.username.length > 30
+                        }
+                    >
+                        Submit
+                    </button>
+                </div>
             </form>
         );
     }
@@ -154,11 +172,11 @@ export default function Profile() {
         <div>
             <h1>Profile</h1>
             {usernameForm}
-            <form className="form-inline my-5">
-                <label htmlFor="email" className="col-sm-2 col-form-label">
-                    Email
-                </label>
-                <div className="mx-sm-3">
+            <form className="my-5 row row-cols-lg-auto g-3 align-items-center">
+                <div className="col-12">
+                    <label htmlFor="email">Email</label>
+                </div>
+                <div className="mx-sm-3 col-12">
                     <input
                         type="text"
                         className="form-control"
@@ -167,9 +185,13 @@ export default function Profile() {
                         readOnly
                     />
                 </div>
-                <small id="emailComment" className="form-text text-muted">
+                <label
+                    htmlFor="email"
+                    id="emailComment"
+                    className="text-muted col-12"
+                >
                     Primary email from GitHub/Google
-                </small>
+                </label>
             </form>
             <button
                 type="button"
@@ -188,7 +210,7 @@ export default function Profile() {
                 myProjects.map((idea) => (
                     <div key={idea.id} className="container">
                         <div className="row">
-                            <div className="col mr-auto">
+                            <div className="col me-auto">
                                 <IdeaSummary idea={idea} />
                             </div>
                             <div className="col-auto my-auto">

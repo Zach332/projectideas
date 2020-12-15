@@ -34,7 +34,7 @@ export default function Success() {
                         width="1em"
                         height="1em"
                         viewBox="0 0 16 16"
-                        className="bi ml-1 bi-arrow-return-left"
+                        className="bi ms-1 bi-arrow-return-left"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
                     >
