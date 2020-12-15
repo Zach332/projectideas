@@ -36,6 +36,12 @@ public class UserController {
             );
     }
 
+    @GetMapping("/api/users/{userId}/postedideas")
+    @JsonView(View.Get.class)
+    public List<Idea> getPostedIdeas(@PathVariable String userId) {
+        return database.getPostedIdeasForUser(userId);
+    }
+
     @GetMapping("/api/users/{userId}/savedIdeas")
     @JsonView(View.Get.class)
     public List<Idea> getSavedIdeas(@PathVariable String userId) {

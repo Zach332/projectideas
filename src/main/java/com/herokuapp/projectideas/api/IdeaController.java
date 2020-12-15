@@ -184,7 +184,7 @@ public class IdeaController {
         if (!user.isAdmin() && !ideaToDelete.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        database.deleteIdea(id);
+        database.deleteIdea(id, userId);
     }
 
     @DeleteMapping("/api/ideas/{ideaId}/comments/{commentId}")

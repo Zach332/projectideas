@@ -172,6 +172,21 @@ public class Database {
         return getIdeasInList(ideaIds);
     }
 
+    public List<Idea> getPostedIdeasForUser(String userId) {
+        List<String> ideaIds = userContainer
+            .queryItems(
+                "SELECT VALUE c.postedIdeaIds FROM c WHERE c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+
+        return getIdeasInList(ideaIds);
+    }
+
     private List<Idea> getIdeasInList(List<String> ideaIds) {
         return postContainer
             .queryItems(
@@ -197,6 +212,9 @@ public class Database {
 
     public void createIdea(Idea idea) {
         postContainer.createItem(idea);
+        User user = findUser(idea.getAuthorId()).get();
+        user.getPostedIdeaIds().add(idea.getId());
+        updateUser(idea.getAuthorId(), user);
     }
 
     public List<Idea> findAllIdeas() {
@@ -232,11 +250,12 @@ public class Database {
         );
     }
 
-    public void deleteIdea(String id) {
-        PartitionKey partitionKey = new PartitionKey(id);
+    public void deleteIdea(String ideaId, String userId) {
+        // Delete idea and all associated comments
+        PartitionKey partitionKey = new PartitionKey(ideaId);
         List<String> ids = postContainer
             .queryItems(
-                "SELECT VALUE c.id FROM c WHERE c.ideaId = '" + id + "'",
+                "SELECT VALUE c.id FROM c WHERE c.ideaId = '" + ideaId + "'",
                 new CosmosQueryRequestOptions(),
                 String.class
             )
@@ -249,6 +268,11 @@ public class Database {
                 new CosmosItemRequestOptions()
             );
         }
+
+        // Remove ideaId from author's postedIdeaIds list
+        User user = findUser(userId).get();
+        user.getPostedIdeaIds().remove(ideaId);
+        updateUser(userId, user);
     }
 
     // Comments
