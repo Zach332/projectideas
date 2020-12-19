@@ -115,6 +115,7 @@ public class Database {
                     String.class
                 )
                 .stream()
+                .distinct()
                 .map(ideaId -> new PartitionKey(ideaId))
                 .collect(Collectors.toList());
 
