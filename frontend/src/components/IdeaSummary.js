@@ -16,7 +16,14 @@ export default function IdeaSummary({ idea }) {
                     {date.toLocaleDateString()}
                 </small>
             </div>
-            <p className="mb-1">{removeMd(idea.content)}</p>
+            <p
+                className="mb-1"
+                style={{
+                    wordBreak: "break-word",
+                }}
+            >
+                {removeMd(idea.content)}
+            </p>
             <small className="text-muted">By {idea.authorUsername}</small>
         </a>
     );

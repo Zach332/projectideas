@@ -21,7 +21,7 @@ export default function Comment({
                     className="mx-5 ps-2"
                     style={{
                         background: "#ededed",
-                        wordBreak: "break-all",
+                        wordBreak: "break-word",
                     }}
                 >
                     {addBlockquoteStyling(text.replace(/^> ?/gm, ""))}
