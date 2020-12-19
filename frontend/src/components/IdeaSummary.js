@@ -4,6 +4,7 @@ export default function IdeaSummary({ idea }) {
     const removeMd = require("remove-markdown");
     var ideaLink = "/idea/" + idea.id;
     var date = new Date(idea.timePosted * 1000);
+    const MAX_LENGTH = 320;
 
     return (
         <a
@@ -22,7 +23,8 @@ export default function IdeaSummary({ idea }) {
                     wordBreak: "break-word",
                 }}
             >
-                {removeMd(idea.content)}
+                {removeMd(idea.content).substring(0, MAX_LENGTH)}
+                {removeMd(idea.content).length > MAX_LENGTH && "..."}
             </p>
             <small className="text-muted">By {idea.authorUsername}</small>
         </a>
