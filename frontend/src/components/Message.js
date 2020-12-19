@@ -122,14 +122,21 @@ export default function Message({ message, setRerender }) {
                         New
                     </span>
                 )}
-                From {message.senderUsername}
+                {message.senderUsername != null
+                    ? "From " + message.senderUsername
+                    : "To " + message.recipientUsername}
             </h6>
             <p className="mb-1 ms-2" style={{ whiteSpace: "pre" }}>
                 {message.content}
             </p>
             <Modal
                 id={"sendMessage" + message.id}
-                title={"Send message to " + message.senderUsername}
+                title={
+                    "Send message to " +
+                    (message.senderUsername != null
+                        ? message.senderUsername
+                        : message.recipientUsername)
+                }
                 body={messageForm}
                 submit="Send"
                 onClick={sendMessage}
