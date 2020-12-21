@@ -1,11 +1,13 @@
 package com.herokuapp.projectideas.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.View;
 import com.herokuapp.projectideas.database.document.User;
-import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.dto.DTOMapper;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.user.CreateUserDTO;
+import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,10 +24,12 @@ public class UserController {
     @Autowired
     Database database;
 
+    @Autowired
+    DTOMapper mapper;
+
     @GetMapping("/api/users/{id}")
-    @JsonView(View.Get.class)
-    public User getUser(@PathVariable String id) {
-        return database
+    public ViewUserDTO getUser(@PathVariable String id) {
+        User user = database
             .findUser(id)
             .orElseThrow(
                 () ->
@@ -34,35 +38,43 @@ public class UserController {
                         "User " + id + " does not exist."
                     )
             );
+        return mapper.userDTO(user);
     }
 
     @GetMapping("/api/users/{userId}/postedideas")
-    @JsonView(View.Get.class)
-    public List<Idea> getPostedIdeas(@PathVariable String userId) {
-        return database.getPostedIdeasForUser(userId);
+    public List<PreviewIdeaDTO> getPostedIdeas(@PathVariable String userId) {
+        return database
+            .getPostedIdeasForUser(userId)
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea))
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/api/users/{userId}/savedIdeas")
-    @JsonView(View.Get.class)
-    public List<Idea> getSavedIdeas(@PathVariable String userId) {
-        return database.getSavedIdeasForUser(userId);
+    public List<PreviewIdeaDTO> getSavedIdeas(@PathVariable String userId) {
+        return database
+            .getSavedIdeasForUser(userId)
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea))
+            .collect(Collectors.toList());
     }
 
     @PostMapping("/api/users")
-    public void createUser(@RequestBody @JsonView(View.Post.class) User user) {
+    public void createUser(@RequestBody CreateUserDTO user) {
         if (database.containsUserWithUsername(user.getUsername())) {
             throw new ResponseStatusException(
                 HttpStatus.CONFLICT,
                 "Username " + user.getUsername() + " is already taken."
             );
         }
+        // TODO: Create the user object in Database.java
         database.createUser(new User(user.getUsername(), user.getEmail()));
     }
 
     @PutMapping("/api/users/{id}")
     public void updateUser(
         @PathVariable String id,
-        @RequestBody @JsonView(View.Post.class) User user
+        @RequestBody CreateUserDTO user
     ) {
         // No authorization because ID in path verifies identity
         User existingUser = database
