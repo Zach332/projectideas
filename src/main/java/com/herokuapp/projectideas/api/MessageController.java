@@ -1,11 +1,12 @@
 package com.herokuapp.projectideas.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.View;
-import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
-import com.herokuapp.projectideas.database.document.message.SentMessage;
+import com.herokuapp.projectideas.dto.DTOMapper;
+import com.herokuapp.projectideas.dto.message.SendMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,20 +22,29 @@ public class MessageController {
     @Autowired
     Database database;
 
+    @Autowired
+    DTOMapper mapper;
+
     @GetMapping("/api/messages/received")
-    @JsonView(View.Get.class)
-    public List<ReceivedMessage> getReceivedMessages(
+    public List<ViewReceivedMessageDTO> getReceivedMessages(
         @RequestHeader("authorization") String userId
     ) {
-        return database.findAllReceivedMessages(userId);
+        return database
+            .findAllReceivedMessages(userId)
+            .stream()
+            .map(message -> mapper.viewReceivedMessageDTO(message))
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/api/messages/sent")
-    @JsonView(View.Get.class)
-    public List<SentMessage> getSentMessages(
+    public List<ViewSentMessageDTO> getSentMessages(
         @RequestHeader("authorization") String userId
     ) {
-        return database.findAllSentMessages(userId);
+        return database
+            .findAllSentMessages(userId)
+            .stream()
+            .map(message -> mapper.viewSentMessageDTO(message))
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/api/messages/numunread")
@@ -44,12 +54,11 @@ public class MessageController {
         return database.getNumberOfUnreadMessages(userId);
     }
 
-    // TODO: Refactor to not rely on the ReceivedMessage type
     @PostMapping("/api/messages/{recipientUsername}")
     public void sendMessage(
         @RequestHeader("authorization") String userId,
         @PathVariable("recipientUsername") String recipientUsername,
-        @RequestBody @JsonView(View.Post.class) ReceivedMessage message
+        @RequestBody SendMessageDTO message
     ) {
         database.createMessage(userId, recipientUsername, message.getContent());
     }

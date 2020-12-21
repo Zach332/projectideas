@@ -38,7 +38,7 @@ public class UserController {
                         "User " + id + " does not exist."
                     )
             );
-        return mapper.userDTO(user);
+        return mapper.viewUserDTO(user);
     }
 
     @GetMapping("/api/users/{userId}/postedideas")
