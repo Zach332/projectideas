@@ -35,6 +35,7 @@ public class User {
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
         this.type = "User";
+        this.userId = this.id;
         this.username = username;
         this.email = email;
         this.timeCreated = Instant.now().getEpochSecond();
