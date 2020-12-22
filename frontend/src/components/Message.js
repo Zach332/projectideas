@@ -125,6 +125,10 @@ export default function Message({ message, setRerender }) {
                 {message.senderUsername != null
                     ? "From " + message.senderUsername
                     : "To " + message.recipientUsername}
+                <span className="text-muted">
+                    {" "}
+                    on {new Date(message.timeSent * 1000).toLocaleDateString()}
+                </span>
             </h6>
             <p className="mb-1 ms-2" style={{ whiteSpace: "pre" }}>
                 {message.content}
