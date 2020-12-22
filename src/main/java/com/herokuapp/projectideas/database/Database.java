@@ -160,8 +160,8 @@ public class Database {
         );
     }
 
-    public List<Idea> getSavedIdeasForUser(String userId) {
-        List<String> ideaIds = userContainer
+    private List<String> getSavedIdeaIdsForUser(String userId) {
+        return userContainer
             .queryItems(
                 "SELECT VALUE c.savedIdeaIds FROM c WHERE c.userId = '" +
                 userId +
@@ -171,23 +171,20 @@ public class Database {
             )
             .stream()
             .collect(Collectors.toList());
+    }
 
+    public List<Idea> getSavedIdeasForUser(String userId) {
+        List<String> ideaIds = getSavedIdeaIdsForUser(userId);
         return getIdeasInList(ideaIds);
     }
 
     public List<Idea> getPostedIdeasForUser(String userId) {
-        List<String> ideaIds = userContainer
-            .queryItems(
-                "SELECT VALUE c.postedIdeaIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
-
+        List<String> ideaIds = getSavedIdeaIdsForUser(userId);
         return getIdeasInList(ideaIds);
+    }
+
+    public boolean isIdeaSavedByUser(String userId, String ideaId) {
+        return getSavedIdeaIdsForUser(userId).contains(ideaId);
     }
 
     private List<Idea> getIdeasInList(List<String> ideaIds) {
