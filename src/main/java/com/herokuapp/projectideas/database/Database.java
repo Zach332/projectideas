@@ -173,13 +173,26 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    private List<String> getPostedIdeaIdsForUser(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.postedIdeaIds FROM c WHERE c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public List<Idea> getSavedIdeasForUser(String userId) {
         List<String> ideaIds = getSavedIdeaIdsForUser(userId);
         return getIdeasInList(ideaIds);
     }
 
     public List<Idea> getPostedIdeasForUser(String userId) {
-        List<String> ideaIds = getSavedIdeaIdsForUser(userId);
+        List<String> ideaIds = getPostedIdeaIdsForUser(userId);
         return getIdeasInList(ideaIds);
     }
 
