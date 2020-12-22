@@ -10,6 +10,7 @@ export default function Profile() {
     const [user] = useGlobalState("user");
     const [userData, setUserData] = React.useState([]);
     const [myProjects, setMyProjects] = React.useState([]);
+    const [myIdeas, setMyIdeas] = React.useState([]);
     const [rerender, setRerender] = React.useState(0);
     const [changingUsername, setChangingUsername] = React.useState(false);
 
@@ -22,6 +23,11 @@ export default function Profile() {
                 .get("/api/users/" + user.id + "/savedIdeas")
                 .then((response) => {
                     setMyProjects(response.data);
+                });
+            axios
+                .get("/api/users/" + user.id + "/postedideas")
+                .then((response) => {
+                    setMyIdeas(response.data);
                 });
         }
     }, [rerender]);
@@ -245,6 +251,11 @@ export default function Profile() {
                 ))
             )}
             <h2 className="mt-4">My ideas</h2>
+            {myIdeas.length === 0 ? (
+                <p>You haven&apos;t posted any ideas.</p>
+            ) : (
+                myIdeas.map((idea) => <IdeaSummary key={idea.id} idea={idea} />)
+            )}
         </div>
     );
 }
