@@ -1,7 +1,5 @@
 package com.herokuapp.projectideas.database.document.message;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.herokuapp.projectideas.database.View;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
@@ -11,25 +9,15 @@ import lombok.*;
 @Setter
 public class ReceivedMessage {
 
-    @JsonView(View.Get.class)
     protected String id;
-
     protected String type;
-
     /**
      * Id of the user that received the message
      */
     protected String userId;
-
-    @JsonView(View.Get.class)
     protected String senderUsername;
-
-    @JsonView(View.Base.class)
     protected String content;
-
     protected long timeSent;
-
-    @JsonView(View.Get.class)
     protected boolean unread;
 
     public ReceivedMessage(
