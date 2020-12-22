@@ -1,13 +1,18 @@
 package com.herokuapp.projectideas.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.View;
 import com.herokuapp.projectideas.database.document.User;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.dto.DTOMapper;
+import com.herokuapp.projectideas.dto.post.PostCommentDTO;
+import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
+import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,38 +31,55 @@ public class IdeaController {
     @Autowired
     Database database;
 
+    @Autowired
+    DTOMapper mapper;
+
     @GetMapping("/api/ideas")
-    @JsonView(View.Get.class)
-    public List<Idea> getAllIdeas() {
+    public List<PreviewIdeaDTO> getAllIdeas() {
         List<Idea> allIdeas = database.findAllIdeas();
         Collections.reverse(allIdeas);
-        return allIdeas;
+        return allIdeas
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea))
+            .collect(Collectors.toList());
     }
 
-    @GetMapping("/api/ideas/{id}")
-    @JsonView(View.Get.class)
-    public Idea getIdea(@PathVariable String id) {
-        return database
-            .findIdea(id)
+    @GetMapping("/api/ideas/{ideaId}")
+    public ViewIdeaDTO getIdea(
+        @PathVariable String ideaId,
+        @RequestHeader(value = "authorization", required = false) String userId
+    ) {
+        Idea idea = database
+            .findIdea(ideaId)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Idea " + id + " does not exist."
+                        "Idea " + ideaId + " does not exist."
                     )
             );
+        Boolean ideaSavedByUser;
+        if (userId != null && !userId.equals("")) {
+            ideaSavedByUser = database.isIdeaSavedByUser(userId, ideaId);
+        } else {
+            ideaSavedByUser = null;
+        }
+        return mapper.viewIdeaDTO(idea, ideaSavedByUser);
     }
 
     @GetMapping("/api/ideas/{ideaId}/comments")
-    @JsonView(View.Get.class)
-    public List<Comment> getCommentsOnIdea(@PathVariable String ideaId) {
-        return database.findAllCommentsOnIdea(ideaId);
+    public List<ViewCommentDTO> getCommentsOnIdea(@PathVariable String ideaId) {
+        return database
+            .findAllCommentsOnIdea(ideaId)
+            .stream()
+            .map(comment -> mapper.viewCommentDTO(comment))
+            .collect(Collectors.toList());
     }
 
     @PostMapping("/api/ideas")
     public void createIdea(
         @RequestHeader("authorization") String userId,
-        @RequestBody @JsonView(View.Post.class) Idea idea
+        @RequestBody PostIdeaDTO idea
     ) {
         User user = database
             .findUser(userId)
@@ -78,7 +100,7 @@ public class IdeaController {
     public void createComment(
         @RequestHeader("authorization") String userId,
         @PathVariable String ideaId,
-        @RequestBody @JsonView(View.Post.class) Comment comment
+        @RequestBody PostCommentDTO comment
     ) {
         User user = database
             .findUser(userId)
@@ -99,7 +121,7 @@ public class IdeaController {
     public void updateIdea(
         @RequestHeader("authorization") String userId,
         @PathVariable String id,
-        @RequestBody @JsonView(View.Post.class) Idea idea
+        @RequestBody PostIdeaDTO idea
     ) {
         Idea existingIdea = database
             .findIdea(id)
@@ -128,7 +150,7 @@ public class IdeaController {
         @RequestHeader("authorization") String userId,
         @PathVariable String ideaId,
         @PathVariable String commentId,
-        @RequestBody @JsonView(View.Post.class) Comment comment
+        @RequestBody PostCommentDTO comment
     ) {
         Comment existingComment = database
             .findCommentOnIdea(ideaId, commentId)

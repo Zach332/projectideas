@@ -1,7 +1,5 @@
 package com.herokuapp.projectideas.database.document.post;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.herokuapp.projectideas.database.View;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
@@ -11,7 +9,6 @@ import lombok.*;
 @Setter
 public class Idea extends Post {
 
-    @JsonView(View.Base.class)
     protected String title;
 
     public Idea(
