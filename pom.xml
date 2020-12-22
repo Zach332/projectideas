@@ -91,11 +91,16 @@
                         </path>
                         <!--Lombok is required to be here because the generated
                             mapstruct code relies on lombok generated getters/setters
-                            https://github.com/mapstruct/mapstruct/issues/1270 -->
+                            https://stackoverflow.com/a/47684351/ -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${org.projectlombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.1.0</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
