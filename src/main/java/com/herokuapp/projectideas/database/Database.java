@@ -14,6 +14,7 @@ import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -187,8 +188,17 @@ public class Database {
     }
 
     public List<Idea> getSavedIdeasForUser(String userId) {
+        ArrayList<Idea> ideas = new ArrayList<Idea>();
         List<String> ideaIds = getSavedIdeaIdsForUser(userId);
-        return getIdeasInList(ideaIds);
+        // Return ideas in newest-first order
+        Collections.reverse(ideaIds);
+        for (String ideaId : ideaIds) {
+            Optional<Idea> idea = findIdea(ideaId);
+            if (idea.isPresent()) {
+                ideas.add(idea.get());
+            }
+        }
+        return ideas;
     }
 
     public List<Idea> getPostedIdeasForUser(String userId) {
@@ -205,7 +215,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
                 String.join("', '", ideaIds) +
-                "')",
+                "') ORDER BY c.timePosted DESC",
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )
@@ -299,7 +309,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
                 ideaId +
-                "'",
+                "' ORDER BY c.timePosted DESC",
                 new CosmosQueryRequestOptions(),
                 Comment.class
             )
@@ -389,7 +399,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
                 recipientId +
-                "'",
+                "' ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
                 ReceivedMessage.class
             )
@@ -404,7 +414,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
                 recipientId +
-                "' AND c.unread = true",
+                "' AND c.unread = true ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
                 ReceivedMessage.class
             )
@@ -417,7 +427,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'SentMessage' AND c.userId = '" +
                 senderId +
-                "'",
+                "' ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
                 SentMessage.class
             )
