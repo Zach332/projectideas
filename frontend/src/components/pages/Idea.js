@@ -78,7 +78,7 @@ export default function Idea() {
         setStatus(Status.NotSubmitted);
     };
 
-    const saveIdeaToProjects = () => {
+    const saveIdea = () => {
         axios
             .post("/api/ideas/" + idea.id + "/save", {})
             .then(() => {
@@ -86,10 +86,35 @@ export default function Idea() {
                     appearance: "success",
                     autoDismiss: true,
                 });
+                setIdea((idea) => ({
+                    ...idea,
+                    savedByUser: true,
+                }));
             })
             .catch((err) => {
                 console.log("Error saving idea: " + err);
                 addToast("The idea was not saved. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
+    const unsaveIdea = () => {
+        axios
+            .post("/api/ideas/" + idea.id + "/unsave", {})
+            .then(() => {
+                addToast("Idea unsaved.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                setIdea((idea) => ({
+                    ...idea,
+                    savedByUser: false,
+                }));
+            })
+            .catch((err) => {
+                console.log("Error unsaving idea: " + err);
+                addToast("The idea was not unsaved. Please try again.", {
                     appearance: "error",
                 });
             });
@@ -182,15 +207,27 @@ export default function Idea() {
                                 Message author
                             </button>
                         </li>
-                        <li className="list-group-item">
-                            <button
-                                type="button"
-                                className="btn btn-primary btn-md"
-                                onClick={saveIdeaToProjects}
-                            >
-                                Work on this idea
-                            </button>
-                        </li>
+                        {idea.savedByUser ? (
+                            <li className="list-group-item">
+                                <button
+                                    type="button"
+                                    className="btn btn-danger btn-md"
+                                    onClick={unsaveIdea}
+                                >
+                                    Unsave
+                                </button>
+                            </li>
+                        ) : (
+                            <li className="list-group-item">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary btn-md"
+                                    onClick={saveIdea}
+                                >
+                                    Save
+                                </button>
+                            </li>
+                        )}
                         {more}
                     </ul>
                 </div>
