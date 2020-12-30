@@ -10,7 +10,6 @@ import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,10 +35,9 @@ public class IdeaController {
     DTOMapper mapper;
 
     @GetMapping("/api/ideas")
-    public List<PreviewIdeaDTO> getAllIdeas() {
-        List<Idea> allIdeas = database.findAllIdeas();
-        Collections.reverse(allIdeas);
-        return allIdeas
+    public List<PreviewIdeaDTO> getIdeas(@RequestParam("page") int pageNum) {
+        return database
+            .findIdeasByPageNum(pageNum)
             .stream()
             .map(idea -> mapper.previewIdeaDTO(idea))
             .collect(Collectors.toList());

@@ -230,10 +230,14 @@ public class Database {
         updateUser(idea.getAuthorId(), user);
     }
 
-    public List<Idea> findAllIdeas() {
+    public List<Idea> findIdeasByPageNum(int pageNum) {
+        int ideasPerPage = 10;
         return postContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea'",
+                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC OFFSET " +
+                ((pageNum - 1) * ideasPerPage) +
+                " LIMIT " +
+                ideasPerPage,
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )
