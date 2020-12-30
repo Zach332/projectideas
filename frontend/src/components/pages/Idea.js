@@ -11,6 +11,7 @@ import LoginWarning from "../logins/LoginWarning";
 import Modal from "../Modal";
 import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
+import { formatTime } from "../../TimeFormatter";
 
 export default function Idea() {
     const { addToast } = useToasts();
@@ -184,7 +185,6 @@ export default function Idea() {
         <LoginWarning />
     );
 
-    var date = new Date(idea.timePosted * 1000);
     return (
         <div className="container-fluid">
             <div className="row justify-content-center">
@@ -195,7 +195,8 @@ export default function Idea() {
                     <ul className="card list-group list-group-flush">
                         <li className="list-group-item">
                             By {idea.authorUsername}
-                            <br></br>on {date.toLocaleDateString()}
+                            <br></br>
+                            {formatTime(idea.timePosted)}
                         </li>
                         <li className="list-group-item">
                             <button

@@ -1,9 +1,9 @@
 import React from "react";
+import { formatTime } from "../TimeFormatter";
 
 export default function IdeaSummary({ idea }) {
     const removeMd = require("remove-markdown");
     var ideaLink = "/idea/" + idea.id;
-    var date = new Date(idea.timePosted * 1000);
     const MAX_LENGTH = 320;
 
     return (
@@ -14,7 +14,7 @@ export default function IdeaSummary({ idea }) {
             <div className="d-flex justify-content-between">
                 <h5 className="mb-1">{idea.title}</h5>
                 <small className="text-muted">
-                    {date.toLocaleDateString()}
+                    {formatTime(idea.timePosted)}
                 </small>
             </div>
             <p

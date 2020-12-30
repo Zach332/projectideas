@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import { useLeavePageWarning } from "./hooks/LeavePageWarning";
 import { motion } from "framer-motion";
 import { useToasts } from "react-toast-notifications";
+import { formatTime } from "../TimeFormatter";
 
 export default function Message({ message, setRerender }) {
     const [messageToSend, setMessageToSend] = React.useState("");
@@ -127,7 +128,7 @@ export default function Message({ message, setRerender }) {
                     : "To " + message.recipientUsername}
                 <span className="text-muted">
                     {" "}
-                    on {new Date(message.timeSent * 1000).toLocaleDateString()}
+                    {formatTime(message.timeSent)}
                 </span>
             </h6>
             <p className="mb-1 ms-2" style={{ whiteSpace: "pre" }}>
