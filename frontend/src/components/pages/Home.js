@@ -83,13 +83,15 @@ export default function Home() {
             {ideaElements}
             <div className="d-flex">
                 <div className="me-auto p-2">
-                    <button
-                        type="btn btn-primary"
-                        className="btn btn-primary btn-md"
-                        onClick={previous}
-                    >
-                        Previous
-                    </button>
+                    {params.page > 1 && (
+                        <button
+                            type="btn btn-primary"
+                            className="btn btn-primary btn-md"
+                            onClick={previous}
+                        >
+                            Previous
+                        </button>
+                    )}
                 </div>
                 <div className="p-2">
                     <button
