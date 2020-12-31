@@ -30,7 +30,7 @@ export default function Home() {
     };
 
     let ideaElements;
-    if (status == Status.Success) {
+    if (status == Status.Success && ideas.length > 0) {
         ideaElements = (
             <div className="container mx-auto">
                 {ideas.map((idea) => (
@@ -40,6 +40,10 @@ export default function Home() {
         );
     } else if (status == Status.Loading) {
         ideaElements = <Spinner />;
+    } else {
+        ideaElements = (
+            <p className="ms-2">There are no ideas posted here yet.</p>
+        );
     }
 
     return (
