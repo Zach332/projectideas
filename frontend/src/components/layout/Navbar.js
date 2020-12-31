@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import NameLogo from "../../namelogo.png";
 import { userPersistenceKey, useGlobalState } from "../../State";
+import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
     const [user] = useGlobalState("user");
@@ -22,7 +23,11 @@ export default function Navbar() {
     if (user.loggedIn) {
         userLinks = (
             <ul className="navbar-nav ms-auto" id="navbarLogin">
-                <a className="nav-item active nav-link" href="/messages">
+                <NavLink
+                    className="nav-item nav-link"
+                    activeClassName="nav-item nav-link active"
+                    to="/messages"
+                >
                     <svg
                         width="1em"
                         height="1em"
@@ -46,10 +51,14 @@ export default function Navbar() {
                             {unreadMessages}
                         </span>
                     )}
-                </a>
-                <a className="nav-item active nav-link" href="/profile">
+                </NavLink>
+                <NavLink
+                    className="nav-item nav-link"
+                    activeClassName="nav-item nav-link active"
+                    to="/profile"
+                >
                     {user.username}
-                </a>
+                </NavLink>
             </ul>
         );
     } else {
@@ -86,11 +95,13 @@ export default function Navbar() {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav">
-                        <li className="nav-item active">
-                            <a className="nav-link" href="/about">
-                                About
-                            </a>
-                        </li>
+                        <NavLink
+                            className="nav-item nav-link"
+                            activeClassName="nav-item nav-link active"
+                            to="/about"
+                        >
+                            About
+                        </NavLink>
                     </ul>
                     {userLinks}
                 </div>
