@@ -8,17 +8,12 @@ import { toParams, toQuery } from "../utils/Routing";
 export default function Home() {
     const [ideas, setIdeas] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
+    const params = toParams(window.location.search.replace(/^\?/, ""));
+    if (!params.page) params.page = 1;
 
     useEffect(() => {
-        const params = toParams(window.location.search.replace(/^\?/, ""));
-        if (!params.page) params.page = 1;
         axios
-            .get(
-                "/api/ideas?" +
-                    toQuery({
-                        page: params.page,
-                    })
-            )
+            .get("/api/ideas?" + toQuery({ page: params.page }))
             .then((response) => {
                 setIdeas(response.data);
                 setStatus(Status.Success);
@@ -27,6 +22,16 @@ export default function Home() {
 
     const onCLick = () => {
         window.location.href = "/new-idea";
+    };
+
+    const next = () => {
+        window.location.href =
+            "/?" + toQuery({ page: parseInt(params.page) + 1 });
+    };
+
+    const previous = () => {
+        window.location.href =
+            "/?" + toQuery({ page: parseInt(params.page) - 1 });
     };
 
     let ideaElements;
@@ -76,6 +81,26 @@ export default function Home() {
                 </div>
             </div>
             {ideaElements}
+            <div className="d-flex">
+                <div className="me-auto p-2">
+                    <button
+                        type="btn btn-primary"
+                        className="btn btn-primary btn-md"
+                        onClick={previous}
+                    >
+                        Previous
+                    </button>
+                </div>
+                <div className="p-2">
+                    <button
+                        type="btn btn-primary"
+                        className="btn btn-primary btn-md"
+                        onClick={next}
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
