@@ -3,16 +3,29 @@ import IdeaSummary from "./../IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
 import Spinner from "../general/Spinner";
+import { toParams, toQuery } from "../utils/Routing";
 
 export default function Home() {
     const [ideas, setIdeas] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
 
     useEffect(() => {
-        axios.get("/api/ideas").then((response) => {
-            setIdeas(response.data);
-            setStatus(Status.Success);
-        });
+        const params = toParams(window.location.search.replace(/^\?/, ""));
+        if (!params.page) params.page = 1;
+        axios
+            .get(
+                "/api/ideas?" +
+                    toQuery({
+                        page: params.page,
+                    }),
+                {
+                    page: 1,
+                }
+            )
+            .then((response) => {
+                setIdeas(response.data);
+                setStatus(Status.Success);
+            });
     }, []);
 
     const onCLick = () => {
