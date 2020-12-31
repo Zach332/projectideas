@@ -17,10 +17,7 @@ export default function Home() {
                 "/api/ideas?" +
                     toQuery({
                         page: params.page,
-                    }),
-                {
-                    page: 1,
-                }
+                    })
             )
             .then((response) => {
                 setIdeas(response.data);
