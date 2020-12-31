@@ -8,6 +8,7 @@ import { toParams, toQuery } from "../utils/Routing";
 export default function Home() {
     const [ideas, setIdeas] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
+    const [lastPage, setLastPage] = React.useState(true);
     const params = toParams(window.location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
@@ -15,7 +16,9 @@ export default function Home() {
         axios
             .get("/api/ideas?" + toQuery({ page: params.page }))
             .then((response) => {
-                setIdeas(response.data);
+                console.log(response.data);
+                setIdeas(response.data.ideaPreviews);
+                setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
     }, []);
@@ -94,13 +97,15 @@ export default function Home() {
                     )}
                 </div>
                 <div className="p-2">
-                    <button
-                        type="btn btn-primary"
-                        className="btn btn-primary btn-md"
-                        onClick={next}
-                    >
-                        Next
-                    </button>
+                    {!lastPage && ideas.length > 0 && (
+                        <button
+                            type="btn btn-primary"
+                            className="btn btn-primary btn-md"
+                            onClick={next}
+                        >
+                            Next
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
