@@ -214,7 +214,7 @@ export default function Profile() {
                 </p>
             ) : (
                 myProjects.map((idea) => (
-                    <div key={idea.id} className="container">
+                    <div key={idea.id} className="container-flex">
                         <div className="row">
                             <div className="col me-auto">
                                 <IdeaSummary idea={idea} />
