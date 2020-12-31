@@ -29,6 +29,8 @@ public class Database {
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
 
+    private static final int IDEAS_PER_PAGE = 10;
+
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
         @Value("${azure.cosmos.key}") String key,
@@ -240,10 +242,30 @@ public class Database {
         updateUser(idea.getAuthorId(), user);
     }
 
-    public List<Idea> findAllIdeas() {
+    public int getNumIdeas() {
         return postContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea'",
+                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Idea'",
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+    }
+
+    public int getLastPageNum() {
+        int numIdeas = getNumIdeas();
+        return ((numIdeas - 1) / IDEAS_PER_PAGE) + 1;
+    }
+
+    public List<Idea> findIdeasByPageNum(int pageNum) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC OFFSET " +
+                ((pageNum - 1) * IDEAS_PER_PAGE) +
+                " LIMIT " +
+                IDEAS_PER_PAGE,
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )

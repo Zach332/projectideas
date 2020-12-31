@@ -8,9 +8,10 @@ import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,13 +37,21 @@ public class IdeaController {
     DTOMapper mapper;
 
     @GetMapping("/api/ideas")
-    public List<PreviewIdeaDTO> getAllIdeas() {
-        List<Idea> allIdeas = database.findAllIdeas();
-        Collections.reverse(allIdeas);
-        return allIdeas
-            .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea))
-            .collect(Collectors.toList());
+    public PreviewIdeaPageDTO getIdeas(@RequestParam("page") int pageNum) {
+        int lastPageNum = database.getLastPageNum();
+
+        List<PreviewIdeaDTO> ideaPreviews;
+        if (pageNum <= 0 || pageNum > lastPageNum) {
+            ideaPreviews = new ArrayList<>();
+        } else {
+            ideaPreviews =
+                database
+                    .findIdeasByPageNum(pageNum)
+                    .stream()
+                    .map(idea -> mapper.previewIdeaDTO(idea))
+                    .collect(Collectors.toList());
+        }
+        return new PreviewIdeaPageDTO(ideaPreviews, pageNum == lastPageNum);
     }
 
     @GetMapping("/api/ideas/{ideaId}")
