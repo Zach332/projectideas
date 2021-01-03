@@ -10,6 +10,8 @@ import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
+import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,6 +78,17 @@ public class IdeaController {
             .collect(Collectors.toList());
     }
 
+    @GetMapping("/api/ideas/{ideaId}/projects")
+    public List<PreviewProjectDTO> getProjectsBasedOnIdea(
+        @PathVariable String ideaId
+    ) {
+        return database
+            .getProjectsBasedOnIdea(ideaId)
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project))
+            .collect(Collectors.toList());
+    }
+
     @PostMapping("/api/ideas")
     public void createIdea(
         @RequestHeader("authorization") String userId,
@@ -114,6 +127,20 @@ public class IdeaController {
                 user.getUsername(),
                 comment.getContent()
             )
+        );
+    }
+
+    @PostMapping("/api/ideas/{ideaId}/projects")
+    public void createProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId,
+        @RequestBody CreateProjectDTO project
+    ) {
+        database.createProject(
+            project.getName(),
+            project.getDescription(),
+            ideaId,
+            userId
         );
     }
 

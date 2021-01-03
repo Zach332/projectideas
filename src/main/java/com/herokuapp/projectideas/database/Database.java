@@ -12,6 +12,7 @@ import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -515,5 +516,44 @@ public class Database {
             new PartitionKey(senderId),
             new CosmosItemRequestOptions()
         );
+    }
+
+    // Projects
+
+    public void createProject(
+        String name,
+        String description,
+        String ideaId,
+        String initialTeamMemberId
+    ) {
+        Project project = new Project(
+            name,
+            description,
+            ideaId,
+            initialTeamMemberId
+        );
+        projectContainer.createItem(project);
+    }
+
+    public Optional<Project> getProject(String projectId) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.id = '" + projectId + "'",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .findFirst();
+    }
+
+    public List<Project> getProjectsBasedOnIdea(String ideaId) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.ideaId = '" + ideaId + "'",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
     }
 }

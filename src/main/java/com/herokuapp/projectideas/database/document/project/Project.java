@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.database.document.project;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.*;
 
 @NoArgsConstructor
@@ -9,21 +10,28 @@ import lombok.*;
 @Setter
 public class Project {
 
+    protected String id;
+    protected String type;
+    /**
+     * Id of the idea associated with this project
+     */
+    protected String ideaId;
     protected String name;
     protected String description;
-    protected String associatedIdeaId;
     protected String githubLink;
     protected List<String> teamMemberIds;
 
     public Project(
         String name,
         String description,
-        String associatedIdeaId,
+        String ideaId,
         String initialTeamMemberId
     ) {
+        this.id = UUID.randomUUID().toString();
+        this.type = "Project";
+        this.ideaId = ideaId;
         this.name = name;
         this.description = description;
-        this.associatedIdeaId = associatedIdeaId;
         this.teamMemberIds = new ArrayList<>();
         this.teamMemberIds.add(initialTeamMemberId);
     }
