@@ -28,6 +28,7 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
+    private CosmosContainer projectContainer;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -38,6 +39,8 @@ public class Database {
         database = client.getDatabase("projectideas");
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
+        projectContainer =
+            database.getContainer(collectionPrefix + "_projects");
     }
 
     // Users
