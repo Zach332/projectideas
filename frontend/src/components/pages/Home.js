@@ -42,7 +42,9 @@ export default function Home() {
         ideaElements = (
             <div className="container mx-auto">
                 {ideas.map((idea) => (
-                    <IdeaSummary key={idea.id} idea={idea} />
+                    <div className="my-2" key={idea.id}>
+                        <IdeaSummary idea={idea} />
+                    </div>
                 ))}
             </div>
         );

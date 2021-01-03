@@ -9,7 +9,7 @@ export default function IdeaSummary({ idea }) {
     return (
         <a
             href={ideaLink}
-            className="list-group-item list-group-item-action flex-column align-items-start my-3 rounded border"
+            className="list-group-item list-group-item-action flex-column align-items-start rounded border"
         >
             <div className="d-flex justify-content-between">
                 <h5 className="mb-1">{idea.title}</h5>

@@ -215,7 +215,7 @@ export default function Profile() {
             ) : (
                 myProjects.map((idea) => (
                     <div key={idea.id} className="container-flex">
-                        <div className="row">
+                        <div className="row my-2">
                             <div className="col me-auto">
                                 <IdeaSummary idea={idea} />
                             </div>
@@ -254,7 +254,11 @@ export default function Profile() {
             {myIdeas.length === 0 ? (
                 <p>You haven&apos;t posted any ideas.</p>
             ) : (
-                myIdeas.map((idea) => <IdeaSummary key={idea.id} idea={idea} />)
+                myIdeas.map((idea) => (
+                    <div className="my-2" key={idea.id}>
+                        <IdeaSummary idea={idea} />
+                    </div>
+                ))
             )}
         </div>
     );
