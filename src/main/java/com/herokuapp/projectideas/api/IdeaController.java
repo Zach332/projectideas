@@ -1,9 +1,9 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.User;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;

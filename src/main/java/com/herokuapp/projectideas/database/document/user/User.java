@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.database.document;
+package com.herokuapp.projectideas.database.document.user;
 
 import java.time.Instant;
 import java.util.ArrayList;

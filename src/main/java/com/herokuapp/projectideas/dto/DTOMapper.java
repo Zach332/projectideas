@@ -1,10 +1,10 @@
 package com.herokuapp.projectideas.dto;
 
-import com.herokuapp.projectideas.database.document.User;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;

@@ -1,7 +1,7 @@
 package com.herokuapp.projectideas.login;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.user.User;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

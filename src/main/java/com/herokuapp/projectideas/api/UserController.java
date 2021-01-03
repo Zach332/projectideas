@@ -1,7 +1,7 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
