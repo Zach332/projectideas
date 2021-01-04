@@ -67,7 +67,6 @@ public class UserController {
                 "Username " + user.getUsername() + " is already taken."
             );
         }
-        // TODO: Create the user object in Database.java
         database.createUser(new User(user.getUsername(), user.getEmail()));
     }
 

@@ -3,6 +3,7 @@ package com.herokuapp.projectideas.api;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
@@ -137,10 +138,12 @@ public class IdeaController {
         @RequestBody CreateProjectDTO project
     ) {
         database.createProject(
-            project.getName(),
-            project.getDescription(),
-            ideaId,
-            userId
+            new Project(
+                project.getName(),
+                project.getDescription(),
+                ideaId,
+                userId
+            )
         );
     }
 

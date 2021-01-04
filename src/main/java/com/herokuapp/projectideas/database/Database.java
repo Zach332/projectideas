@@ -29,7 +29,6 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
-    private CosmosContainer projectContainer;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -40,8 +39,6 @@ public class Database {
         database = client.getDatabase("projectideas");
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
-        projectContainer =
-            database.getContainer(collectionPrefix + "_projects");
     }
 
     // Users
@@ -520,25 +517,16 @@ public class Database {
 
     // Projects
 
-    public void createProject(
-        String name,
-        String description,
-        String ideaId,
-        String initialTeamMemberId
-    ) {
-        Project project = new Project(
-            name,
-            description,
-            ideaId,
-            initialTeamMemberId
-        );
-        projectContainer.createItem(project);
+    public void createProject(Project project) {
+        postContainer.createItem(project);
     }
 
     public Optional<Project> getProject(String projectId) {
-        return projectContainer
+        return postContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.id = '" + projectId + "'",
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.id = '" +
+                projectId +
+                "'",
                 new CosmosQueryRequestOptions(),
                 Project.class
             )
@@ -547,9 +535,11 @@ public class Database {
     }
 
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
-        return projectContainer
+        return postContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.ideaId = '" + ideaId + "'",
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
+                ideaId +
+                "'",
                 new CosmosQueryRequestOptions(),
                 Project.class
             )
