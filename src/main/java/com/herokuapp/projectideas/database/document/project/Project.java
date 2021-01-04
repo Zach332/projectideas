@@ -20,12 +20,14 @@ public class Project {
     protected String description;
     protected String githubLink;
     protected List<String> teamMemberIds;
+    protected Boolean lookingForMembers;
 
     public Project(
         String name,
         String description,
         String ideaId,
-        String initialTeamMemberId
+        String initialTeamMemberId,
+        Boolean lookingForMembers
     ) {
         this.id = UUID.randomUUID().toString();
         this.type = "Project";
@@ -34,5 +36,6 @@ public class Project {
         this.description = description;
         this.teamMemberIds = new ArrayList<>();
         this.teamMemberIds.add(initialTeamMemberId);
+        this.lookingForMembers = lookingForMembers;
     }
 }

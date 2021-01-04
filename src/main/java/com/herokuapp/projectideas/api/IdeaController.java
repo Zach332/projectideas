@@ -142,7 +142,8 @@ public class IdeaController {
                 project.getName(),
                 project.getDescription(),
                 ideaId,
-                userId
+                userId,
+                project.getLookingForMembers()
             )
         );
     }
