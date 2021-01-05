@@ -11,12 +11,18 @@ import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
+import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
+import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface DTOMapper {
+    // Document -> DTO
+
     ViewUserDTO viewUserDTO(User user);
 
     PreviewIdeaDTO previewIdeaDTO(Idea idea);
@@ -28,4 +34,15 @@ public interface DTOMapper {
     ViewSentMessageDTO viewSentMessageDTO(SentMessage message);
 
     PreviewProjectDTO previewProjectDTO(Project project);
+    ViewProjectDTO viewProjectDTO(
+        Project project,
+        List<String> teamMemberUsernames
+    );
+
+    // DTO updating existing document
+
+    Project updateProjectFromDTO(
+        @MappingTarget Project project,
+        CreateProjectDTO createProjectDTO
+    );
 }

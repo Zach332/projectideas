@@ -80,6 +80,20 @@ public class Database {
             .findFirst();
     }
 
+    public String getUsernameFromId(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.username FROM c WHERE c.type = 'User' AND c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+    }
+
     public boolean containsUserWithUsername(String username) {
         return (
             userContainer
@@ -209,6 +223,20 @@ public class Database {
 
     public boolean isIdeaSavedByUser(String userId, String ideaId) {
         return getSavedIdeaIdsForUser(userId).contains(ideaId);
+    }
+
+    public boolean isUserAdmin(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.admin FROM c WHERE c.type = 'User' AND c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                boolean.class
+            )
+            .stream()
+            .findFirst()
+            .get();
     }
 
     private List<Idea> getIdeasInList(List<String> ideaIds) {
@@ -545,5 +573,22 @@ public class Database {
             )
             .stream()
             .collect(Collectors.toList());
+    }
+
+    public void updateProject(Project project) {
+        postContainer.replaceItem(
+            project,
+            project.getId(),
+            new PartitionKey(project.getIdeaId()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public void deleteProject(String projectId, String associatedIdeaId) {
+        postContainer.deleteItem(
+            projectId,
+            new PartitionKey(associatedIdeaId),
+            new CosmosItemRequestOptions()
+        );
     }
 }
