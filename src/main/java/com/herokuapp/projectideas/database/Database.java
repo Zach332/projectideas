@@ -235,6 +235,17 @@ public class Database {
 
     // Ideas
 
+    public List<Idea> getAllIdeas() {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC",
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public void createIdea(Idea idea) {
         postContainer.createItem(idea);
         User user = findUser(idea.getAuthorId()).get();
