@@ -41,6 +41,8 @@ public class LuceneConfig {
         throws IOException {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
+        indexWriter.deleteAll();
+        indexWriter.commit();
         return indexWriter;
     }
 
