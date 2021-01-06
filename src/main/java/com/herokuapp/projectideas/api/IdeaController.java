@@ -95,6 +95,8 @@ public class IdeaController {
         @RequestHeader("authorization") String userId,
         @RequestBody PostIdeaDTO idea
     ) {
+        // TODO: Move this call into the createIdea function
+        // As is, creating an idea requires calling the findUser function twice
         User user = database
             .findUser(userId)
             .orElseThrow(
@@ -163,12 +165,10 @@ public class IdeaController {
                         "Idea " + id + " does not exist."
                     )
             );
-        User user = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        if (!user.isAdmin() && !existingIdea.getAuthorId().equals(userId)) {
+        if (
+            !existingIdea.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         mapper.updateIdeaFromDTO(existingIdea, idea);
@@ -191,7 +191,10 @@ public class IdeaController {
                         "Comment " + commentId + " does not exist."
                     )
             );
-        if (!existingComment.getAuthorId().equals(userId)) {
+        if (
+            !existingComment.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         mapper.updateCommentFromDTO(existingComment, comment);
@@ -228,12 +231,10 @@ public class IdeaController {
                         "Idea " + id + " does not exist."
                     )
             );
-        User user = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        if (!user.isAdmin() && !ideaToDelete.getAuthorId().equals(userId)) {
+        if (
+            !ideaToDelete.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id, userId);
@@ -254,12 +255,10 @@ public class IdeaController {
                         "Comment " + commentId + " does not exist."
                     )
             );
-        User user = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        if (!user.isAdmin() && !commentToDelete.getAuthorId().equals(userId)) {
+        if (
+            !commentToDelete.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteComment(commentId, ideaId);
