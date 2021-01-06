@@ -26,7 +26,6 @@ public class IndexController {
 
     @PostConstruct
     private void init() {
-        System.out.println("*****Calling this constructor******");
         List<Idea> ideaList = database.getAllIdeas();
         try {
             indexIdeas(ideaList);
@@ -43,13 +42,7 @@ public class IndexController {
             doc.add(
                 new TextField("content", idea.getContent(), Field.Store.YES)
             );
-            doc.add(
-                new TextField(
-                    "author",
-                    idea.getAuthorUsername(),
-                    Field.Store.YES
-                )
-            );
+            doc.add(new TextField("id", idea.getId(), Field.Store.YES));
             docs.add(doc);
         }
         indexWriter.addDocuments(docs);
@@ -60,9 +53,7 @@ public class IndexController {
         Document doc = new Document();
         doc.add(new TextField("title", idea.getTitle(), Field.Store.YES));
         doc.add(new TextField("content", idea.getContent(), Field.Store.YES));
-        doc.add(
-            new TextField("author", idea.getAuthorUsername(), Field.Store.YES)
-        );
+        doc.add(new TextField("id", idea.getId(), Field.Store.YES));
         indexWriter.addDocument(doc);
         indexWriter.commit();
     }

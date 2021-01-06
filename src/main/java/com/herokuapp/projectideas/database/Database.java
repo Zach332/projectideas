@@ -212,7 +212,7 @@ public class Database {
         return getSavedIdeaIdsForUser(userId).contains(ideaId);
     }
 
-    private List<Idea> getIdeasInList(List<String> ideaIds) {
+    public List<Idea> getIdeasInList(List<String> ideaIds) {
         return postContainer
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +

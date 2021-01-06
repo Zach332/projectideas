@@ -1,7 +1,10 @@
 package com.herokuapp.projectideas.search;
 
+import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.document.post.Idea;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -24,7 +27,10 @@ public class SearchController {
     @Autowired
     private Analyzer analyzer;
 
-    public List<Document> searchIndex(String queryString) {
+    @Autowired
+    private Database database;
+
+    private List<Document> searchIndex(String queryString) {
         try {
             searcherManager.maybeRefresh();
             IndexSearcher indexSearcher = searcherManager.acquire();
@@ -43,5 +49,26 @@ public class SearchController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Idea> searchForIdea(String queryString) {
+        List<Document> documents = searchIndex(queryString);
+        List<String> ids = documents
+            .stream()
+            .map(doc -> doc.get("id"))
+            .collect(Collectors.toList());
+        List<Idea> unorderedIdeas = database.getIdeasInList(ids);
+
+        List<Idea> orderedIdeas = new ArrayList<Idea>();
+        for (String id : ids) {
+            orderedIdeas.add(
+                unorderedIdeas
+                    .stream()
+                    .filter(idea -> idea.getId().equals(id))
+                    .findFirst()
+                    .get()
+            );
+        }
+        return orderedIdeas;
     }
 }
