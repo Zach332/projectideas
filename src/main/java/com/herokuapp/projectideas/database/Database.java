@@ -212,19 +212,6 @@ public class Database {
         return getSavedIdeaIdsForUser(userId).contains(ideaId);
     }
 
-    public List<Idea> getIdeasInList(List<String> ideaIds) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
-                String.join("', '", ideaIds) +
-                "') ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
-    }
-
     public void deleteUser(String id) {
         userContainer.deleteItem(
             id,
@@ -277,6 +264,19 @@ public class Database {
                 ((pageNum - 1) * IDEAS_PER_PAGE) +
                 " LIMIT " +
                 IDEAS_PER_PAGE,
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public List<Idea> getIdeasInList(List<String> ideaIds) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
+                String.join("', '", ideaIds) +
+                "') ORDER BY c.timePosted DESC",
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )

@@ -11,6 +11,7 @@ import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
+import com.herokuapp.projectideas.search.SearchController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,9 @@ public class IdeaController {
 
     @Autowired
     DTOMapper mapper;
+
+    @Autowired
+    SearchController searchController;
 
     @GetMapping("/api/ideas")
     public PreviewIdeaPageDTO getIdeas(@RequestParam("page") int pageNum) {
@@ -104,6 +108,14 @@ public class IdeaController {
                 idea.getContent()
             )
         );
+    }
+
+    @GetMapping("/api/ideas/search")
+    public List<Idea> searchIdeas(
+        @RequestHeader("authorization") String userId,
+        @RequestBody String query
+    ) {
+        return searchController.searchForIdea(query);
     }
 
     @PostMapping("/api/ideas/{ideaId}/comments")
