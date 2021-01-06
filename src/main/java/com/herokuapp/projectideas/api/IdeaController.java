@@ -171,8 +171,7 @@ public class IdeaController {
         if (!user.isAdmin() && !existingIdea.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        existingIdea.setTitle(idea.getTitle());
-        existingIdea.setContent(idea.getContent());
+        mapper.updateIdeaFromDTO(existingIdea, idea);
         database.updateIdea(existingIdea);
     }
 
@@ -195,7 +194,7 @@ public class IdeaController {
         if (!existingComment.getAuthorId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        existingComment.setContent(comment.getContent());
+        mapper.updateCommentFromDTO(existingComment, comment);
         database.updateComment(existingComment);
     }
 

@@ -8,12 +8,15 @@ import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
+import com.herokuapp.projectideas.dto.post.PostCommentDTO;
+import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
+import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import java.util.List;
 import org.mapstruct.Mapper;
@@ -41,7 +44,19 @@ public interface DTOMapper {
 
     // DTO updating existing document
 
-    Project updateProjectFromDTO(
+    User updateUserFromDTO(
+        @MappingTarget User user,
+        CreateUserDTO createUserDTO
+    );
+
+    void updateIdeaFromDTO(@MappingTarget Idea idea, PostIdeaDTO postIdeaDTO);
+
+    void updateCommentFromDTO(
+        @MappingTarget Comment comment,
+        PostCommentDTO postCommentDTO
+    );
+
+    void updateProjectFromDTO(
         @MappingTarget Project project,
         CreateProjectDTO createProjectDTO
     );

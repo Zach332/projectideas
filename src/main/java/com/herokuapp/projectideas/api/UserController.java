@@ -105,8 +105,7 @@ public class UserController {
                 );
             }
         }
-        existingUser.setUsername(user.getUsername());
-        existingUser.setEmail(user.getEmail());
+        mapper.updateUserFromDTO(existingUser, user);
         database.updateUser(id, existingUser);
     }
 }
