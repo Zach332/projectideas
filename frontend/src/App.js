@@ -11,6 +11,7 @@ import Profile from "./components/pages/Profile";
 import NewIdea from "./components/pages/NewIdea";
 import Messages from "./components/pages/Messages";
 import Markdown from "./components/pages/Markdown";
+import Search from "./components/pages/Search";
 import GitHubLogin from "./components/logins/Login";
 import LoginLanding from "./components/logins/LoginLanding";
 
@@ -34,6 +35,7 @@ function App() {
                                 component={LoginLanding}
                             />
                             <Route path="/new-idea" exact component={NewIdea} />
+                            <Route path="/search" exact component={Search} />
                             <Route path="/about" exact component={About} />
                             <Route path="/privacy" exact component={Privacy} />
                             <Route path="/idea/:id" exact component={Idea} />
