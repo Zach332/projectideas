@@ -11,11 +11,16 @@ import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,9 +46,19 @@ public class SearchController {
             searcherManager.maybeRefresh();
             IndexSearcher indexSearcher = searcherManager.acquire();
 
-            Query query = new QueryParser("title", analyzer).parse(queryString);
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+            PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
+            phraseQuery.setSlop(20);
 
-            TopDocs topDocs = indexSearcher.search(query, 30);
+            String[] terms = queryString.split(" ");
+
+            for (String term : terms) {
+                phraseQuery.add(new Term("title", term));
+            }
+
+            booleanQuery.add(phraseQuery.build(), Occur.SHOULD);
+
+            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
             List<Document> documents = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
