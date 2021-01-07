@@ -2,6 +2,9 @@ package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.dto.DTOMapper;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +33,9 @@ public class SearchController {
     @Autowired
     private Database database;
 
+    @Autowired
+    DTOMapper mapper;
+
     private List<Document> searchIndex(String queryString) {
         try {
             searcherManager.maybeRefresh();
@@ -51,7 +57,7 @@ public class SearchController {
         }
     }
 
-    public List<Idea> searchForIdea(String queryString) {
+    private List<Idea> searchForIdea(String queryString) {
         List<Document> documents = searchIndex(queryString);
         List<String> ids = documents
             .stream()
@@ -70,5 +76,30 @@ public class SearchController {
             );
         }
         return orderedIdeas;
+    }
+
+    public PreviewIdeaPageDTO searchForIdeaByPage(
+        String queryString,
+        int page
+    ) {
+        List<Idea> allResults = searchForIdea(queryString);
+        List<Idea> pageResults = allResults.subList(
+            clamp((page - 1) * Database.IDEAS_PER_PAGE, allResults.size()),
+            clamp(page * Database.IDEAS_PER_PAGE, allResults.size())
+        );
+        List<PreviewIdeaDTO> ideaPreviews = pageResults
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea))
+            .collect(Collectors.toList());
+        return new PreviewIdeaPageDTO(
+            ideaPreviews,
+            page * Database.IDEAS_PER_PAGE >= allResults.size()
+        );
+    }
+
+    private int clamp(int value, int maximum) {
+        if (value < 0) return 0;
+        if (value > maximum) return maximum;
+        return value;
     }
 }

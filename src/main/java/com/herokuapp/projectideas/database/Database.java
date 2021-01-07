@@ -29,7 +29,7 @@ public class Database {
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
 
-    private static final int IDEAS_PER_PAGE = 10;
+    public static final int IDEAS_PER_PAGE = 10;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,

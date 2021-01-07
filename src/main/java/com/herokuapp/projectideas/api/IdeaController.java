@@ -111,11 +111,11 @@ public class IdeaController {
     }
 
     @GetMapping("/api/ideas/search")
-    public List<Idea> searchIdeas(
-        @RequestHeader("authorization") String userId,
-        @RequestBody String query
+    public PreviewIdeaPageDTO searchIdeas(
+        @RequestParam("query") String query,
+        @RequestParam("page") int page
     ) {
-        return searchController.searchForIdea(query);
+        return searchController.searchForIdeaByPage(query, page);
     }
 
     @PostMapping("/api/ideas/{ideaId}/comments")
