@@ -16,7 +16,6 @@ export default function Home() {
         axios
             .get("/api/ideas?" + toQuery({ page: params.page }))
             .then((response) => {
-                console.log(response.data);
                 setIdeas(response.data.ideaPreviews);
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);

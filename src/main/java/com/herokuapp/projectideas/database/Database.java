@@ -29,7 +29,7 @@ public class Database {
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
 
-    private static final int IDEAS_PER_PAGE = 10;
+    public static final int IDEAS_PER_PAGE = 10;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -212,19 +212,6 @@ public class Database {
         return getSavedIdeaIdsForUser(userId).contains(ideaId);
     }
 
-    private List<Idea> getIdeasInList(List<String> ideaIds) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
-                String.join("', '", ideaIds) +
-                "') ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
-    }
-
     public void deleteUser(String id) {
         userContainer.deleteItem(
             id,
@@ -234,6 +221,17 @@ public class Database {
     }
 
     // Ideas
+
+    public List<Idea> getAllIdeas() {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC",
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
 
     public void createIdea(Idea idea) {
         postContainer.createItem(idea);
@@ -266,6 +264,19 @@ public class Database {
                 ((pageNum - 1) * IDEAS_PER_PAGE) +
                 " LIMIT " +
                 IDEAS_PER_PAGE,
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public List<Idea> getIdeasInList(List<String> ideaIds) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
+                String.join("', '", ideaIds) +
+                "') ORDER BY c.timePosted DESC",
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )
