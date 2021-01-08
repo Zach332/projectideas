@@ -15,7 +15,7 @@ export default function Search() {
 
     useEffect(() => {
         if (params.query) {
-            setQuery(params.query);
+            setQuery(decodeURI(params.query));
             setStatus(Status.Loading);
             executeSearch();
         }
