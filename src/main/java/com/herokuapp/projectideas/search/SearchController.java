@@ -43,7 +43,7 @@ public class SearchController {
             PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
             phraseQuery.setSlop(20);
 
-            String[] terms = queryString.split(" ");
+            String[] terms = queryString.toLowerCase().split(" ");
 
             for (String term : terms) {
                 phraseQuery.add(new Term("title", term));
