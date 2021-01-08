@@ -48,7 +48,6 @@ export default function Search() {
 
     const handleInputChange = (event) => {
         setQuery(event.target.value);
-        console.log("/search?" + toQuery({ query: query, page: 1 }));
     };
 
     const handleSubmit = () => {
