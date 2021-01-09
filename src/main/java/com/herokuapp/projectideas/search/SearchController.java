@@ -40,16 +40,20 @@ public class SearchController {
             IndexSearcher indexSearcher = searcherManager.acquire();
 
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
-            PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
-            phraseQuery.setSlop(20);
+            PhraseQuery.Builder phraseQueryTitle = new PhraseQuery.Builder();
+            PhraseQuery.Builder phraseQueryContent = new PhraseQuery.Builder();
+            phraseQueryTitle.setSlop(10);
+            phraseQueryContent.setSlop(20);
 
             String[] terms = queryString.toLowerCase().split(" ");
 
             for (String term : terms) {
-                phraseQuery.add(new Term("title", term));
+                phraseQueryTitle.add(new Term("title", term));
+                phraseQueryContent.add(new Term("content", term));
             }
 
-            booleanQuery.add(phraseQuery.build(), Occur.SHOULD);
+            booleanQuery.add(phraseQueryTitle.build(), Occur.SHOULD);
+            booleanQuery.add(phraseQueryContent.build(), Occur.SHOULD);
 
             TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
             List<Document> documents = new ArrayList<>();
