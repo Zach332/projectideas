@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.database.document;
+package com.herokuapp.projectideas.database.document.tag;
 
 import lombok.*;
 
