@@ -13,6 +13,7 @@ import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
+    private CosmosContainer tagContainer;
 
     @Autowired
     IndexController indexController;
@@ -45,6 +47,7 @@ public class Database {
         database = client.getDatabase("projectideas");
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
+        tagContainer = database.getContainer(collectionPrefix + "_tags");
     }
 
     // Users
@@ -554,5 +557,56 @@ public class Database {
             new PartitionKey(senderId),
             new CosmosItemRequestOptions()
         );
+    }
+
+    // Tags
+
+    public void createTag(Tag tag) {
+        tagContainer.createItem(tag);
+    }
+
+    public List<Tag> getIdeaTags() {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public List<Tag> getProjectTags() {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public void incrementTagUsages(String name) {
+        Tag tag = tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.name = '" + name + "'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+        tag.setUsages(tag.getUsages() + 1);
+        tagContainer.replaceItem(
+            tag,
+            tag.getId(),
+            new PartitionKey(tag.getName()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public void deleteTag(Tag tag) {
+        tagContainer.deleteItem(tag, new CosmosItemRequestOptions());
     }
 }
