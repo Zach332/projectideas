@@ -13,11 +13,13 @@ import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,9 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
+
+    @Autowired
+    IndexController indexController;
 
     public static final int IDEAS_PER_PAGE = 10;
 
@@ -238,6 +243,7 @@ public class Database {
         User user = findUser(idea.getAuthorId()).get();
         user.getPostedIdeaIds().add(idea.getId());
         updateUser(idea.getAuthorId(), user);
+        indexController.tryIndexIdea(idea);
     }
 
     public int getNumIdeas() {
@@ -324,6 +330,9 @@ public class Database {
                 new CosmosItemRequestOptions()
             );
         }
+
+        //Remove idea from index
+        indexController.tryDeleteIdea(ideaId);
 
         // Remove ideaId from author's postedIdeaIds list
         User user = findUser(userId).get();

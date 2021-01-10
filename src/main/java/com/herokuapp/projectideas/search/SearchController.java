@@ -7,6 +7,7 @@ import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
@@ -15,6 +16,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopDocs;
@@ -34,6 +36,15 @@ public class SearchController {
     @Autowired
     DTOMapper mapper;
 
+    public static Query getIdQuery(String id) {
+        PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
+        String[] terms = id.split("-");
+        for (String term : terms) {
+            phraseQuery.add(new Term("id", term));
+        }
+        return phraseQuery.build();
+    }
+
     private List<Document> searchIndex(String queryString) {
         try {
             searcherManager.maybeRefresh();
@@ -45,7 +56,7 @@ public class SearchController {
             phraseQueryTitle.setSlop(10);
             phraseQueryContent.setSlop(20);
 
-            String[] terms = queryString.toLowerCase().split(" ");
+            String[] terms = queryString.toLowerCase().split("-| ");
 
             for (String term : terms) {
                 phraseQueryTitle.add(new Term("title", term));
@@ -79,13 +90,13 @@ public class SearchController {
 
         List<Idea> orderedIdeas = new ArrayList<Idea>();
         for (String id : ids) {
-            orderedIdeas.add(
-                unorderedIdeas
-                    .stream()
-                    .filter(idea -> idea.getId().equals(id))
-                    .findFirst()
-                    .get()
-            );
+            Optional<Idea> ideaToAdd = unorderedIdeas
+                .stream()
+                .filter(idea -> idea.getId().equals(id))
+                .findFirst();
+            if (ideaToAdd.isPresent()) {
+                orderedIdeas.add(ideaToAdd.get());
+            }
         }
         return orderedIdeas;
     }

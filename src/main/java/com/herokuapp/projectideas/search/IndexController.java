@@ -57,4 +57,21 @@ public class IndexController {
         indexWriter.addDocument(doc);
         indexWriter.commit();
     }
+
+    public void deleteIdea(String ideaId) throws IOException {
+        indexWriter.deleteDocuments(SearchController.getIdQuery(ideaId));
+        indexWriter.commit();
+    }
+
+    public void tryIndexIdea(Idea idea) {
+        try {
+            indexIdea(idea);
+        } catch (Exception ignored) {}
+    }
+
+    public void tryDeleteIdea(String ideaId) {
+        try {
+            deleteIdea(ideaId);
+        } catch (Exception ignored) {}
+    }
 }
