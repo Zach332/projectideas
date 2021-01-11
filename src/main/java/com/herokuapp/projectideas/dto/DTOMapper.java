@@ -1,12 +1,20 @@
 package com.herokuapp.projectideas.dto;
 
+import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
+import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentGroupMessage;
+import com.herokuapp.projectideas.database.document.message.SentIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.dto.message.ViewReceivedGroupMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewReceivedIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentGroupMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
@@ -23,40 +31,83 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface DTOMapper {
+public abstract class DTOMapper {
+
     // Document -> DTO
 
-    ViewUserDTO viewUserDTO(User user);
+    public abstract ViewUserDTO viewUserDTO(User user);
 
-    PreviewIdeaDTO previewIdeaDTO(Idea idea);
-    ViewIdeaDTO viewIdeaDTO(Idea idea, Boolean savedByUser);
+    public abstract PreviewIdeaDTO previewIdeaDTO(Idea idea);
 
-    ViewCommentDTO viewCommentDTO(Comment comment);
+    public abstract ViewIdeaDTO viewIdeaDTO(Idea idea, Boolean savedByUser);
 
-    ViewReceivedMessageDTO viewReceivedMessageDTO(ReceivedMessage message);
-    ViewSentMessageDTO viewSentMessageDTO(SentMessage message);
+    public abstract ViewCommentDTO viewCommentDTO(Comment comment);
 
-    PreviewProjectDTO previewProjectDTO(Project project);
-    ViewProjectDTO viewProjectDTO(
+    public abstract ViewReceivedIndividualMessageDTO viewReceivedIndividualMessageDTO(
+        ReceivedIndividualMessage message
+    );
+
+    public abstract ViewReceivedGroupMessageDTO viewReceivedGroupMessageDTO(
+        ReceivedGroupMessage message
+    );
+
+    public abstract ViewSentIndividualMessageDTO viewSentIndividualMessageDTO(
+        SentIndividualMessage message
+    );
+
+    public abstract ViewSentGroupMessageDTO viewSentGroupMessageDTO(
+        SentGroupMessage message
+    );
+
+    public ViewReceivedMessageDTO viewReceivedMessageDTO(
+        ReceivedMessage message
+    ) {
+        if (message instanceof ReceivedIndividualMessage) {
+            return viewReceivedIndividualMessageDTO(
+                (ReceivedIndividualMessage) message
+            );
+        } else if (message instanceof ReceivedGroupMessage) {
+            return viewReceivedGroupMessageDTO((ReceivedGroupMessage) message);
+        }
+        return null;
+    }
+
+    public ViewSentMessageDTO viewSentMessageDTO(SentMessage message) {
+        if (message instanceof SentIndividualMessage) {
+            return viewSentIndividualMessageDTO(
+                (SentIndividualMessage) message
+            );
+        } else if (message instanceof SentGroupMessage) {
+            return viewSentGroupMessageDTO((SentGroupMessage) message);
+        }
+        return null;
+    }
+
+    public abstract PreviewProjectDTO previewProjectDTO(Project project);
+
+    public abstract ViewProjectDTO viewProjectDTO(
         Project project,
         List<String> teamMemberUsernames
     );
 
     // DTO updating existing document
 
-    User updateUserFromDTO(
+    public abstract User updateUserFromDTO(
         @MappingTarget User user,
         CreateUserDTO createUserDTO
     );
 
-    void updateIdeaFromDTO(@MappingTarget Idea idea, PostIdeaDTO postIdeaDTO);
+    public abstract void updateIdeaFromDTO(
+        @MappingTarget Idea idea,
+        PostIdeaDTO postIdeaDTO
+    );
 
-    void updateCommentFromDTO(
+    public abstract void updateCommentFromDTO(
         @MappingTarget Comment comment,
         PostCommentDTO postCommentDTO
     );
 
-    void updateProjectFromDTO(
+    public abstract void updateProjectFromDTO(
         @MappingTarget Project project,
         CreateProjectDTO createProjectDTO
     );

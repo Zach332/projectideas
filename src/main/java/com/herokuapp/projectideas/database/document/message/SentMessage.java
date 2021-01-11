@@ -1,34 +1,25 @@
 package com.herokuapp.projectideas.database.document.message;
 
-import java.time.Instant;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 
 @NoArgsConstructor
 @Getter
 @Setter
-public class SentMessage {
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    { @Type(SentIndividualMessage.class), @Type(SentGroupMessage.class) }
+)
+public abstract class SentMessage extends Message {
 
-    protected String id;
-    protected String type;
-    /**
-     * Id of the user that sent the message
-     */
-    protected String userId;
-    protected String recipientUsername;
-    protected String content;
-    protected long timeSent;
-
-    public SentMessage(
-        String senderId,
-        String recipientUsername,
-        String content
-    ) {
-        this.id = UUID.randomUUID().toString();
+    protected SentMessage(String senderId, String content) {
+        super(senderId, content);
         this.type = "SentMessage";
-        this.userId = senderId;
-        this.recipientUsername = recipientUsername;
-        this.content = content;
-        this.timeSent = Instant.now().getEpochSecond();
     }
 }

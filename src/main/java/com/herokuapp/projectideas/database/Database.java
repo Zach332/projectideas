@@ -8,7 +8,9 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
+import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
@@ -390,12 +392,12 @@ public class Database {
     ) {
         User sender = findUser(senderId).get();
         User recipient = findUserByUsername(recipientUsername).get();
-        ReceivedMessage receivedMessage = new ReceivedMessage(
+        ReceivedMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
             sender.getUsername(),
             content
         );
-        SentMessage sentMessage = new SentMessage(
+        SentMessage sentMessage = new SentIndividualMessage(
             senderId,
             recipientUsername,
             content
@@ -411,7 +413,8 @@ public class Database {
     ) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.userId = '" +
                 recipientId +
                 "' AND c.id = '" +
                 messageId +
@@ -426,7 +429,8 @@ public class Database {
     public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.userId = '" +
                 recipientId +
                 "' ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
@@ -441,7 +445,8 @@ public class Database {
     ) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.userId = '" +
                 recipientId +
                 "' AND c.unread = true ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
@@ -454,7 +459,8 @@ public class Database {
     public List<SentMessage> findAllSentMessages(String senderId) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'SentMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'SentIndividualMessage' OR c.type = 'SentGroupMessage') " +
+                "AND c.userId = '" +
                 senderId +
                 "' ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
@@ -467,7 +473,8 @@ public class Database {
     public int getNumberOfUnreadMessages(String recipientId) {
         return userContainer
             .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'ReceivedMessage' AND c.unread = true AND c.userId = '" +
+                "SELECT VALUE COUNT(1) FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.unread = true AND c.userId = '" +
                 recipientId +
                 "'",
                 new CosmosQueryRequestOptions(),
@@ -495,7 +502,8 @@ public class Database {
     public void markAllReceivedMessagesAsRead(String recipientId) {
         userContainer
             .queryItems(
-                "SELECT VALUE c.id FROM c WHERE c.type = 'ReceivedMessage' AND c.unread = true AND c.userId = '" +
+                "SELECT VALUE c.id FROM c WHERE c.type = (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.unread = true AND c.userId = '" +
                 recipientId +
                 "'",
                 new CosmosQueryRequestOptions(),
