@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 public class SearchController {
 
     @Autowired
-    private SearcherManager searcherManager;
+    private SearcherManager ideaSearcherManager;
+
+    @Autowired
+    private SearcherManager tagSearcherManager;
 
     @Autowired
     private Database database;
@@ -47,8 +50,8 @@ public class SearchController {
 
     private List<Document> searchIndex(String queryString) {
         try {
-            searcherManager.maybeRefresh();
-            IndexSearcher indexSearcher = searcherManager.acquire();
+            ideaSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = ideaSearcherManager.acquire();
 
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
             PhraseQuery.Builder phraseQueryTitle = new PhraseQuery.Builder();
@@ -72,7 +75,7 @@ public class SearchController {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
             }
 
-            searcherManager.release(indexSearcher);
+            ideaSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
             e.printStackTrace();
