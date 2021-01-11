@@ -39,6 +39,31 @@ public class SearchController {
     @Autowired
     DTOMapper mapper;
 
+    public boolean tagExists(String name, String type) {
+        try {
+            tagSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = ideaSearcherManager.acquire();
+
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+            PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
+            String[] terms = name.split("-");
+            for (String term : terms) {
+                phraseQuery.add(new Term("name", term));
+            }
+            booleanQuery.add(phraseQuery.build(), Occur.MUST);
+            booleanQuery.add(
+                new PhraseQuery.Builder().add(new Term("type", type)).build(),
+                Occur.MUST
+            );
+
+            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            if (topDocs.totalHits.value > 0) return true;
+            return false;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     public static Query getIdQuery(String id) {
         PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
         String[] terms = id.split("-");
