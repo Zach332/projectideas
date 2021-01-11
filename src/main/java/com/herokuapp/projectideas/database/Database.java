@@ -587,6 +587,17 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    public List<Tag> getAllTags() {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public void incrementTagUsages(String name) {
         Tag tag = tagContainer
             .queryItems(

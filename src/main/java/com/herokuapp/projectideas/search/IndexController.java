@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.tag.Tag;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import javax.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,10 @@ import org.springframework.stereotype.Component;
 public class IndexController {
 
     @Autowired
-    private IndexWriter indexWriter;
+    private IndexWriter ideaIndexWriter;
+
+    @Autowired
+    private IndexWriter tagIndexWriter;
 
     @Autowired
     private Database database;
@@ -32,9 +37,16 @@ public class IndexController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        List<Tag> tagList = database.getAllTags();
+        try {
+            indexTags(tagList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void indexIdeas(List<Idea> ideaList) throws IOException {
+    private void indexIdeas(List<Idea> ideaList) throws IOException {
         List<Document> docs = new ArrayList<Document>();
         for (Idea idea : ideaList) {
             Document doc = new Document();
@@ -45,8 +57,23 @@ public class IndexController {
             doc.add(new TextField("id", idea.getId(), Field.Store.YES));
             docs.add(doc);
         }
-        indexWriter.addDocuments(docs);
-        indexWriter.commit();
+        ideaIndexWriter.addDocuments(docs);
+        ideaIndexWriter.commit();
+    }
+
+    private void indexTags(List<Tag> tagList) throws IOException {
+        List<Document> docs = new ArrayList<Document>();
+        for (Tag tag : tagList) {
+            Document doc = new Document();
+            doc.add(new TextField("name", tag.getName(), Field.Store.YES));
+            doc.add(new IntPoint("usages", tag.getUsages()));
+            doc.add(
+                new TextField("type", tag.getType().toString(), Field.Store.YES)
+            );
+            docs.add(doc);
+        }
+        tagIndexWriter.addDocuments(docs);
+        tagIndexWriter.commit();
     }
 
     public void indexIdea(Idea idea) throws IOException {
@@ -54,13 +81,13 @@ public class IndexController {
         doc.add(new TextField("title", idea.getTitle(), Field.Store.YES));
         doc.add(new TextField("content", idea.getContent(), Field.Store.YES));
         doc.add(new TextField("id", idea.getId(), Field.Store.YES));
-        indexWriter.addDocument(doc);
-        indexWriter.commit();
+        ideaIndexWriter.addDocument(doc);
+        ideaIndexWriter.commit();
     }
 
     public void deleteIdea(String ideaId) throws IOException {
-        indexWriter.deleteDocuments(SearchController.getIdQuery(ideaId));
-        indexWriter.commit();
+        ideaIndexWriter.deleteDocuments(SearchController.getIdQuery(ideaId));
+        ideaIndexWriter.commit();
     }
 
     public void tryIndexIdea(Idea idea) {

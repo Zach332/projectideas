@@ -12,9 +12,9 @@ public class Tag {
     protected int usages;
     protected Type type;
     protected boolean standard;
-}
 
-enum Type {
-    Project,
-    Idea,
+    public static enum Type {
+        Project,
+        Idea,
+    }
 }
