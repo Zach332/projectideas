@@ -1,6 +1,9 @@
 package com.herokuapp.projectideas.database.document.tag;
 
-import lombok.*;
+import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @Getter
@@ -12,6 +15,14 @@ public class Tag {
     protected int usages;
     protected Type type;
     protected boolean standard;
+
+    public Tag(String name, Type type) {
+        this.id = UUID.randomUUID().toString();
+        this.name = name;
+        this.usages = 1;
+        this.type = type;
+        this.standard = false;
+    }
 
     public static enum Type {
         Project,

@@ -31,9 +31,6 @@ public class SearchController {
     private SearcherManager ideaSearcherManager;
 
     @Autowired
-    private SearcherManager tagSearcherManager;
-
-    @Autowired
     private Database database;
 
     @Autowired
