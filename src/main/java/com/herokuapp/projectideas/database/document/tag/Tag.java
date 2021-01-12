@@ -17,4 +17,12 @@ public class Tag {
         Project,
         Idea,
     }
+
+    public static String[] STANDARD_IDEA_TAGS = {
+        "simple",
+        "complex",
+        "website",
+        "iot",
+        "app",
+    };
 }
