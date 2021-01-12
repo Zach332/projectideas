@@ -80,7 +80,7 @@ public class LuceneConfig {
 
     @Bean
     public SearcherManager ideaSearcherManager(
-        Directory directory,
+        Directory ideaDirectory,
         IndexWriter ideaIndexWriter
     ) throws IOException {
         SearcherManager searcherManager = new SearcherManager(
@@ -94,7 +94,7 @@ public class LuceneConfig {
 
     @Bean
     public SearcherManager tagSearcherManager(
-        Directory directory,
+        Directory tagDirectory,
         IndexWriter tagIndexWriter
     ) throws IOException {
         SearcherManager searcherManager = new SearcherManager(
