@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
@@ -12,9 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -68,6 +71,40 @@ public class ProjectController {
         }
         mapper.updateProjectFromDTO(existingProject, project);
         database.updateProject(existingProject);
+    }
+
+    @PostMapping(
+        "/api/projects/{projectId}/addteammember/{newTeamMemberUsername}"
+    )
+    public void addTeamMemberToProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable("projectId") String projectId,
+        @PathVariable("newTeamMemberUsername") String newTeamMemberUsername
+    ) {
+        User newTeamMember = database
+            .findUserByUsername(newTeamMemberUsername)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User " + newTeamMemberUsername + " does not exist."
+                    )
+            );
+        Project project = database
+            .getProject(projectId)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Project " + projectId + " does not exist."
+                    )
+            );
+        if (project.getTeamMemberIds().contains(userId)) {
+            project.getTeamMemberIds().add(newTeamMember.getUserId());
+            database.updateProject(project);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     @DeleteMapping("/api/projects/{projectId}")
