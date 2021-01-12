@@ -598,10 +598,29 @@ public class Database {
             .collect(Collectors.toList());
     }
 
-    public void incrementTagUsages(String name) {
+    public Optional<Tag> getTag(String name, Tag.Type type) {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.name = '" +
+                name +
+                "' AND c.type = '" +
+                type.toString() +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .findFirst();
+    }
+
+    public void incrementTagUsages(String name, Tag.Type type) {
         Tag tag = tagContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.name = '" + name + "'",
+                "SELECT * FROM c WHERE c.name = '" +
+                name +
+                "' AND c.type = '" +
+                type.toString() +
+                "'",
                 new CosmosQueryRequestOptions(),
                 Tag.class
             )
