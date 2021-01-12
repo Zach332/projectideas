@@ -13,7 +13,10 @@ import IdeaCard from "../IdeaCard";
 
 export default function NewIdea() {
     const { addToast } = useToasts();
-    const [idea, setIdea] = React.useState([{ title: "", content: "" }]);
+    const [idea, setIdea] = React.useState([
+        { title: "", content: "", tags: [] },
+    ]);
+    const [tagSuggestions, setTagSuggestions] = React.useState([]);
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [user] = useGlobalState("user");
     const [savedIdea] = useGlobalState("newIdea");
@@ -33,7 +36,24 @@ export default function NewIdea() {
 
     useEffect(() => {
         setIdea(savedIdea);
+        axios.get("/api/tags/standard/idea").then((response) => {
+            setTagSuggestions(response.data);
+        });
     }, []);
+
+    const addTag = (tagName) => {
+        setIdea((idea) => ({
+            ...idea,
+            tags: idea.tags.concat(tagName),
+        }));
+    };
+
+    const removeTag = (tagName) => {
+        setIdea((idea) => ({
+            ...idea,
+            tags: idea.tags.filter((tag) => tag != tagName),
+        }));
+    };
 
     const handleSubmit = (event) => {
         axios
@@ -84,10 +104,43 @@ export default function NewIdea() {
                             onChange={handleInputChange}
                         ></textarea>
                     </div>
+                    {idea.tags &&
+                        idea.tags.map((tag) => (
+                            <span
+                                className="badge btn rounded-pill bg-primary me-2"
+                                onClick={() => removeTag(tag)}
+                                key={tag}
+                            >
+                                {tag}{" "}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    className="bi bi-x"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                </svg>
+                            </span>
+                        ))}
+                    <div className="mt-1">
+                        <br></br>
+                    </div>
+                    {tagSuggestions.map((tag) => (
+                        <span
+                            className="badge btn rounded-pill bg-secondary me-2"
+                            onClick={() => addTag(tag)}
+                            key={tag}
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                    <br></br>
                     <button
                         type="submit"
                         disabled={idea.title === ""}
-                        className="btn btn-primary"
+                        className="btn btn-primary mt-4"
                     >
                         Post Idea
                     </button>
