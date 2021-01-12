@@ -1,7 +1,6 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.message.SendMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
@@ -56,12 +55,29 @@ public class MessageController {
     }
 
     @PostMapping("/api/messages/{recipientUsername}")
-    public void sendMessage(
+    public void sendIndividualMessage(
         @RequestHeader("authorization") String userId,
         @PathVariable("recipientUsername") String recipientUsername,
         @RequestBody SendMessageDTO message
     ) {
-        database.createMessage(userId, recipientUsername, message.getContent());
+        database.sendIndividualMessage(
+            userId,
+            recipientUsername,
+            message.getContent()
+        );
+    }
+
+    @PostMapping("/api/messages/projects/{recipientProjectId}")
+    public void sendGroupMessage(
+        @RequestHeader("authorization") String userId,
+        @PathVariable("recipientProjectId") String recipientProjectId,
+        @RequestBody SendMessageDTO message
+    ) {
+        database.sendGroupMessage(
+            userId,
+            recipientProjectId,
+            message.getContent()
+        );
     }
 
     @PostMapping("/api/messages/received/{messageId}/markasread")

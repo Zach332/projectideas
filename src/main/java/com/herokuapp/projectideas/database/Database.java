@@ -8,8 +8,10 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
+import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentGroupMessage;
 import com.herokuapp.projectideas.database.document.message.SentIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
@@ -385,19 +387,19 @@ public class Database {
 
     // Messages
 
-    public void createMessage(
+    public void sendIndividualMessage(
         String senderId,
         String recipientUsername,
         String content
     ) {
         User sender = findUser(senderId).get();
         User recipient = findUserByUsername(recipientUsername).get();
-        ReceivedMessage receivedMessage = new ReceivedIndividualMessage(
+        ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
             sender.getUsername(),
             content
         );
-        SentMessage sentMessage = new SentIndividualMessage(
+        SentIndividualMessage sentMessage = new SentIndividualMessage(
             senderId,
             recipientUsername,
             content
@@ -405,6 +407,37 @@ public class Database {
         // TODO: Handle failure here
         userContainer.createItem(receivedMessage);
         userContainer.createItem(sentMessage);
+    }
+
+    // TODO: Handle failure if one or more messages fail to save
+    public void sendGroupMessage(
+        String senderId,
+        String recipientProjectId,
+        String content
+    ) {
+        User sender = findUser(senderId).get();
+        Project recipientProject = getProject(recipientProjectId).get();
+        for (String recipientId : recipientProject.getTeamMemberIds()) {
+            // Skip the user sending the message
+            if (recipientId.equals(senderId)) {
+                continue;
+            }
+            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                recipientId,
+                sender.getUsername(),
+                content,
+                recipientProjectId,
+                recipientProject.getName()
+            );
+            userContainer.createItem(receivedGroupMessage);
+        }
+        SentGroupMessage sentGroupMessage = new SentGroupMessage(
+            senderId,
+            recipientProjectId,
+            recipientProject.getName(),
+            content
+        );
+        userContainer.createItem(sentGroupMessage);
     }
 
     public Optional<ReceivedMessage> findReceivedMessage(

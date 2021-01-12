@@ -19,5 +19,6 @@ public class SentGroupMessage extends SentMessage {
         super(senderId, content);
         this.type = "SentGroupMessage";
         this.recipientProjectId = recipientProjectId;
+        this.recipientProjectName = recipientProjectName;
     }
 }
