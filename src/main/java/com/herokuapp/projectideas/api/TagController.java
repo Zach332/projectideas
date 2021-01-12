@@ -24,6 +24,7 @@ public class TagController {
 
     @PostMapping("/api/tags/new/idea")
     public void addIdeaTag(@RequestBody String tagName) {
+        tagName = tagName.toLowerCase().replaceAll("\\s", "");
         Optional<Tag> existingTag = database.getTag(tagName, Tag.Type.Idea);
         if (existingTag.isPresent()) {
             database.incrementTagUsages(tagName, Tag.Type.Idea);
