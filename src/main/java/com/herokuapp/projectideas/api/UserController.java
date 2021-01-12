@@ -4,6 +4,8 @@ import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import java.util.List;
@@ -56,6 +58,17 @@ public class UserController {
             .getSavedIdeasForUser(userId)
             .stream()
             .map(idea -> mapper.previewIdeaDTO(idea))
+            .collect(Collectors.toList());
+    }
+
+    @GetMapping("/api/users/{userId}/projects")
+    public List<PreviewProjectDTO> getJoinedProjects(
+        @PathVariable String userId
+    ) {
+        return database
+            .getJoinedProjectsForUser(userId)
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project))
             .collect(Collectors.toList());
     }
 

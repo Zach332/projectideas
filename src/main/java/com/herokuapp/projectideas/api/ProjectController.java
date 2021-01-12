@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,7 +29,7 @@ public class ProjectController {
     @Autowired
     DTOMapper mapper;
 
-    // TODO: Handle team member users versus other users
+    // TODO: Handle team members differently than other users
     @GetMapping("/api/projects/{projectId}")
     public ViewProjectDTO getProject(@PathVariable String projectId) {
         Project project = database
@@ -78,8 +77,8 @@ public class ProjectController {
     )
     public void addTeamMemberToProject(
         @RequestHeader("authorization") String userId,
-        @PathVariable("projectId") String projectId,
-        @PathVariable("newTeamMemberUsername") String newTeamMemberUsername
+        @PathVariable String projectId,
+        @PathVariable String newTeamMemberUsername
     ) {
         User newTeamMember = database
             .findUserByUsername(newTeamMemberUsername)
@@ -101,7 +100,9 @@ public class ProjectController {
             );
         if (project.getTeamMemberIds().contains(userId)) {
             project.getTeamMemberIds().add(newTeamMember.getUserId());
+            newTeamMember.getJoinedProjectIds().add(projectId);
             database.updateProject(project);
+            database.updateUser(newTeamMember.getId(), newTeamMember);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }

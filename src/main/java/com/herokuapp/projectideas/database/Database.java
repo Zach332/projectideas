@@ -206,6 +206,19 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    private List<String> getJoinedProjectIdsForUser(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.joinedProjectIds FROM c WHERE c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public List<Idea> getSavedIdeasForUser(String userId) {
         ArrayList<Idea> ideas = new ArrayList<Idea>();
         List<String> ideaIds = getSavedIdeaIdsForUser(userId);
@@ -223,6 +236,11 @@ public class Database {
     public List<Idea> getPostedIdeasForUser(String userId) {
         List<String> ideaIds = getPostedIdeaIdsForUser(userId);
         return getIdeasInList(ideaIds);
+    }
+
+    public List<Project> getJoinedProjectsForUser(String userId) {
+        List<String> projectIds = getJoinedProjectIdsForUser(userId);
+        return getProjectsInList(projectIds);
     }
 
     public boolean isIdeaSavedByUser(String userId, String ideaId) {
@@ -586,8 +604,11 @@ public class Database {
 
     // Projects
 
-    public void createProject(Project project) {
+    public void createProject(Project project, String projectCreatorId) {
         postContainer.createItem(project);
+        User user = findUser(projectCreatorId).get();
+        user.getJoinedProjectIds().add(project.getId());
+        updateUser(projectCreatorId, user);
     }
 
     public Optional<Project> getProject(String projectId) {
@@ -609,6 +630,19 @@ public class Database {
                 "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
                 ideaId +
                 "'",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    private List<Project> getProjectsInList(List<String> projectIds) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.id IN ('" +
+                String.join("', '", projectIds) +
+                "')",
                 new CosmosQueryRequestOptions(),
                 Project.class
             )
