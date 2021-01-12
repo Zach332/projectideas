@@ -128,6 +128,6 @@ public class ProjectController {
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        database.deleteProject(projectId, projectToDelete.getIdeaId());
+        database.deleteProject(projectId);
     }
 }

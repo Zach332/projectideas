@@ -5,7 +5,6 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
-import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import java.util.List;
@@ -88,7 +87,6 @@ public class UserController {
         @PathVariable String id,
         @RequestBody CreateUserDTO user
     ) {
-        // No authorization because ID in path verifies identity
         User existingUser = database
             .findUser(id)
             .orElseThrow(

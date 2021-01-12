@@ -33,6 +33,7 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
+    private CosmosContainer projectContainer;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -43,6 +44,8 @@ public class Database {
         database = client.getDatabase("projectideas");
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
+        projectContainer =
+            database.getContainer(collectionPrefix + "_projects");
     }
 
     // Users
@@ -605,16 +608,16 @@ public class Database {
     // Projects
 
     public void createProject(Project project, String projectCreatorId) {
-        postContainer.createItem(project);
+        projectContainer.createItem(project);
         User user = findUser(projectCreatorId).get();
         user.getJoinedProjectIds().add(project.getId());
         updateUser(projectCreatorId, user);
     }
 
     public Optional<Project> getProject(String projectId) {
-        return postContainer
+        return projectContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.id = '" +
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId = '" +
                 projectId +
                 "'",
                 new CosmosQueryRequestOptions(),
@@ -625,7 +628,7 @@ public class Database {
     }
 
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
-        return postContainer
+        return projectContainer
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
                 ideaId +
@@ -638,9 +641,9 @@ public class Database {
     }
 
     private List<Project> getProjectsInList(List<String> projectIds) {
-        return postContainer
+        return projectContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.id IN ('" +
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId IN ('" +
                 String.join("', '", projectIds) +
                 "')",
                 new CosmosQueryRequestOptions(),
@@ -651,18 +654,18 @@ public class Database {
     }
 
     public void updateProject(Project project) {
-        postContainer.replaceItem(
+        projectContainer.replaceItem(
             project,
             project.getId(),
-            new PartitionKey(project.getIdeaId()),
+            new PartitionKey(project.getProjectId()),
             new CosmosItemRequestOptions()
         );
     }
 
-    public void deleteProject(String projectId, String associatedIdeaId) {
-        postContainer.deleteItem(
+    public void deleteProject(String projectId) {
+        projectContainer.deleteItem(
             projectId,
-            new PartitionKey(associatedIdeaId),
+            new PartitionKey(projectId),
             new CosmosItemRequestOptions()
         );
     }
