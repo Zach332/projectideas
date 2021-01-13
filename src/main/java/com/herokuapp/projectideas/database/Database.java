@@ -630,7 +630,7 @@ public class Database {
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
         return projectContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
                 ideaId +
                 "'",
                 new CosmosQueryRequestOptions(),
