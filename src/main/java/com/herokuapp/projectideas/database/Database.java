@@ -242,6 +242,15 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
+        for (Tag tag : idea.getTags()) {
+            Optional<Tag> existingTag = getTag(tag.getName(), Tag.Type.Idea);
+            if (existingTag.isPresent()) {
+                incrementTagUsages(tag.getName(), Tag.Type.Idea);
+            } else {
+                createTag(tag);
+            }
+        }
+        postContainer.createItem(idea);
         User user = findUser(idea.getAuthorId()).get();
         user.getPostedIdeaIds().add(idea.getId());
         updateUser(idea.getAuthorId(), user);
