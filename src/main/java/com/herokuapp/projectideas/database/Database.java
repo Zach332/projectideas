@@ -242,7 +242,6 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
-        postContainer.createItem(idea);
         User user = findUser(idea.getAuthorId()).get();
         user.getPostedIdeaIds().add(idea.getId());
         updateUser(idea.getAuthorId(), user);

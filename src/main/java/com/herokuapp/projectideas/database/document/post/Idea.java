@@ -2,7 +2,6 @@ package com.herokuapp.projectideas.database.document.post;
 
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
@@ -19,7 +18,8 @@ public class Idea extends Post {
         String authorId,
         String authorUsername,
         String title,
-        String content
+        String content,
+        List<Tag> tags
     ) {
         this.id = UUID.randomUUID().toString();
         this.type = "Idea";
@@ -31,6 +31,6 @@ public class Idea extends Post {
         this.authorUsername = authorUsername;
         this.title = title;
         this.content = content;
-        this.tags = new ArrayList<>();
+        this.tags = tags;
     }
 }
