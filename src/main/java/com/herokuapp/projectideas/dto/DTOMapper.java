@@ -44,19 +44,23 @@ public abstract class DTOMapper {
     public abstract ViewCommentDTO viewCommentDTO(Comment comment);
 
     public abstract ViewReceivedIndividualMessageDTO viewReceivedIndividualMessageDTO(
-        ReceivedIndividualMessage message
+        ReceivedIndividualMessage message,
+        boolean groupMessage
     );
 
     public abstract ViewReceivedGroupMessageDTO viewReceivedGroupMessageDTO(
-        ReceivedGroupMessage message
+        ReceivedGroupMessage message,
+        boolean groupMessage
     );
 
     public abstract ViewSentIndividualMessageDTO viewSentIndividualMessageDTO(
-        SentIndividualMessage message
+        SentIndividualMessage message,
+        boolean groupMessage
     );
 
     public abstract ViewSentGroupMessageDTO viewSentGroupMessageDTO(
-        SentGroupMessage message
+        SentGroupMessage message,
+        boolean groupMessage
     );
 
     public ViewReceivedMessageDTO viewReceivedMessageDTO(
@@ -64,10 +68,14 @@ public abstract class DTOMapper {
     ) {
         if (message instanceof ReceivedIndividualMessage) {
             return viewReceivedIndividualMessageDTO(
-                (ReceivedIndividualMessage) message
+                (ReceivedIndividualMessage) message,
+                false
             );
         } else if (message instanceof ReceivedGroupMessage) {
-            return viewReceivedGroupMessageDTO((ReceivedGroupMessage) message);
+            return viewReceivedGroupMessageDTO(
+                (ReceivedGroupMessage) message,
+                true
+            );
         }
         return null;
     }
@@ -75,10 +83,11 @@ public abstract class DTOMapper {
     public ViewSentMessageDTO viewSentMessageDTO(SentMessage message) {
         if (message instanceof SentIndividualMessage) {
             return viewSentIndividualMessageDTO(
-                (SentIndividualMessage) message
+                (SentIndividualMessage) message,
+                false
             );
         } else if (message instanceof SentGroupMessage) {
-            return viewSentGroupMessageDTO((SentGroupMessage) message);
+            return viewSentGroupMessageDTO((SentGroupMessage) message, true);
         }
         return null;
     }
