@@ -40,10 +40,6 @@ export default function NewIdea() {
         localStorage.setItem(newIdeaPersistenceKey, JSON.stringify(idea));
     }, [idea]);
 
-    // useEffect(() => {
-    //     updateTagSuggestions(tagSuggestions)
-    // }, [idea])
-
     useEffect(() => {
         setIdea(savedIdea);
         axios.get("/api/tags/standard/idea").then((response) => {
@@ -58,7 +54,6 @@ export default function NewIdea() {
                 ? idea.tags
                 : idea.tags.concat(tagName),
         }));
-        //updateTagSuggestions(tagSuggestions)
     };
 
     const removeTag = (tagName) => {
