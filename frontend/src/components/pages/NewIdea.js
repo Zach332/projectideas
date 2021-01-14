@@ -70,6 +70,7 @@ export default function NewIdea() {
             .post("/api/ideas", {
                 title: idea.title,
                 content: idea.content,
+                tags: idea.tags,
             })
             .then(() => {
                 setStatus(Status.Success);
