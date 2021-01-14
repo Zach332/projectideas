@@ -13,9 +13,11 @@ import IdeaCard from "../IdeaCard";
 
 export default function NewIdea() {
     const { addToast } = useToasts();
-    const [idea, setIdea] = React.useState([
-        { title: "", content: "", tags: [] },
-    ]);
+    const [idea, setIdea] = React.useState({
+        title: "",
+        content: "",
+        tags: [],
+    });
     const [tagSuggestions, setTagSuggestions] = React.useState([]);
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [user] = useGlobalState("user");
@@ -30,9 +32,17 @@ export default function NewIdea() {
         }));
     };
 
+    const filterTagSuggestions = (suggestions) => {
+        return suggestions.filter((tag) => !idea.tags.includes(tag));
+    };
+
     useEffect(() => {
         localStorage.setItem(newIdeaPersistenceKey, JSON.stringify(idea));
     }, [idea]);
+
+    // useEffect(() => {
+    //     updateTagSuggestions(tagSuggestions)
+    // }, [idea])
 
     useEffect(() => {
         setIdea(savedIdea);
@@ -44,8 +54,11 @@ export default function NewIdea() {
     const addTag = (tagName) => {
         setIdea((idea) => ({
             ...idea,
-            tags: idea.tags.concat(tagName),
+            tags: idea.tags.includes(tagName)
+                ? idea.tags
+                : idea.tags.concat(tagName),
         }));
+        //updateTagSuggestions(tagSuggestions)
     };
 
     const removeTag = (tagName) => {
@@ -54,6 +67,8 @@ export default function NewIdea() {
             tags: idea.tags.filter((tag) => tag != tagName),
         }));
     };
+
+    const updateNewTagName = () => {};
 
     const handleSubmit = (event) => {
         axios
@@ -107,7 +122,7 @@ export default function NewIdea() {
                     {idea.tags &&
                         idea.tags.map((tag) => (
                             <span
-                                className="badge btn rounded-pill bg-primary me-2"
+                                className="badge btn rounded-pill bg-dark me-2"
                                 onClick={() => removeTag(tag)}
                                 key={tag}
                             >
@@ -127,7 +142,28 @@ export default function NewIdea() {
                     <div className="mt-1">
                         <br></br>
                     </div>
-                    {tagSuggestions.map((tag) => (
+                    <form className="row g-3">
+                        <div className="col-auto">
+                            <span>Add tag</span>
+                        </div>
+                        <div className="col-auto">
+                            <input
+                                type="text"
+                                className="form-control"
+                                onChange={updateNewTagName}
+                                placeholder="new tag"
+                            />
+                        </div>
+                        <div className="col-auto">
+                            <button
+                                type="submit"
+                                className="btn btn-primary mb-3"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </form>
+                    {filterTagSuggestions(tagSuggestions).map((tag) => (
                         <span
                             className="badge btn rounded-pill bg-secondary me-2"
                             onClick={() => addTag(tag)}
