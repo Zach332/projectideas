@@ -3,7 +3,7 @@ package com.herokuapp.projectideas.api;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
-import com.herokuapp.projectideas.database.document.user.UserIdPair;
+import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
@@ -45,7 +45,7 @@ public class ProjectController {
         List<String> teamMemberUsernames = project
             .getTeamMembers()
             .stream()
-            .map(userIdPair -> userIdPair.getUsername())
+            .map(usernameIdPair -> usernameIdPair.getUsername())
             .collect(Collectors.toList());
         return mapper.viewProjectDTO(project, teamMemberUsernames);
     }
@@ -69,7 +69,9 @@ public class ProjectController {
             !existingProject
                 .getTeamMembers()
                 .stream()
-                .anyMatch(userIdPair -> userIdPair.getUserId().equals(userId))
+                .anyMatch(
+                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+                )
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -89,7 +91,7 @@ public class ProjectController {
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
 
-        project.getUsersRequestingToJoin().add(new UserIdPair(user));
+        project.getUsersRequestingToJoin().add(new UsernameIdPair(user));
         database.sendAdminGroupMessage(
             projectId,
             user.getUsername() +
@@ -129,9 +131,11 @@ public class ProjectController {
             project
                 .getTeamMembers()
                 .stream()
-                .anyMatch(userIdPair -> userIdPair.getUserId().equals(userId))
+                .anyMatch(
+                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+                )
         ) {
-            project.getTeamMembers().add(new UserIdPair(newTeamMember));
+            project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
             newTeamMember.getJoinedProjectIds().add(projectId);
             database.updateProject(project);
             database.updateUser(newTeamMember.getId(), newTeamMember);
@@ -158,7 +162,9 @@ public class ProjectController {
             !projectToDelete
                 .getTeamMembers()
                 .stream()
-                .anyMatch(userIdPair -> userIdPair.getUserId().equals(userId)) &
+                .anyMatch(
+                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+                ) &
             !database.isUserAdmin(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);

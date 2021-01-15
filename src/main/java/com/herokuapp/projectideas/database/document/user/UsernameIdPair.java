@@ -5,17 +5,17 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserIdPair {
+public class UsernameIdPair {
 
     protected String userId;
     protected String username;
 
-    public UserIdPair(String userId, String username) {
+    public UsernameIdPair(String userId, String username) {
         this.userId = userId;
         this.username = username;
     }
 
-    public UserIdPair(User user) {
+    public UsernameIdPair(User user) {
         this.userId = user.getUserId();
         this.username = user.getUsername();
     }

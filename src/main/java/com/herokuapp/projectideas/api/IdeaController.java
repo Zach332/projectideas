@@ -5,7 +5,7 @@ import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
-import com.herokuapp.projectideas.database.document.user.UserIdPair;
+import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
@@ -146,7 +146,7 @@ public class IdeaController {
                 project.getName(),
                 project.getDescription(),
                 ideaId,
-                new UserIdPair(user),
+                new UsernameIdPair(user),
                 project.getLookingForMembers()
             ),
             userId
