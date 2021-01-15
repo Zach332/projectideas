@@ -230,6 +230,18 @@ export default function Idea() {
                             </li>
                         )}
                         {more}
+                        {idea.tags && (
+                            <li className="list-group-item">
+                                {idea.tags.map((tag) => (
+                                    <span
+                                        className="badge rounded-pill bg-dark me-2"
+                                        key={tag}
+                                    >
+                                        {tag.name}
+                                    </span>
+                                ))}
+                            </li>
+                        )}
                     </ul>
                 </div>
             </div>
