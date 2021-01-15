@@ -49,13 +49,15 @@ export default function NewIdea() {
     }, []);
 
     const addTag = (tagName) => {
-        setIdea((idea) => ({
-            ...idea,
-            tags: idea.tags.includes(tagName)
-                ? idea.tags
-                : idea.tags.concat(tagName),
-        }));
-        setNewTag("");
+        if (idea.tags.length < 5 && tagName.length > 0) {
+            setIdea((idea) => ({
+                ...idea,
+                tags: idea.tags.includes(tagName)
+                    ? idea.tags
+                    : idea.tags.concat(tagName),
+            }));
+            setNewTag("");
+        }
     };
 
     const removeTag = (tagName) => {
@@ -123,26 +125,30 @@ export default function NewIdea() {
                             onChange={handleInputChange}
                         ></textarea>
                     </div>
-                    {idea.tags &&
-                        idea.tags.map((tag) => (
-                            <span
-                                className="badge btn rounded-pill bg-dark me-2"
-                                onClick={() => removeTag(tag)}
-                                key={tag}
-                            >
-                                {tag}{" "}
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    fill="currentColor"
-                                    className="bi bi-x"
-                                    viewBox="0 0 16 16"
+                    {idea.tags && (
+                        <div>
+                            {idea.tags.map((tag) => (
+                                <span
+                                    className="badge btn rounded-pill bg-dark me-2"
+                                    onClick={() => removeTag(tag)}
+                                    key={tag}
                                 >
-                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                                </svg>
-                            </span>
-                        ))}
+                                    {tag}{" "}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        fill="currentColor"
+                                        className="bi bi-x"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                    </svg>
+                                </span>
+                            ))}
+                            {idea.tags.length > 0 && idea.tags.length + "/" + 5}
+                        </div>
+                    )}
                     <div className="mt-1">
                         <br></br>
                     </div>
