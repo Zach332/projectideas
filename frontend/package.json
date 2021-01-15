@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "fibers": "^5.0.0",
     "framer-motion": "^2.9.5",
     "node-sass": "^4.0.0",

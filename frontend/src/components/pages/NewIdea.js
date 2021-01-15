@@ -19,6 +19,7 @@ export default function NewIdea() {
         tags: [],
     });
     const [tagSuggestions, setTagSuggestions] = React.useState([]);
+    const [newTag, setNewTag] = React.useState("");
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [user] = useGlobalState("user");
     const [savedIdea] = useGlobalState("newIdea");
@@ -54,6 +55,7 @@ export default function NewIdea() {
                 ? idea.tags
                 : idea.tags.concat(tagName),
         }));
+        setNewTag("");
     };
 
     const removeTag = (tagName) => {
@@ -63,7 +65,13 @@ export default function NewIdea() {
         }));
     };
 
-    const updateNewTagName = () => {};
+    const updateNewTag = (event) => {
+        setNewTag(event.target.value);
+    };
+
+    const createTag = () => {
+        addTag(newTag);
+    };
 
     const handleSubmit = (event) => {
         axios
@@ -75,7 +83,7 @@ export default function NewIdea() {
             .then(() => {
                 setStatus(Status.Success);
                 post();
-                setIdea({ title: "", content: "" });
+                setIdea({ title: "", content: "", tags: [] });
             })
             .catch((err) => {
                 console.log("Error submitting post: " + err);
@@ -146,17 +154,18 @@ export default function NewIdea() {
                             <input
                                 type="text"
                                 className="form-control"
-                                onChange={updateNewTagName}
+                                value={newTag}
+                                onChange={updateNewTag}
                                 placeholder="new tag"
                             />
                         </div>
                         <div className="col-auto">
-                            <button
-                                type="submit"
+                            <div
                                 className="btn btn-primary mb-3"
+                                onClick={createTag}
                             >
                                 Add
-                            </button>
+                            </div>
                         </div>
                     </form>
                     {filterTagSuggestions(tagSuggestions).map((tag) => (
