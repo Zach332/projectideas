@@ -49,7 +49,7 @@ export default function NewIdea() {
     }, []);
 
     const addTag = (tagName) => {
-        if (idea.tags.length < 5 && tagName.length > 0) {
+        if (idea.tags.length < 5 && tagName.length > 0 && tagName.length < 30) {
             setIdea((idea) => ({
                 ...idea,
                 tags: idea.tags.includes(tagName)
@@ -173,6 +173,11 @@ export default function NewIdea() {
                                 Add
                             </div>
                         </div>
+                        {newTag.length > 29 && (
+                            <div className="col-auto text-red">
+                                Tag too long
+                            </div>
+                        )}
                     </form>
                     {filterTagSuggestions(tagSuggestions).map((tag) => (
                         <span
