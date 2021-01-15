@@ -13,6 +13,7 @@ import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ public class Database {
     private CosmosDatabase database;
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
+    private CosmosContainer tagContainer;
 
     @Autowired
     IndexController indexController;
@@ -45,6 +47,7 @@ public class Database {
         database = client.getDatabase("projectideas");
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
+        tagContainer = database.getContainer(collectionPrefix + "_tags");
     }
 
     // Users
@@ -239,6 +242,14 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
+        for (Tag tag : idea.getTags()) {
+            Optional<Tag> existingTag = getTag(tag.getName(), Tag.Type.Idea);
+            if (existingTag.isPresent()) {
+                incrementTagUsages(tag.getName(), Tag.Type.Idea);
+            } else {
+                createTag(tag);
+            }
+        }
         postContainer.createItem(idea);
         User user = findUser(idea.getAuthorId()).get();
         user.getPostedIdeaIds().add(idea.getId());
@@ -554,5 +565,86 @@ public class Database {
             new PartitionKey(senderId),
             new CosmosItemRequestOptions()
         );
+    }
+
+    // Tags
+
+    public void createTag(Tag tag) {
+        tagContainer.createItem(tag);
+    }
+
+    public List<Tag> getIdeaTags() {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public List<Tag> getProjectTags() {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public List<Tag> getAllTags() {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public Optional<Tag> getTag(String name, Tag.Type type) {
+        return tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.name = '" +
+                name +
+                "' AND c.type = '" +
+                type.toString() +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .findFirst();
+    }
+
+    public void incrementTagUsages(String name, Tag.Type type) {
+        Tag tag = tagContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.name = '" +
+                name +
+                "' AND c.type = '" +
+                type.toString() +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Tag.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+        tag.setUsages(tag.getUsages() + 1);
+        tagContainer.replaceItem(
+            tag,
+            tag.getId(),
+            new PartitionKey(tag.getName()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public void deleteTag(Tag tag) {
+        tagContainer.deleteItem(tag, new CosmosItemRequestOptions());
     }
 }

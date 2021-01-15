@@ -18,11 +18,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LuceneConfig {
 
-    private static final String LUCENE_INDEX_PATH = "lucene/indexDir/";
+    private static final String IDEA_LUCENE_INDEX_PATH = "lucene/ideaIndex/";
+    private static final String TAG_LUCENE_INDEX_PATH = "lucene/tagIndex/";
 
     @Bean
-    public Directory directory() throws IOException {
-        Path path = Paths.get(LUCENE_INDEX_PATH);
+    public Directory ideaDirectory() throws IOException {
+        Path path = Paths.get(IDEA_LUCENE_INDEX_PATH);
+        File file = path.toFile();
+        if (!file.exists()) {
+            // Create the folder if it does not exist
+            file.mkdirs();
+        }
+        return FSDirectory.open(path);
+    }
+
+    @Bean
+    public Directory tagDirectory() throws IOException {
+        Path path = Paths.get(TAG_LUCENE_INDEX_PATH);
         File file = path.toFile();
         if (!file.exists()) {
             // Create the folder if it does not exist
@@ -37,22 +49,56 @@ public class LuceneConfig {
     }
 
     @Bean
-    public IndexWriter indexWriter(Directory directory, Analyzer analyzer)
-        throws IOException {
+    public IndexWriter ideaIndexWriter(
+        Directory ideaDirectory,
+        Analyzer analyzer
+    ) throws IOException {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
-        IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
+        IndexWriter indexWriter = new IndexWriter(
+            ideaDirectory,
+            indexWriterConfig
+        );
         indexWriter.deleteAll();
         indexWriter.commit();
         return indexWriter;
     }
 
     @Bean
-    public SearcherManager searcherManager(
-        Directory directory,
-        IndexWriter indexWriter
+    public IndexWriter tagIndexWriter(
+        Directory tagDirectory,
+        Analyzer analyzer
+    ) throws IOException {
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
+        IndexWriter indexWriter = new IndexWriter(
+            tagDirectory,
+            indexWriterConfig
+        );
+        indexWriter.deleteAll();
+        indexWriter.commit();
+        return indexWriter;
+    }
+
+    @Bean
+    public SearcherManager ideaSearcherManager(
+        Directory ideaDirectory,
+        IndexWriter ideaIndexWriter
     ) throws IOException {
         SearcherManager searcherManager = new SearcherManager(
-            indexWriter,
+            ideaIndexWriter,
+            false,
+            false,
+            new SearcherFactory()
+        );
+        return searcherManager;
+    }
+
+    @Bean
+    public SearcherManager tagSearcherManager(
+        Directory tagDirectory,
+        IndexWriter tagIndexWriter
+    ) throws IOException {
+        SearcherManager searcherManager = new SearcherManager(
+            tagIndexWriter,
             false,
             false,
             new SearcherFactory()

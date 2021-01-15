@@ -22,6 +22,7 @@ const firstUserState = {
 const firstNewideaState = {
     title: "",
     content: "",
+    tags: [],
 };
 
 const userFromStorage = localStorage.getItem(userPersistenceKey);
