@@ -72,6 +72,28 @@ public class ProjectController {
         database.updateProject(existingProject);
     }
 
+    @PostMapping("/api/projects/{projectId}/requesttojoin")
+    public void requestToJoinProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId
+    ) {
+        Project project = database.getProject(projectId).get();
+        User user = database
+            .findUser(userId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
+            );
+
+        project.getLookingToJoinUserIds().add(user.getUserId());
+        database.sendAdminGroupMessage(
+            projectId,
+            user.getUsername() +
+            " has requested to join your " +
+            project.getName() +
+            " project. Visit your project page to accept or decline this request."
+        );
+    }
+
     @PostMapping(
         "/api/projects/{projectId}/addteammember/{newTeamMemberUsername}"
     )

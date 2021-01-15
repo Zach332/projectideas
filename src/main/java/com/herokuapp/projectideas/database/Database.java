@@ -461,6 +461,23 @@ public class Database {
         userContainer.createItem(sentGroupMessage);
     }
 
+    public void sendAdminGroupMessage(
+        String recipientProjectId,
+        String content
+    ) {
+        Project recipientProject = getProject(recipientProjectId).get();
+        for (String recipientId : recipientProject.getTeamMemberIds()) {
+            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                recipientId,
+                "projectideas",
+                content,
+                recipientProjectId,
+                recipientProject.getName()
+            );
+            userContainer.createItem(receivedGroupMessage);
+        }
+    }
+
     public Optional<ReceivedMessage> findReceivedMessage(
         String recipientId,
         String messageId
