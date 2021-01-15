@@ -191,7 +191,7 @@ export default function Idea() {
                 <div className="col-lg-8 col-md-8 col-sm-auto mb-2">
                     <IdeaCard title={idea.title} content={idea.content} />
                 </div>
-                <div className="col-md-auto col-sm-auto">
+                <div className="col-md-3 col-sm-auto">
                     <ul className="card list-group list-group-flush">
                         <li className="list-group-item">
                             By {idea.authorUsername}
@@ -231,7 +231,7 @@ export default function Idea() {
                         )}
                         {more}
                         {idea.tags && (
-                            <li className="list-group-item">
+                            <li className="list-group-item mw-100">
                                 {idea.tags.map((tag) => (
                                     <span
                                         className="badge rounded-pill bg-dark me-2"
