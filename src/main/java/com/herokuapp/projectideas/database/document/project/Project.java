@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.project;
 
+import com.herokuapp.projectideas.database.document.user.UserIdPair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,15 +21,15 @@ public class Project {
     protected String name;
     protected String description;
     protected String githubLink;
-    protected List<String> teamMemberIds;
+    protected List<UserIdPair> teamMembers;
     protected boolean lookingForMembers;
-    protected List<String> lookingToJoinUserIds;
+    protected List<UserIdPair> usersRequestingToJoin;
 
     public Project(
         String name,
         String description,
         String ideaId,
-        String initialTeamMemberId,
+        UserIdPair initialUser,
         boolean lookingForMembers
     ) {
         this.id = UUID.randomUUID().toString();
@@ -37,9 +38,9 @@ public class Project {
         this.ideaId = ideaId;
         this.name = name;
         this.description = description;
-        this.teamMemberIds = new ArrayList<>();
-        this.teamMemberIds.add(initialTeamMemberId);
+        this.teamMembers = new ArrayList<>();
+        this.teamMembers.add(initialUser);
         this.lookingForMembers = lookingForMembers;
-        this.lookingToJoinUserIds = new ArrayList<>();
+        this.usersRequestingToJoin = new ArrayList<>();
     }
 }

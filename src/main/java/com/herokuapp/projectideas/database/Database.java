@@ -18,6 +18,7 @@ import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UserIdPair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -438,7 +439,8 @@ public class Database {
     ) {
         User sender = findUser(senderId).get();
         Project recipientProject = getProject(recipientProjectId).get();
-        for (String recipientId : recipientProject.getTeamMemberIds()) {
+        for (UserIdPair recipient : recipientProject.getTeamMembers()) {
+            String recipientId = recipient.getUserId();
             // Skip the user sending the message
             if (recipientId.equals(senderId)) {
                 continue;
@@ -466,7 +468,8 @@ public class Database {
         String content
     ) {
         Project recipientProject = getProject(recipientProjectId).get();
-        for (String recipientId : recipientProject.getTeamMemberIds()) {
+        for (UserIdPair recipient : recipientProject.getTeamMembers()) {
+            String recipientId = recipient.getUserId();
             ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
                 recipientId,
                 "projectideas",

@@ -3,6 +3,7 @@ package com.herokuapp.projectideas.api;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UserIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
@@ -42,10 +43,9 @@ public class ProjectController {
                     )
             );
         List<String> teamMemberUsernames = project
-            .getTeamMemberIds()
+            .getTeamMembers()
             .stream()
-            // TODO: Use denormalized usernames in place of this database call
-            .map(id -> database.getUsernameFromId(id))
+            .map(userIdPair -> userIdPair.getUsername())
             .collect(Collectors.toList());
         return mapper.viewProjectDTO(project, teamMemberUsernames);
     }
@@ -65,7 +65,12 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (!existingProject.getTeamMemberIds().contains(userId)) {
+        if (
+            !existingProject
+                .getTeamMembers()
+                .stream()
+                .anyMatch(userIdPair -> userIdPair.getUserId().equals(userId))
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         mapper.updateProjectFromDTO(existingProject, project);
@@ -84,7 +89,7 @@ public class ProjectController {
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
 
-        project.getLookingToJoinUserIds().add(user.getUserId());
+        project.getUsersRequestingToJoin().add(new UserIdPair(user));
         database.sendAdminGroupMessage(
             projectId,
             user.getUsername() +
@@ -120,8 +125,13 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (project.getTeamMemberIds().contains(userId)) {
-            project.getTeamMemberIds().add(newTeamMember.getUserId());
+        if (
+            project
+                .getTeamMembers()
+                .stream()
+                .anyMatch(userIdPair -> userIdPair.getUserId().equals(userId))
+        ) {
+            project.getTeamMembers().add(new UserIdPair(newTeamMember));
             newTeamMember.getJoinedProjectIds().add(projectId);
             database.updateProject(project);
             database.updateUser(newTeamMember.getId(), newTeamMember);
@@ -145,7 +155,10 @@ public class ProjectController {
                     )
             );
         if (
-            !projectToDelete.getTeamMemberIds().contains(userId) &&
+            !projectToDelete
+                .getTeamMembers()
+                .stream()
+                .anyMatch(userIdPair -> userIdPair.getUserId().equals(userId)) &
             !database.isUserAdmin(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
