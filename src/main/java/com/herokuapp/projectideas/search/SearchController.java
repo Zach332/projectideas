@@ -94,7 +94,10 @@ public class SearchController {
 
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
-            //booleanQuery.add(new TermQuery(new Term("type", type.toString())), Occur.MUST);
+            booleanQuery.add(
+                new TermQuery(new Term("type", type.toString().toLowerCase())),
+                Occur.MUST
+            );
             booleanQuery.add(
                 new FuzzyQuery(new Term("name", queryString)),
                 Occur.MUST
