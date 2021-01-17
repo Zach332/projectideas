@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
@@ -11,14 +12,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FeatureField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +33,9 @@ public class SearchController {
 
     @Autowired
     private SearcherManager ideaSearcherManager;
+
+    @Autowired
+    private SearcherManager tagSearcherManager;
 
     @Autowired
     private Database database;
@@ -45,7 +52,7 @@ public class SearchController {
         return phraseQuery.build();
     }
 
-    private List<Document> searchIndex(String queryString) {
+    private List<Document> searchIdeaIndex(String queryString) {
         try {
             ideaSearcherManager.maybeRefresh();
             IndexSearcher indexSearcher = ideaSearcherManager.acquire();
@@ -80,8 +87,39 @@ public class SearchController {
         }
     }
 
+    private List<Document> searchTagIndex(String queryString, Tag.Type type) {
+        try {
+            tagSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = tagSearcherManager.acquire();
+
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+
+            //booleanQuery.add(new TermQuery(new Term("type", type.toString())), Occur.MUST);
+            booleanQuery.add(
+                new FuzzyQuery(new Term("name", queryString)),
+                Occur.MUST
+            );
+            booleanQuery.add(
+                FeatureField.newSaturationQuery("features", "usages"),
+                Occur.SHOULD
+            );
+
+            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 5);
+            List<Document> documents = new ArrayList<>();
+            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                documents.add(indexSearcher.doc(scoreDoc.doc));
+            }
+
+            tagSearcherManager.release(indexSearcher);
+            return documents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private List<Idea> searchForIdea(String queryString) {
-        List<Document> documents = searchIndex(queryString);
+        List<Document> documents = searchIdeaIndex(queryString);
         List<String> ids = documents
             .stream()
             .map(doc -> doc.get("id"))
@@ -118,6 +156,14 @@ public class SearchController {
             ideaPreviews,
             page * Database.IDEAS_PER_PAGE >= allResults.size()
         );
+    }
+
+    public List<String> searchForIdeaTags(String queryString) {
+        List<Document> documents = searchTagIndex(queryString, Tag.Type.Idea);
+        return documents
+            .stream()
+            .map(doc -> doc.get("name"))
+            .collect(Collectors.toList());
     }
 
     private int clamp(int value, int maximum) {

@@ -9,8 +9,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FeatureField;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class IndexController {
         for (Tag tag : tagList) {
             Document doc = new Document();
             doc.add(new TextField("name", tag.getName(), Field.Store.YES));
-            doc.add(new IntPoint("usages", tag.getUsages()));
+            doc.add(new FeatureField("features", "usages", tag.getUsages()));
             doc.add(
                 new TextField("type", tag.getType().toString(), Field.Store.YES)
             );
