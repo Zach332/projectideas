@@ -10,6 +10,7 @@ import {
 } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../IdeaCard";
+import { toQuery } from "../utils/Routing";
 
 export default function NewIdea() {
     const { addToast } = useToasts();
@@ -57,6 +58,9 @@ export default function NewIdea() {
                     : idea.tags.concat(tagName),
             }));
             setNewTag("");
+            axios.get("/api/tags/standard/idea").then((response) => {
+                setTagSuggestions(response.data);
+            });
         }
     };
 
@@ -69,6 +73,20 @@ export default function NewIdea() {
 
     const updateNewTag = (event) => {
         setNewTag(event.target.value);
+        if (event.target.value === "") {
+            axios.get("/api/tags/standard/idea").then((response) => {
+                setTagSuggestions(response.data);
+            });
+        } else {
+            axios
+                .get(
+                    "/api/tags/suggested/idea?" +
+                        toQuery({ search: event.target.value })
+                )
+                .then((response) => {
+                    setTagSuggestions(response.data);
+                });
+        }
     };
 
     const createTag = () => {
