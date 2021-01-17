@@ -9,5 +9,7 @@ public class CreateProjectDTO {
 
     private String name;
     private String description;
+    // Optional during project creation
+    private String githubLink;
     private Boolean lookingForMembers;
 }
