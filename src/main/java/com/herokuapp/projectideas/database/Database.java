@@ -130,7 +130,8 @@ public class Database {
 
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
-            List<PartitionKey> partitionKeys = postContainer
+            // Handle posts container
+            List<PartitionKey> ideaPartitionKeys = postContainer
                 .queryItems(
                     "SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" +
                     user.getId() +
@@ -142,10 +143,30 @@ public class Database {
                 .distinct()
                 .map(ideaId -> new PartitionKey(ideaId))
                 .collect(Collectors.toList());
-
-            for (PartitionKey partitionKey : partitionKeys) {
+            for (PartitionKey partitionKey : ideaPartitionKeys) {
                 options.setPartitionKey(partitionKey);
                 postContainer
+                    .getScripts()
+                    .getStoredProcedure("updateUsername")
+                    .execute(params, options);
+            }
+
+            // Handle projects container
+            List<PartitionKey> projectPartitionKeys = projectContainer
+                .queryItems(
+                    "SELECT VALUE p.projectId FROM p JOIN u IN p.teamMembers WHERE u.userId = '" +
+                    user.getId() +
+                    "'",
+                    new CosmosQueryRequestOptions(),
+                    String.class
+                )
+                .stream()
+                .distinct()
+                .map(projectId -> new PartitionKey(projectId))
+                .collect(Collectors.toList());
+            for (PartitionKey partitionKey : projectPartitionKeys) {
+                options.setPartitionKey(partitionKey);
+                projectContainer
                     .getScripts()
                     .getStoredProcedure("updateUsername")
                     .execute(params, options);
