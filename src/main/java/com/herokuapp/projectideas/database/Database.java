@@ -154,7 +154,12 @@ public class Database {
             // Handle projects container
             List<PartitionKey> projectPartitionKeys = projectContainer
                 .queryItems(
-                    "SELECT VALUE p.projectId FROM p JOIN u IN p.teamMembers WHERE u.userId = '" +
+                    "SELECT VALUE p.projectId FROM p " +
+                    "JOIN t IN p.teamMembers " +
+                    "JOIN r IN p.usersRequestingToJoin " +
+                    "WHERE t.userId = '" +
+                    user.getId() +
+                    "' OR r.userId = '" +
                     user.getId() +
                     "'",
                     new CosmosQueryRequestOptions(),
