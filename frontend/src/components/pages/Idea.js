@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import Success from "../Success";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { useParams } from "react-router-dom";
+import { toQuery } from "../utils/Routing";
 import axios from "axios";
 import IdeaCard from "../IdeaCard";
 import NotFound from "./NotFound";
@@ -121,6 +122,10 @@ export default function Idea() {
             });
     };
 
+    const searchTag = (tagName) => {
+        window.location.href = "/tags?" + toQuery({ tag: tagName });
+    };
+
     if (status === Status.NotFound) {
         return <NotFound />;
     }
@@ -234,7 +239,8 @@ export default function Idea() {
                             <li className="list-group-item mw-100">
                                 {idea.tags.map((tag) => (
                                     <span
-                                        className="badge rounded-pill bg-dark me-2"
+                                        className="badge btn rounded-pill bg-dark me-2"
+                                        onClick={() => searchTag(tag)}
                                         key={tag}
                                     >
                                         {tag}
