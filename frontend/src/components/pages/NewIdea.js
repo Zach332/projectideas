@@ -24,6 +24,7 @@ export default function NewIdea() {
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [user] = useGlobalState("user");
     const [savedIdea] = useGlobalState("newIdea");
+    const [invalidCharacter, setInvalidCharacter] = React.useState(false);
 
     const handleInputChange = (event) => {
         const target = event.target;
@@ -73,6 +74,7 @@ export default function NewIdea() {
 
     const updateNewTag = (event) => {
         setNewTag(event.target.value);
+        setInvalidCharacter(false);
         if (event.target.value === "") {
             axios.get("/api/tags/standard/idea").then((response) => {
                 setTagSuggestions(response.data);
@@ -113,6 +115,20 @@ export default function NewIdea() {
                 });
             });
         event.preventDefault();
+    };
+
+    const validateTagKeyPress = (event) => {
+        if (
+            !(
+                event.keyCode === 8 ||
+                (event.key >= "a" && event.key <= "z") ||
+                event.key === "-" ||
+                (event.key >= "0" && event.key <= "9")
+            )
+        ) {
+            event.preventDefault();
+            setInvalidCharacter(true);
+        }
     };
 
     if (!user.loggedIn) {
@@ -178,6 +194,7 @@ export default function NewIdea() {
                             <input
                                 type="text"
                                 className="form-control"
+                                onKeyDown={validateTagKeyPress}
                                 value={newTag}
                                 onChange={updateNewTag}
                                 placeholder="new tag"
@@ -191,9 +208,11 @@ export default function NewIdea() {
                                 Add
                             </div>
                         </div>
-                        {newTag.length > 29 && (
+                        {(newTag.length > 29 || invalidCharacter) && (
                             <div className="col-auto text-red">
-                                Tag too long
+                                Tags must be less than 30 characters, and
+                                include only lowercase letters, numbers, or
+                                dashes
                             </div>
                         )}
                     </form>
