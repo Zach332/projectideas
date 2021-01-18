@@ -84,6 +84,11 @@ public class ProjectController {
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
 
+        // Do not add request for existing memeber
+        if (project.isUserTeamMember(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         project.getUsersRequestingToJoin().add(new UsernameIdPair(user));
         database.updateProject(project);
         database.sendAdminGroupMessage(
