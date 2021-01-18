@@ -97,6 +97,23 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        // Do not duplicate a request to join
+        if (
+            project
+                .getUsersRequestingToJoin()
+                .stream()
+                .anyMatch(
+                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+                )
+        ) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "User " +
+                user.getUsername() +
+                " has already requested to join this project"
+            );
+        }
+
         project.getUsersRequestingToJoin().add(new UsernameIdPair(user));
         database.updateProject(project);
         database.sendGroupAdminMessage(
