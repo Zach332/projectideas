@@ -58,6 +58,27 @@ public class IdeaController {
         return new PreviewIdeaPageDTO(ideaPreviews, pageNum == lastPageNum);
     }
 
+    @GetMapping("/api/ideas/tags")
+    public PreviewIdeaPageDTO getIdeasByTag(
+        @RequestParam("page") int pageNum,
+        @RequestParam("tag") String tag
+    ) {
+        int lastPageNum = database.getLastPageNumForTag(tag);
+
+        List<PreviewIdeaDTO> ideaPreviews;
+        if (pageNum <= 0 || pageNum > lastPageNum) {
+            ideaPreviews = new ArrayList<>();
+        } else {
+            ideaPreviews =
+                database
+                    .findIdeasByTagAndPageNum(tag, pageNum)
+                    .stream()
+                    .map(idea -> mapper.previewIdeaDTO(idea))
+                    .collect(Collectors.toList());
+        }
+        return new PreviewIdeaPageDTO(ideaPreviews, pageNum == lastPageNum);
+    }
+
     @GetMapping("/api/ideas/{ideaId}")
     public ViewIdeaDTO getIdea(
         @PathVariable String ideaId,

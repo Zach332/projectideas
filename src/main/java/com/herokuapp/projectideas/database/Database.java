@@ -269,8 +269,27 @@ public class Database {
             .get();
     }
 
+    public int getNumIdeasForTag(String tag) {
+        return postContainer
+            .queryItems(
+                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
+                tag +
+                "')",
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+    }
+
     public int getLastPageNum() {
         int numIdeas = getNumIdeas();
+        return ((numIdeas - 1) / IDEAS_PER_PAGE) + 1;
+    }
+
+    public int getLastPageNumForTag(String tag) {
+        int numIdeas = getNumIdeasForTag(tag);
         return ((numIdeas - 1) / IDEAS_PER_PAGE) + 1;
     }
 
@@ -291,9 +310,9 @@ public class Database {
     public List<Idea> findIdeasByTagAndPageNum(String tag, int pageNum) {
         return postContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND " +
+                "SELECT * FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
                 tag +
-                " IN c.tags ORDER BY c.timePosted DESC OFFSET " +
+                "') ORDER BY c.timePosted DESC OFFSET " +
                 ((pageNum - 1) * IDEAS_PER_PAGE) +
                 " LIMIT " +
                 IDEAS_PER_PAGE,
