@@ -4,7 +4,6 @@ import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.User;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
-import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
@@ -101,18 +100,13 @@ public class IdeaController {
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
-        List<Tag> tags = idea
-            .getTags()
-            .stream()
-            .map(tag -> new Tag(tag, Tag.Type.Idea))
-            .collect(Collectors.toList());
         database.createIdea(
             new Idea(
                 userId,
                 user.getUsername(),
                 idea.getTitle(),
                 idea.getContent(),
-                tags
+                idea.getTags()
             )
         );
     }

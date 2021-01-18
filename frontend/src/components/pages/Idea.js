@@ -235,9 +235,9 @@ export default function Idea() {
                                 {idea.tags.map((tag) => (
                                     <span
                                         className="badge rounded-pill bg-dark me-2"
-                                        key={tag.name}
+                                        key={tag}
                                     >
-                                        {tag.name}
+                                        {tag}
                                     </span>
                                 ))}
                             </li>

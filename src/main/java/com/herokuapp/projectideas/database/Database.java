@@ -242,12 +242,12 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
-        for (Tag tag : idea.getTags()) {
-            Optional<Tag> existingTag = getTag(tag.getName(), Tag.Type.Idea);
+        for (String tag : idea.getTags()) {
+            Optional<Tag> existingTag = getTag(tag, Tag.Type.Idea);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag.getName(), Tag.Type.Idea);
+                incrementTagUsages(tag, Tag.Type.Idea);
             } else {
-                createTag(tag);
+                createTag(new Tag(tag, Tag.Type.Idea));
             }
         }
         postContainer.createItem(idea);
@@ -278,6 +278,22 @@ public class Database {
         return postContainer
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC OFFSET " +
+                ((pageNum - 1) * IDEAS_PER_PAGE) +
+                " LIMIT " +
+                IDEAS_PER_PAGE,
+                new CosmosQueryRequestOptions(),
+                Idea.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public List<Idea> findIdeasByTagAndPageNum(String tag, int pageNum) {
+        return postContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Idea' AND " +
+                tag +
+                " IN c.tags ORDER BY c.timePosted DESC OFFSET " +
                 ((pageNum - 1) * IDEAS_PER_PAGE) +
                 " LIMIT " +
                 IDEAS_PER_PAGE,

@@ -1,6 +1,5 @@
 package com.herokuapp.projectideas.database.document.post;
 
-import com.herokuapp.projectideas.database.document.tag.Tag;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -12,14 +11,14 @@ import lombok.*;
 public class Idea extends Post {
 
     protected String title;
-    protected List<Tag> tags;
+    protected List<String> tags;
 
     public Idea(
         String authorId,
         String authorUsername,
         String title,
         String content,
-        List<Tag> tags
+        List<String> tags
     ) {
         this.id = UUID.randomUUID().toString();
         this.type = "Idea";
