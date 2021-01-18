@@ -72,7 +72,7 @@ public class ProjectController {
         database.updateProject(existingProject);
     }
 
-    @PostMapping("/api/projects/{projectId}/requesttojoin")
+    @PostMapping("/api/projects/{projectId}/joinrequests")
     public void requestToJoinProject(
         @RequestHeader("authorization") String userId,
         @PathVariable String projectId
@@ -126,7 +126,7 @@ public class ProjectController {
     }
 
     @PostMapping(
-        "/api/projects/{projectId}/joinrequest/{newTeamMemberUsername}"
+        "/api/projects/{projectId}/joinrequests/{newTeamMemberUsername}"
     )
     public void respondToProjectJoinRequest(
         @RequestHeader("authorization") String userId,
