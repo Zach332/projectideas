@@ -9,7 +9,6 @@ import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -143,26 +142,30 @@ public class ProjectController {
         database.updateUser(newTeamMember.getId(), newTeamMember);
     }
 
-    @DeleteMapping("/api/projects/{projectId}")
-    public void deleteProject(
+    @PostMapping("/api/projects/{projectId}/leave")
+    public void leaveProject(
         @RequestHeader("authorization") String userId,
         @PathVariable String projectId
     ) {
-        Project projectToDelete = database
-            .getProject(projectId)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Project " + projectId + " does not exist."
-                    )
-            );
-        if (
-            !projectToDelete.isUserTeamMember(userId) &&
-            !database.isUserAdmin(userId)
-        ) {
+        Project project = database.getProject(projectId).get();
+
+        if (!project.isUserTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        database.deleteProject(projectId);
+
+        project
+            .getTeamMembers()
+            .removeIf(
+                usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+            );
+        if (project.getTeamMembers().size() == 0) {
+            database.deleteProject(projectId);
+        } else {
+            database.updateProject(project);
+        }
+
+        User user = database.findUser(userId).get();
+        user.getJoinedProjectIds().remove(projectId);
+        database.updateUser(userId, user);
     }
 }
