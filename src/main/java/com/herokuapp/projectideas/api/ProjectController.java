@@ -7,8 +7,6 @@ import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,9 +28,11 @@ public class ProjectController {
     @Autowired
     DTOMapper mapper;
 
-    // TODO: Handle team members differently than other users
     @GetMapping("/api/projects/{projectId}")
-    public ViewProjectDTO getProject(@PathVariable String projectId) {
+    public ViewProjectDTO getProject(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @PathVariable String projectId
+    ) {
         Project project = database
             .getProject(projectId)
             .orElseThrow(
@@ -42,12 +42,12 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        List<String> teamMemberUsernames = project
-            .getTeamMembers()
-            .stream()
-            .map(usernameIdPair -> usernameIdPair.getUsername())
-            .collect(Collectors.toList());
-        return mapper.viewProjectDTO(project, teamMemberUsernames);
+
+        if (project.isUserTeamMember(userId)) {
+            return mapper.viewProjectAsTeamMemberDTO(project);
+        } else {
+            return mapper.viewProjectDTO(project);
+        }
     }
 
     @PutMapping("/api/projects/{projectId}")
@@ -65,14 +65,7 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (
-            !existingProject
-                .getTeamMembers()
-                .stream()
-                .anyMatch(
-                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
-                )
-        ) {
+        if (!existingProject.isUserTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         mapper.updateProjectFromDTO(existingProject, project);
@@ -92,6 +85,7 @@ public class ProjectController {
             );
 
         project.getUsersRequestingToJoin().add(new UsernameIdPair(user));
+        database.updateProject(project);
         database.sendAdminGroupMessage(
             projectId,
             user.getUsername() +
@@ -127,21 +121,21 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (
-            project
-                .getTeamMembers()
-                .stream()
-                .anyMatch(
-                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
-                )
-        ) {
-            project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
-            newTeamMember.getJoinedProjectIds().add(projectId);
-            database.updateProject(project);
-            database.updateUser(newTeamMember.getId(), newTeamMember);
-        } else {
+
+        if (!project.isUserTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
+        project
+            .getUsersRequestingToJoin()
+            .removeIf(
+                usernameIdPair ->
+                    usernameIdPair.getUsername().equals(newTeamMemberUsername)
+            );
+        newTeamMember.getJoinedProjectIds().add(projectId);
+        database.updateProject(project);
+        database.updateUser(newTeamMember.getId(), newTeamMember);
     }
 
     @DeleteMapping("/api/projects/{projectId}")
@@ -159,12 +153,7 @@ public class ProjectController {
                     )
             );
         if (
-            !projectToDelete
-                .getTeamMembers()
-                .stream()
-                .anyMatch(
-                    usernameIdPair -> usernameIdPair.getUserId().equals(userId)
-                ) &
+            !projectToDelete.isUserTeamMember(userId) &&
             !database.isUserAdmin(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);

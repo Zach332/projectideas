@@ -1,9 +1,11 @@
 package com.herokuapp.projectideas.database.document.project;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.*;
 
 @NoArgsConstructor
@@ -42,5 +44,30 @@ public class Project {
         this.teamMembers.add(initialUser);
         this.lookingForMembers = lookingForMembers;
         this.usersRequestingToJoin = new ArrayList<>();
+    }
+
+    @JsonIgnore
+    public boolean isUserTeamMember(String userId) {
+        return teamMembers
+            .stream()
+            .anyMatch(
+                usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+            );
+    }
+
+    @JsonIgnore
+    public List<String> getTeamMemberUsernames() {
+        return teamMembers
+            .stream()
+            .map(usernameIdPair -> usernameIdPair.getUsername())
+            .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<String> getJoinRequestUsernames() {
+        return usersRequestingToJoin
+            .stream()
+            .map(usernameIdPair -> usernameIdPair.getUsername())
+            .collect(Collectors.toList());
     }
 }

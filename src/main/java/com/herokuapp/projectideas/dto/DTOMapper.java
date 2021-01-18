@@ -23,10 +23,10 @@ import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
-import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
@@ -94,9 +94,10 @@ public abstract class DTOMapper {
 
     public abstract PreviewProjectDTO previewProjectDTO(Project project);
 
-    public abstract ViewProjectDTO viewProjectDTO(
-        Project project,
-        List<String> teamMemberUsernames
+    public abstract ViewProjectDTO viewProjectDTO(Project project);
+
+    public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
+        Project project
     );
 
     // DTO updating existing document
