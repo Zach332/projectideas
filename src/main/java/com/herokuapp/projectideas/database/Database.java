@@ -602,7 +602,7 @@ public class Database {
     public void markAllReceivedMessagesAsRead(String recipientId) {
         userContainer
             .queryItems(
-                "SELECT VALUE c.id FROM c WHERE c.type = (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "SELECT VALUE c.id FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
                 "AND c.unread = true AND c.userId = '" +
                 recipientId +
                 "'",
