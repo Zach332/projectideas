@@ -13,7 +13,8 @@ import lombok.*;
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type"
+    property = "type",
+    visible = true
 )
 @JsonSubTypes({ @Type(ReceivedMessage.class), @Type(SentMessage.class) })
 public abstract class Message {
