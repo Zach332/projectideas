@@ -168,12 +168,18 @@ public class ProjectController {
             project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
             newTeamMember.getJoinedProjectIds().add(projectId);
             database.updateUser(newTeamMember.getId(), newTeamMember);
+            database.sendIndividualAdminMessage(
+                newTeamMember.getUserId(),
+                "Your request to join " +
+                project.getName() +
+                " has been accepted."
+            );
         } else {
             database.sendIndividualAdminMessage(
                 newTeamMember.getUserId(),
                 "Your request to join " +
                 project.getName() +
-                " has been rejceted."
+                " has been rejected."
             );
         }
 
