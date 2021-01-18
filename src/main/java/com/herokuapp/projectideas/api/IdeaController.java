@@ -80,6 +80,10 @@ public class IdeaController {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns a list of all projects based on this idea
+     * that are looking for members
+     */
     @GetMapping("/api/ideas/{ideaId}/projects")
     public List<PreviewProjectDTO> getProjectsBasedOnIdea(
         @PathVariable String ideaId
