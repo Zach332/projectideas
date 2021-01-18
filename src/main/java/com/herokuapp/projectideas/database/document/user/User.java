@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.database.document;
+package com.herokuapp.projectideas.database.document.user;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ public class User {
     protected boolean admin;
     protected List<String> postedIdeaIds;
     protected List<String> savedIdeaIds;
+    protected List<String> joinedProjectIds;
 
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
@@ -31,5 +32,6 @@ public class User {
         this.admin = false;
         this.postedIdeaIds = new ArrayList<String>();
         this.savedIdeaIds = new ArrayList<String>();
+        this.joinedProjectIds = new ArrayList<String>();
     }
 }

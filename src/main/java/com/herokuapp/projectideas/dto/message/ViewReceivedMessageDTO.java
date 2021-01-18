@@ -5,11 +5,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ViewReceivedMessageDTO {
+public abstract class ViewReceivedMessageDTO extends ViewMessageDTO {
 
-    private String id;
     private String senderUsername;
-    private String content;
-    private long timeSent;
     private boolean unread;
 }

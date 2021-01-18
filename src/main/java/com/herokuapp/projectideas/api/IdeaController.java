@@ -1,9 +1,11 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.User;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
@@ -11,6 +13,8 @@ import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
+import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,11 +115,28 @@ public class IdeaController {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns a list of all projects based on this idea
+     * that are looking for members
+     */
+    @GetMapping("/api/ideas/{ideaId}/projects")
+    public List<PreviewProjectDTO> getProjectsBasedOnIdea(
+        @PathVariable String ideaId
+    ) {
+        return database
+            .getProjectsBasedOnIdea(ideaId)
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project))
+            .collect(Collectors.toList());
+    }
+
     @PostMapping("/api/ideas")
     public void createIdea(
         @RequestHeader("authorization") String userId,
         @RequestBody PostIdeaDTO idea
     ) {
+        // TODO: Move this call into the createIdea function
+        // As is, creating an idea requires calling the findUser function twice
         User user = database
             .findUser(userId)
             .orElseThrow(
@@ -161,6 +182,25 @@ public class IdeaController {
         );
     }
 
+    @PostMapping("/api/ideas/{ideaId}/projects")
+    public void createProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId,
+        @RequestBody CreateProjectDTO project
+    ) {
+        User user = database.findUser(userId).get();
+        database.createProject(
+            new Project(
+                project.getName(),
+                project.getDescription(),
+                ideaId,
+                new UsernameIdPair(user),
+                project.isLookingForMembers()
+            ),
+            userId
+        );
+    }
+
     @PutMapping("/api/ideas/{id}")
     public void updateIdea(
         @RequestHeader("authorization") String userId,
@@ -176,16 +216,13 @@ public class IdeaController {
                         "Idea " + id + " does not exist."
                     )
             );
-        User user = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        if (!user.isAdmin() && !existingIdea.getAuthorId().equals(userId)) {
+        if (
+            !existingIdea.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        existingIdea.setTitle(idea.getTitle());
-        existingIdea.setContent(idea.getContent());
+        mapper.updateIdeaFromDTO(existingIdea, idea);
         database.updateIdea(existingIdea);
     }
 
@@ -205,10 +242,13 @@ public class IdeaController {
                         "Comment " + commentId + " does not exist."
                     )
             );
-        if (!existingComment.getAuthorId().equals(userId)) {
+        if (
+            !existingComment.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        existingComment.setContent(comment.getContent());
+        mapper.updateCommentFromDTO(existingComment, comment);
         database.updateComment(existingComment);
     }
 
@@ -242,12 +282,10 @@ public class IdeaController {
                         "Idea " + id + " does not exist."
                     )
             );
-        User user = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        if (!user.isAdmin() && !ideaToDelete.getAuthorId().equals(userId)) {
+        if (
+            !ideaToDelete.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteIdea(id, userId);
@@ -268,12 +306,10 @@ public class IdeaController {
                         "Comment " + commentId + " does not exist."
                     )
             );
-        User user = database
-            .findUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
-            );
-        if (!user.isAdmin() && !commentToDelete.getAuthorId().equals(userId)) {
+        if (
+            !commentToDelete.getAuthorId().equals(userId) &&
+            !database.isUserAdmin(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         database.deleteComment(commentId, ideaId);

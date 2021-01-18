@@ -1,36 +1,38 @@
 package com.herokuapp.projectideas.database.document.message;
 
-import java.time.Instant;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 
 @NoArgsConstructor
 @Getter
 @Setter
-public class ReceivedMessage {
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true
+)
+@JsonSubTypes(
+    {
+        @Type(ReceivedIndividualMessage.class),
+        @Type(ReceivedGroupMessage.class),
+    }
+)
+public abstract class ReceivedMessage extends Message {
 
-    protected String id;
-    protected String type;
-    /**
-     * Id of the user that received the message
-     */
-    protected String userId;
     protected String senderUsername;
-    protected String content;
-    protected long timeSent;
     protected boolean unread;
 
-    public ReceivedMessage(
+    protected ReceivedMessage(
         String recipientId,
         String senderUsername,
         String content
     ) {
-        this.id = UUID.randomUUID().toString();
+        super(recipientId, content);
         this.type = "ReceivedMessage";
-        this.userId = recipientId;
         this.senderUsername = senderUsername;
-        this.content = content;
-        this.timeSent = Instant.now().getEpochSecond();
         this.unread = true;
     }
 }

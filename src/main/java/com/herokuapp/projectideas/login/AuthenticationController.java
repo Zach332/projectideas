@@ -2,7 +2,7 @@ package com.herokuapp.projectideas.login;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.user.User;
 import java.io.IOException;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;

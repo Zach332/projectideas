@@ -8,12 +8,18 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
+import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentGroupMessage;
+import com.herokuapp.projectideas.database.document.message.SentIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
+import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +38,7 @@ public class Database {
     private CosmosContainer userContainer;
     private CosmosContainer postContainer;
     private CosmosContainer tagContainer;
+    private CosmosContainer projectContainer;
 
     @Autowired
     IndexController indexController;
@@ -48,6 +55,8 @@ public class Database {
         userContainer = database.getContainer(collectionPrefix + "_users");
         postContainer = database.getContainer(collectionPrefix + "_posts");
         tagContainer = database.getContainer(collectionPrefix + "_tags");
+        projectContainer =
+            database.getContainer(collectionPrefix + "_projects");
     }
 
     // Users
@@ -89,6 +98,20 @@ public class Database {
             .findFirst();
     }
 
+    public String getUsernameFromId(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.username FROM c WHERE c.type = 'User' AND c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+    }
+
     public boolean containsUserWithUsername(String username) {
         return (
             userContainer
@@ -117,7 +140,8 @@ public class Database {
 
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
-            List<PartitionKey> partitionKeys = postContainer
+            // Handle posts container
+            List<PartitionKey> ideaPartitionKeys = postContainer
                 .queryItems(
                     "SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" +
                     user.getId() +
@@ -129,10 +153,35 @@ public class Database {
                 .distinct()
                 .map(ideaId -> new PartitionKey(ideaId))
                 .collect(Collectors.toList());
-
-            for (PartitionKey partitionKey : partitionKeys) {
+            for (PartitionKey partitionKey : ideaPartitionKeys) {
                 options.setPartitionKey(partitionKey);
                 postContainer
+                    .getScripts()
+                    .getStoredProcedure("updateUsername")
+                    .execute(params, options);
+            }
+
+            // Handle projects container
+            List<PartitionKey> projectPartitionKeys = projectContainer
+                .queryItems(
+                    "SELECT VALUE p.projectId FROM p " +
+                    "JOIN t IN p.teamMembers " +
+                    "JOIN r IN p.usersRequestingToJoin " +
+                    "WHERE t.userId = '" +
+                    user.getId() +
+                    "' OR r.userId = '" +
+                    user.getId() +
+                    "'",
+                    new CosmosQueryRequestOptions(),
+                    String.class
+                )
+                .stream()
+                .distinct()
+                .map(projectId -> new PartitionKey(projectId))
+                .collect(Collectors.toList());
+            for (PartitionKey partitionKey : projectPartitionKeys) {
+                options.setPartitionKey(partitionKey);
+                projectContainer
                     .getScripts()
                     .getStoredProcedure("updateUsername")
                     .execute(params, options);
@@ -197,6 +246,19 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    private List<String> getJoinedProjectIdsForUser(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.joinedProjectIds FROM c WHERE c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                String.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public List<Idea> getSavedIdeasForUser(String userId) {
         ArrayList<Idea> ideas = new ArrayList<Idea>();
         List<String> ideaIds = getSavedIdeaIdsForUser(userId);
@@ -216,8 +278,27 @@ public class Database {
         return getIdeasInList(ideaIds);
     }
 
+    public List<Project> getJoinedProjectsForUser(String userId) {
+        List<String> projectIds = getJoinedProjectIdsForUser(userId);
+        return getProjectsInList(projectIds);
+    }
+
     public boolean isIdeaSavedByUser(String userId, String ideaId) {
         return getSavedIdeaIdsForUser(userId).contains(ideaId);
+    }
+
+    public boolean isUserAdmin(String userId) {
+        return userContainer
+            .queryItems(
+                "SELECT VALUE c.admin FROM c WHERE c.type = 'User' AND c.userId = '" +
+                userId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                boolean.class
+            )
+            .stream()
+            .findFirst()
+            .get();
     }
 
     public void deleteUser(String id) {
@@ -442,19 +523,19 @@ public class Database {
 
     // Messages
 
-    public void createMessage(
+    public void sendIndividualMessage(
         String senderId,
         String recipientUsername,
         String content
     ) {
         User sender = findUser(senderId).get();
         User recipient = findUserByUsername(recipientUsername).get();
-        ReceivedMessage receivedMessage = new ReceivedMessage(
+        ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
             sender.getUsername(),
             content
         );
-        SentMessage sentMessage = new SentMessage(
+        SentIndividualMessage sentMessage = new SentIndividualMessage(
             senderId,
             recipientUsername,
             content
@@ -464,13 +545,73 @@ public class Database {
         userContainer.createItem(sentMessage);
     }
 
+    public void sendIndividualAdminMessage(String recipientId, String content) {
+        ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
+            recipientId,
+            "projectideas",
+            content
+        );
+        userContainer.createItem(receivedMessage);
+    }
+
+    // TODO: Handle failure if one or more messages fail to save
+    public void sendGroupMessage(
+        String senderId,
+        String recipientProjectId,
+        String content
+    ) {
+        User sender = findUser(senderId).get();
+        Project recipientProject = getProject(recipientProjectId).get();
+        for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
+            String recipientId = recipient.getUserId();
+            // Skip the user sending the message
+            if (recipientId.equals(senderId)) {
+                continue;
+            }
+            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                recipientId,
+                sender.getUsername(),
+                content,
+                recipientProjectId,
+                recipientProject.getName()
+            );
+            userContainer.createItem(receivedGroupMessage);
+        }
+        SentGroupMessage sentGroupMessage = new SentGroupMessage(
+            senderId,
+            recipientProjectId,
+            recipientProject.getName(),
+            content
+        );
+        userContainer.createItem(sentGroupMessage);
+    }
+
+    public void sendGroupAdminMessage(
+        String recipientProjectId,
+        String content
+    ) {
+        Project recipientProject = getProject(recipientProjectId).get();
+        for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
+            String recipientId = recipient.getUserId();
+            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                recipientId,
+                "projectideas",
+                content,
+                recipientProjectId,
+                recipientProject.getName()
+            );
+            userContainer.createItem(receivedGroupMessage);
+        }
+    }
+
     public Optional<ReceivedMessage> findReceivedMessage(
         String recipientId,
         String messageId
     ) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.userId = '" +
                 recipientId +
                 "' AND c.id = '" +
                 messageId +
@@ -485,7 +626,8 @@ public class Database {
     public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.userId = '" +
                 recipientId +
                 "' ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
@@ -500,7 +642,8 @@ public class Database {
     ) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'ReceivedMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.userId = '" +
                 recipientId +
                 "' AND c.unread = true ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
@@ -513,7 +656,8 @@ public class Database {
     public List<SentMessage> findAllSentMessages(String senderId) {
         return userContainer
             .queryItems(
-                "SELECT * FROM c WHERE c.type = 'SentMessage' AND c.userId = '" +
+                "SELECT * FROM c WHERE (c.type = 'SentIndividualMessage' OR c.type = 'SentGroupMessage') " +
+                "AND c.userId = '" +
                 senderId +
                 "' ORDER BY c.timeSent DESC",
                 new CosmosQueryRequestOptions(),
@@ -526,7 +670,8 @@ public class Database {
     public int getNumberOfUnreadMessages(String recipientId) {
         return userContainer
             .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'ReceivedMessage' AND c.unread = true AND c.userId = '" +
+                "SELECT VALUE COUNT(1) FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.unread = true AND c.userId = '" +
                 recipientId +
                 "'",
                 new CosmosQueryRequestOptions(),
@@ -554,7 +699,8 @@ public class Database {
     public void markAllReceivedMessagesAsRead(String recipientId) {
         userContainer
             .queryItems(
-                "SELECT VALUE c.id FROM c WHERE c.type = 'ReceivedMessage' AND c.unread = true AND c.userId = '" +
+                "SELECT VALUE c.id FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
+                "AND c.unread = true AND c.userId = '" +
                 recipientId +
                 "'",
                 new CosmosQueryRequestOptions(),
@@ -681,5 +827,70 @@ public class Database {
 
     public void deleteTag(Tag tag) {
         tagContainer.deleteItem(tag, new CosmosItemRequestOptions());
+    }
+
+    // Projects
+
+    public void createProject(Project project, String projectCreatorId) {
+        projectContainer.createItem(project);
+        User user = findUser(projectCreatorId).get();
+        user.getJoinedProjectIds().add(project.getId());
+        updateUser(projectCreatorId, user);
+    }
+
+    public Optional<Project> getProject(String projectId) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId = '" +
+                projectId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .findFirst();
+    }
+
+    public List<Project> getProjectsBasedOnIdea(String ideaId) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
+                ideaId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    private List<Project> getProjectsInList(List<String> projectIds) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId IN ('" +
+                String.join("', '", projectIds) +
+                "')",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public void updateProject(Project project) {
+        projectContainer.replaceItem(
+            project,
+            project.getId(),
+            new PartitionKey(project.getProjectId()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public void deleteProject(String projectId) {
+        projectContainer.deleteItem(
+            projectId,
+            new PartitionKey(projectId),
+            new CosmosItemRequestOptions()
+        );
     }
 }

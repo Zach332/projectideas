@@ -5,4 +5,4 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public abstract class ViewSentMessageDTO extends ViewMessageDTO {}
+public class ViewReceivedIndividualMessageDTO extends ViewReceivedMessageDTO {}

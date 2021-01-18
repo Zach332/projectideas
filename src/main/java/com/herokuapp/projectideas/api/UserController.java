@@ -1,9 +1,10 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import java.util.List;
@@ -59,6 +60,17 @@ public class UserController {
             .collect(Collectors.toList());
     }
 
+    @GetMapping("/api/users/{userId}/projects")
+    public List<PreviewProjectDTO> getJoinedProjects(
+        @PathVariable String userId
+    ) {
+        return database
+            .getJoinedProjectsForUser(userId)
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project))
+            .collect(Collectors.toList());
+    }
+
     @PostMapping("/api/users")
     public void createUser(@RequestBody CreateUserDTO user) {
         if (database.containsUserWithUsername(user.getUsername())) {
@@ -67,7 +79,6 @@ public class UserController {
                 "Username " + user.getUsername() + " is already taken."
             );
         }
-        // TODO: Create the user object in Database.java
         database.createUser(new User(user.getUsername(), user.getEmail()));
     }
 
@@ -76,7 +87,6 @@ public class UserController {
         @PathVariable String id,
         @RequestBody CreateUserDTO user
     ) {
-        // No authorization because ID in path verifies identity
         User existingUser = database
             .findUser(id)
             .orElseThrow(
@@ -106,8 +116,7 @@ public class UserController {
                 );
             }
         }
-        existingUser.setUsername(user.getUsername());
-        existingUser.setEmail(user.getEmail());
+        mapper.updateUserFromDTO(existingUser, user);
         database.updateUser(id, existingUser);
     }
 }

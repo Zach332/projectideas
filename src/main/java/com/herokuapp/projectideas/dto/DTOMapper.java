@@ -1,27 +1,124 @@
 package com.herokuapp.projectideas.dto;
 
-import com.herokuapp.projectideas.database.document.User;
+import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
+import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
+import com.herokuapp.projectideas.database.document.message.SentGroupMessage;
+import com.herokuapp.projectideas.database.document.message.SentIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.dto.message.ViewReceivedGroupMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewReceivedIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentGroupMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
+import com.herokuapp.projectideas.dto.post.PostCommentDTO;
+import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
+import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
+import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
+import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface DTOMapper {
-    ViewUserDTO viewUserDTO(User user);
+public abstract class DTOMapper {
 
-    PreviewIdeaDTO previewIdeaDTO(Idea idea);
-    ViewIdeaDTO viewIdeaDTO(Idea idea, Boolean savedByUser);
+    // Document -> DTO
 
-    ViewCommentDTO viewCommentDTO(Comment comment);
+    public abstract ViewUserDTO viewUserDTO(User user);
 
-    ViewReceivedMessageDTO viewReceivedMessageDTO(ReceivedMessage message);
-    ViewSentMessageDTO viewSentMessageDTO(SentMessage message);
+    public abstract PreviewIdeaDTO previewIdeaDTO(Idea idea);
+
+    public abstract ViewIdeaDTO viewIdeaDTO(Idea idea, Boolean savedByUser);
+
+    public abstract ViewCommentDTO viewCommentDTO(Comment comment);
+
+    public abstract ViewReceivedIndividualMessageDTO viewReceivedIndividualMessageDTO(
+        ReceivedIndividualMessage message,
+        boolean groupMessage
+    );
+
+    public abstract ViewReceivedGroupMessageDTO viewReceivedGroupMessageDTO(
+        ReceivedGroupMessage message,
+        boolean groupMessage
+    );
+
+    public abstract ViewSentIndividualMessageDTO viewSentIndividualMessageDTO(
+        SentIndividualMessage message,
+        boolean groupMessage
+    );
+
+    public abstract ViewSentGroupMessageDTO viewSentGroupMessageDTO(
+        SentGroupMessage message,
+        boolean groupMessage
+    );
+
+    public ViewReceivedMessageDTO viewReceivedMessageDTO(
+        ReceivedMessage message
+    ) {
+        if (message instanceof ReceivedIndividualMessage) {
+            return viewReceivedIndividualMessageDTO(
+                (ReceivedIndividualMessage) message,
+                false
+            );
+        } else if (message instanceof ReceivedGroupMessage) {
+            return viewReceivedGroupMessageDTO(
+                (ReceivedGroupMessage) message,
+                true
+            );
+        }
+        return null;
+    }
+
+    public ViewSentMessageDTO viewSentMessageDTO(SentMessage message) {
+        if (message instanceof SentIndividualMessage) {
+            return viewSentIndividualMessageDTO(
+                (SentIndividualMessage) message,
+                false
+            );
+        } else if (message instanceof SentGroupMessage) {
+            return viewSentGroupMessageDTO((SentGroupMessage) message, true);
+        }
+        return null;
+    }
+
+    public abstract PreviewProjectDTO previewProjectDTO(Project project);
+
+    public abstract ViewProjectDTO viewProjectDTO(Project project);
+
+    public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
+        Project project
+    );
+
+    // DTO updating existing document
+
+    public abstract User updateUserFromDTO(
+        @MappingTarget User user,
+        CreateUserDTO createUserDTO
+    );
+
+    public abstract void updateIdeaFromDTO(
+        @MappingTarget Idea idea,
+        PostIdeaDTO postIdeaDTO
+    );
+
+    public abstract void updateCommentFromDTO(
+        @MappingTarget Comment comment,
+        PostCommentDTO postCommentDTO
+    );
+
+    public abstract void updateProjectFromDTO(
+        @MappingTarget Project project,
+        CreateProjectDTO createProjectDTO
+    );
 }
