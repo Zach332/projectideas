@@ -78,6 +78,14 @@ public class ProjectController {
         @PathVariable String projectId
     ) {
         Project project = database.getProject(projectId).get();
+
+        if (!project.isLookingForMembers()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "This project is not looking for new members."
+            );
+        }
+
         User user = database
             .findUser(userId)
             .orElseThrow(
