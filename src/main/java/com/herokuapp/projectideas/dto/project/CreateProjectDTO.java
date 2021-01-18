@@ -11,5 +11,5 @@ public class CreateProjectDTO {
     private String description;
     // Optional during project creation
     private String githubLink;
-    private Boolean lookingForMembers;
+    private boolean lookingForMembers;
 }

@@ -147,7 +147,7 @@ public class IdeaController {
                 project.getDescription(),
                 ideaId,
                 new UsernameIdPair(user),
-                project.getLookingForMembers()
+                project.isLookingForMembers()
             ),
             userId
         );
