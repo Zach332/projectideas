@@ -457,6 +457,15 @@ public class Database {
         userContainer.createItem(sentMessage);
     }
 
+    public void sendIndividualAdminMessage(String recipientId, String content) {
+        ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
+            recipientId,
+            "projectideas",
+            content
+        );
+        userContainer.createItem(receivedMessage);
+    }
+
     // TODO: Handle failure if one or more messages fail to save
     public void sendGroupMessage(
         String senderId,
@@ -489,7 +498,7 @@ public class Database {
         userContainer.createItem(sentGroupMessage);
     }
 
-    public void sendAdminGroupMessage(
+    public void sendGroupAdminMessage(
         String recipientProjectId,
         String content
     ) {

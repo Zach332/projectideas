@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -90,7 +91,7 @@ public class ProjectController {
 
         project.getUsersRequestingToJoin().add(new UsernameIdPair(user));
         database.updateProject(project);
-        database.sendAdminGroupMessage(
+        database.sendGroupAdminMessage(
             projectId,
             user.getUsername() +
             " has requested to join your " +
@@ -100,12 +101,13 @@ public class ProjectController {
     }
 
     @PostMapping(
-        "/api/projects/{projectId}/addteammember/{newTeamMemberUsername}"
+        "/api/projects/{projectId}/joinrequest/{newTeamMemberUsername}"
     )
-    public void addTeamMemberToProject(
+    public void respondToProjectJoinRequest(
         @RequestHeader("authorization") String userId,
         @PathVariable String projectId,
-        @PathVariable String newTeamMemberUsername
+        @PathVariable String newTeamMemberUsername,
+        @RequestParam("accept") boolean accept
     ) {
         User newTeamMember = database
             .findUserByUsername(newTeamMemberUsername)
@@ -130,16 +132,27 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
         project
             .getUsersRequestingToJoin()
             .removeIf(
                 usernameIdPair ->
-                    usernameIdPair.getUsername().equals(newTeamMemberUsername)
+                    usernameIdPair.getUserId().equals(newTeamMember.getUserId())
             );
-        newTeamMember.getJoinedProjectIds().add(projectId);
+
+        if (accept) {
+            project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
+            newTeamMember.getJoinedProjectIds().add(projectId);
+            database.updateUser(newTeamMember.getId(), newTeamMember);
+        } else {
+            database.sendIndividualAdminMessage(
+                newTeamMember.getUserId(),
+                "Your request to join " +
+                project.getName() +
+                " has been rejceted."
+            );
+        }
+
         database.updateProject(project);
-        database.updateUser(newTeamMember.getId(), newTeamMember);
     }
 
     @PostMapping("/api/projects/{projectId}/leave")
