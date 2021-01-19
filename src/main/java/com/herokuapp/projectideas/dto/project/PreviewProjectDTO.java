@@ -10,4 +10,5 @@ public class PreviewProjectDTO {
     private String id;
     private String name;
     private String description;
+    private boolean lookingForMembers;
 }
