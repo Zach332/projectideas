@@ -29,6 +29,10 @@ export default function JoinProject() {
             });
     }, []);
 
+    const createProject = () => {
+        window.location.href = "/create/idea/" + idea.id;
+    };
+
     if (status === Status.NotFound) {
         return <NotFound />;
     }
@@ -50,6 +54,13 @@ export default function JoinProject() {
                 <IdeaSummary idea={idea} />
             </div>
             {existingProjects}
+            <button
+                type="button"
+                onClick={createProject}
+                className="btn btn-primary btn-md mt-3"
+            >
+                Create new project
+            </button>
         </div>
     );
 }
