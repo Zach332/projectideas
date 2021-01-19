@@ -199,9 +199,30 @@ export default function Idea() {
                 <div className="col-md-3 col-sm-auto">
                     <ul className="card list-group list-group-flush">
                         <li className="list-group-item">
-                            By {idea.authorUsername}
-                            <br></br>
-                            {formatTime(idea.timePosted)}
+                            <div className="d-flex">
+                                <div className="me-auto">
+                                    By {idea.authorUsername}
+                                    <br></br>
+                                    {formatTime(idea.timePosted)}
+                                </div>
+                                {idea.savedByUser ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger btn-md"
+                                        onClick={unsaveIdea}
+                                    >
+                                        Unsave
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary btn-md"
+                                        onClick={saveIdea}
+                                    >
+                                        Save
+                                    </button>
+                                )}
+                            </div>
                         </li>
                         <li className="list-group-item">
                             <button
@@ -213,27 +234,6 @@ export default function Idea() {
                                 Message author
                             </button>
                         </li>
-                        {idea.savedByUser ? (
-                            <li className="list-group-item">
-                                <button
-                                    type="button"
-                                    className="btn btn-danger btn-md"
-                                    onClick={unsaveIdea}
-                                >
-                                    Unsave
-                                </button>
-                            </li>
-                        ) : (
-                            <li className="list-group-item">
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-md"
-                                    onClick={saveIdea}
-                                >
-                                    Save
-                                </button>
-                            </li>
-                        )}
                         {more}
                         {idea.tags && (
                             <li className="list-group-item mw-100">
