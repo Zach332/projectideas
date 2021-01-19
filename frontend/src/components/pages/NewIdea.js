@@ -118,13 +118,18 @@ export default function NewIdea() {
     };
 
     const validateTagKeyPress = (event) => {
-        if (
-            !(
-                event.keyCode === 8 ||
-                (event.key >= "a" && event.key <= "z") ||
-                event.key === "-" ||
-                (event.key >= "0" && event.key <= "9")
-            )
+        // enter key
+        if (event.keyCode === 13) {
+            createTag();
+            event.preventDefault();
+        } else if (
+            (event.key >= "a" && event.key <= "z") ||
+            event.key === "-"
+        ) {
+            return;
+        } else if (
+            (event.keyCode >= 58 && event.keyCode <= 90) ||
+            (event.keyCode >= 160 && event.keyCode <= 165)
         ) {
             event.preventDefault();
             setInvalidCharacter(true);
