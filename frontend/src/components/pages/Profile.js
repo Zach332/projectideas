@@ -36,7 +36,7 @@ export default function Profile() {
         axios
             .post("/api/ideas/" + ideaId + "/unsave", {})
             .then(() => {
-                addToast("Idea removed from My Projects.", {
+                addToast("Idea removed from Saved Projects.", {
                     appearance: "success",
                     autoDismiss: true,
                 });
@@ -206,12 +206,9 @@ export default function Profile() {
             >
                 Log Out
             </button>
-            <h2 className="mt-4">My projects</h2>
+            <h2 className="mt-4">Saved projects</h2>
             {myProjects.length === 0 ? (
-                <p>
-                    You don&apos;t have any projects. Use the &quot;work on this
-                    idea&quot; button to save an idea here.
-                </p>
+                <p>You haven&apos;t saved any projects.</p>
             ) : (
                 myProjects.map((idea) => (
                     <div key={idea.id} className="container-flex">

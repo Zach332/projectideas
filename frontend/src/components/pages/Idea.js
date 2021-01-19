@@ -84,7 +84,7 @@ export default function Idea() {
         axios
             .post("/api/ideas/" + idea.id + "/save", {})
             .then(() => {
-                addToast("Idea saved to My Projects on your Profile.", {
+                addToast("Idea saved to Saved Projects on your Profile.", {
                     appearance: "success",
                     autoDismiss: true,
                 });
