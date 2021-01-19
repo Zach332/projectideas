@@ -7,6 +7,7 @@ import IdeaSummary from "./../IdeaSummary";
 
 export default function JoinProject() {
     const [idea, setIdea] = React.useState([]);
+    const [projects, setProjects] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     let params = useParams();
 
@@ -18,18 +19,33 @@ export default function JoinProject() {
                 setIdea(response.data);
             }
         });
+        axios.get("/api/ideas/" + params.id + "/projects").then((response) => {
+            setProjects(response.data);
+            console.log(projects);
+        });
     }, []);
 
     if (status === Status.NotFound) {
         return <NotFound />;
     }
 
+    const existingProjects =
+        projects.length > 0 ? (
+            <div></div>
+        ) : (
+            <div>
+                No teams are looking for new members right now. Create a new
+                one!
+            </div>
+        );
+
     return (
         <div>
             <h1>Join or start a project for idea:</h1>
-            <div className="mx-3">
+            <div className="m-3">
                 <IdeaSummary idea={idea} />
             </div>
+            {existingProjects}
         </div>
     );
 }
