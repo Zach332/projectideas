@@ -14,6 +14,7 @@ import Markdown from "./components/pages/Markdown";
 import Search from "./components/pages/Search";
 import Tags from "./components/pages/Tags";
 import JoinProject from "./components/pages/JoinProject";
+import CreateProject from "./components/pages/CreateProject";
 import GitHubLogin from "./components/logins/Login";
 import LoginLanding from "./components/logins/LoginLanding";
 
@@ -46,6 +47,11 @@ function App() {
                                 path="/join/idea/:id"
                                 exact
                                 component={JoinProject}
+                            />
+                            <Route
+                                path="/create/idea/:id"
+                                exact
+                                component={CreateProject}
                             />
                             <Route path="/profile" exact component={Profile} />
                             <Route
