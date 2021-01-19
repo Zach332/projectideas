@@ -117,13 +117,25 @@ public class IdeaController {
 
     @GetMapping("/api/ideas/{ideaId}/projects")
     public List<PreviewProjectDTO> getProjectsBasedOnIdea(
-        @PathVariable String ideaId
+        @PathVariable String ideaId,
+        @RequestParam(
+            value = "lookingForMembersOnly",
+            required = false
+        ) boolean lookingForMembersOnly
     ) {
-        return database
-            .getProjectsBasedOnIdea(ideaId)
-            .stream()
-            .map(project -> mapper.previewProjectDTO(project))
-            .collect(Collectors.toList());
+        if (lookingForMembersOnly) {
+            return database
+                .getProjectsLookingForMemberBasedOnIdea(ideaId)
+                .stream()
+                .map(project -> mapper.previewProjectDTO(project))
+                .collect(Collectors.toList());
+        } else {
+            return database
+                .getProjectsBasedOnIdea(ideaId)
+                .stream()
+                .map(project -> mapper.previewProjectDTO(project))
+                .collect(Collectors.toList());
+        }
     }
 
     @PostMapping("/api/ideas")

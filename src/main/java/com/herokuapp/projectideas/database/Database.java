@@ -864,6 +864,19 @@ public class Database {
             .collect(Collectors.toList());
     }
 
+    public List<Project> getProjectsLookingForMemberBasedOnIdea(String ideaId) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
+                ideaId +
+                "'",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     private List<Project> getProjectsInList(List<String> projectIds) {
         return projectContainer
             .queryItems(
