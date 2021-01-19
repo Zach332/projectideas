@@ -13,6 +13,7 @@ import Messages from "./components/pages/Messages";
 import Markdown from "./components/pages/Markdown";
 import Search from "./components/pages/Search";
 import Tags from "./components/pages/Tags";
+import JoinProject from "./components/pages/JoinProject";
 import GitHubLogin from "./components/logins/Login";
 import LoginLanding from "./components/logins/LoginLanding";
 
@@ -41,6 +42,11 @@ function App() {
                             <Route path="/about" exact component={About} />
                             <Route path="/privacy" exact component={Privacy} />
                             <Route path="/idea/:id" exact component={Idea} />
+                            <Route
+                                path="/join/idea/:id"
+                                exact
+                                component={JoinProject}
+                            />
                             <Route path="/profile" exact component={Profile} />
                             <Route
                                 path="/messages"

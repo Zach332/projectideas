@@ -122,6 +122,10 @@ export default function Idea() {
             });
     };
 
+    const joinProject = () => {
+        window.location.href = "/join/idea/" + idea.id;
+    };
+
     const searchTag = (tagName) => {
         window.location.href = "/tags?" + toQuery({ tag: tagName });
     };
@@ -232,6 +236,15 @@ export default function Idea() {
                                 className="btn btn-outline-secondary btn-md"
                             >
                                 Message author
+                            </button>
+                        </li>
+                        <li className="list-group-item">
+                            <button
+                                type="button"
+                                className="btn btn-info btn-md"
+                                onClick={joinProject}
+                            >
+                                Join or start a project
                             </button>
                         </li>
                         {more}
