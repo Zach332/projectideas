@@ -235,7 +235,7 @@ export default function Idea() {
                             </button>
                         </li>
                         {more}
-                        {idea.tags && (
+                        {idea.tags && idea.tags.length > 0 && (
                             <li className="list-group-item mw-100">
                                 {idea.tags.map((tag) => (
                                     <span
