@@ -35,6 +35,7 @@ export default function CreateProject() {
             .post("/api/ideas/" + idea.id + "/projects", {
                 name: project.name,
                 description: project.description,
+                lookingForMembers: project.lookingForMembers,
             })
             .then(() => {
                 setStatus(Status.Success);
@@ -55,6 +56,7 @@ export default function CreateProject() {
     };
 
     const handleInputChange = (event) => {
+        console.log(project);
         const target = event.target;
         const name = target.id;
         setProject((project) => ({
