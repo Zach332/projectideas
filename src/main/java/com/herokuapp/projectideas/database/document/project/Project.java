@@ -47,8 +47,17 @@ public class Project {
     }
 
     @JsonIgnore
-    public boolean isUserTeamMember(String userId) {
+    public boolean userIsTeamMember(String userId) {
         return teamMembers
+            .stream()
+            .anyMatch(
+                usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+            );
+    }
+
+    @JsonIgnore
+    public boolean userHasRequestedToJoin(String userId) {
+        return usersRequestingToJoin
             .stream()
             .anyMatch(
                 usernameIdPair -> usernameIdPair.getUserId().equals(userId)

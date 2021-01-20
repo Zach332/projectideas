@@ -43,10 +43,12 @@ public class ProjectController {
                     )
             );
 
-        if (project.isUserTeamMember(userId)) {
-            return mapper.viewProjectAsTeamMemberDTO(project);
+        if (project.userIsTeamMember(userId)) {
+            return mapper.viewProjectAsTeamMemberDTO(project, userId);
+        } else if (project.userHasRequestedToJoin(userId)) {
+            return mapper.viewProjectDTO(project, userId);
         } else {
-            return mapper.viewProjectDTO(project);
+            return mapper.viewProjectDTO(project, userId);
         }
     }
 
@@ -65,7 +67,7 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (!existingProject.isUserTeamMember(userId)) {
+        if (!existingProject.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         mapper.updateProjectFromDTO(existingProject, project);
@@ -93,7 +95,7 @@ public class ProjectController {
             );
 
         // Do not add request for existing memeber
-        if (project.isUserTeamMember(userId)) {
+        if (project.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -153,7 +155,7 @@ public class ProjectController {
                     )
             );
 
-        if (!project.isUserTeamMember(userId)) {
+        if (!project.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -193,7 +195,7 @@ public class ProjectController {
     ) {
         Project project = database.getProject(projectId).get();
 
-        if (!project.isUserTeamMember(userId)) {
+        if (!project.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 

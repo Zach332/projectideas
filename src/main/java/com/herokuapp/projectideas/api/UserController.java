@@ -67,7 +67,7 @@ public class UserController {
         return database
             .getJoinedProjectsForUser(userId)
             .stream()
-            .map(project -> mapper.previewProjectDTO(project))
+            .map(project -> mapper.previewProjectDTO(project, userId))
             .collect(Collectors.toList());
     }
 

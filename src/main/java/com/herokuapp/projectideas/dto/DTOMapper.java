@@ -27,8 +27,11 @@ import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public abstract class DTOMapper {
@@ -92,13 +95,61 @@ public abstract class DTOMapper {
         return null;
     }
 
-    public abstract PreviewProjectDTO previewProjectDTO(Project project);
-
-    public abstract ViewProjectDTO viewProjectDTO(Project project);
-
-    public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
-        Project project
+    @Mapping(
+        target = "userHasRequestedToJoin",
+        source = "project",
+        qualifiedByName = "userHasRequestedToJoin"
+    )
+    public abstract PreviewProjectDTO previewProjectDTO(
+        Project project,
+        @Context String userId
     );
+
+    @Mapping(
+        target = "userIsTeamMember",
+        source = "project",
+        qualifiedByName = "userIsTeamMember"
+    )
+    @Mapping(
+        target = "userHasRequestedToJoin",
+        source = "project",
+        qualifiedByName = "userHasRequestedToJoin"
+    )
+    public abstract ViewProjectDTO viewProjectDTO(
+        Project project,
+        @Context String userId
+    );
+
+    @Mapping(
+        target = "userIsTeamMember",
+        source = "project",
+        qualifiedByName = "userIsTeamMember"
+    )
+    @Mapping(
+        target = "userHasRequestedToJoin",
+        source = "project",
+        qualifiedByName = "userHasRequestedToJoin"
+    )
+    public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
+        Project project,
+        @Context String userId
+    );
+
+    @Named("userIsTeamMember")
+    protected boolean userIsTeamMember(
+        Project project,
+        @Context String userId
+    ) {
+        return project.userIsTeamMember(userId);
+    }
+
+    @Named("userHasRequestedToJoin")
+    protected boolean userHasRequestedToJoin(
+        Project project,
+        @Context String userId
+    ) {
+        return project.userHasRequestedToJoin(userId);
+    }
 
     // DTO updating existing document
 
