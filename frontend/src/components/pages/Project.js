@@ -26,6 +26,7 @@ export default function Project() {
     return (
         <div>
             <h1>{project.name}</h1>
+            <p style={{ whiteSpace: "pre-wrap" }}>{project.description}</p>
         </div>
     );
 }
