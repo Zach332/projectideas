@@ -5,6 +5,7 @@ import NotFound from "./NotFound";
 import axios from "axios";
 import IdeaSummary from "./../IdeaSummary";
 import { useToasts } from "react-toast-notifications";
+import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 
 export default function CreateProject() {
     const [idea, setIdea] = React.useState([]);
@@ -12,6 +13,7 @@ export default function CreateProject() {
     const [project, setProject] = React.useState({ name: "", description: "" });
     let params = useParams();
     const { addToast } = useToasts();
+    useLeavePageWarning(project.name != "" || project.description != "");
 
     useEffect(() => {
         axios.get("/api/ideas/" + params.id).then((response) => {
