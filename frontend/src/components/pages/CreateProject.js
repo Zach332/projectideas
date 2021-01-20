@@ -9,7 +9,7 @@ import { useToasts } from "react-toast-notifications";
 export default function CreateProject() {
     const [idea, setIdea] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
-    const [project, setProject] = React.useState({});
+    const [project, setProject] = React.useState({ name: "", description: "" });
     let params = useParams();
     const { addToast } = useToasts();
 
@@ -82,7 +82,7 @@ export default function CreateProject() {
                 </div>
                 <button
                     type="submit"
-                    disabled={idea.title === ""}
+                    disabled={project.name === ""}
                     className="btn btn-primary mt-4"
                 >
                     Create project
