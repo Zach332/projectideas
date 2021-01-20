@@ -10,7 +10,11 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 export default function CreateProject() {
     const [idea, setIdea] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
-    const [project, setProject] = React.useState({ name: "", description: "" });
+    const [project, setProject] = React.useState({
+        name: "",
+        description: "",
+        lookingForMembers: true,
+    });
     let params = useParams();
     const { addToast } = useToasts();
     useLeavePageWarning(project.name != "" || project.description != "");
@@ -74,13 +78,32 @@ export default function CreateProject() {
                     />
                 </div>
                 <div className="form-group mt-2 mb-3">
-                    <label htmlFor="description">Description</label>
+                    <label htmlFor="description">
+                        Description - if you are looking for new members, add
+                        any logistical details or team goals
+                    </label>
                     <textarea
                         className="form-control"
                         id="description"
                         rows="5"
                         onChange={handleInputChange}
                     ></textarea>
+                </div>
+                <div className="form-check form-switch">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="lookingForMembers"
+                        onChange={handleInputChange}
+                        checked
+                    />
+                    <label
+                        className="form-check-label"
+                        htmlFor="lookingForMembers"
+                    >
+                        Look for new members - your idea will show up as an
+                        option if a user wants to join a team
+                    </label>
                 </div>
                 <button
                     type="submit"
