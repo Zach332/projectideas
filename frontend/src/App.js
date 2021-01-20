@@ -7,6 +7,7 @@ import About from "./components/pages/About";
 import Privacy from "./components/pages/Privacy";
 import NotFound from "./components/pages/NotFound";
 import Idea from "./components/pages/Idea";
+import Project from "./components/pages/Project";
 import Profile from "./components/pages/Profile";
 import NewIdea from "./components/pages/NewIdea";
 import Messages from "./components/pages/Messages";
@@ -43,6 +44,11 @@ function App() {
                             <Route path="/about" exact component={About} />
                             <Route path="/privacy" exact component={Privacy} />
                             <Route path="/idea/:id" exact component={Idea} />
+                            <Route
+                                path="/project/:id"
+                                exact
+                                component={Project}
+                            />
                             <Route
                                 path="/join/idea/:id"
                                 exact
