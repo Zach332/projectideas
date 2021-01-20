@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.database.document.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,7 @@ public class Project {
     protected String id;
     protected String type;
     protected String projectId;
+    protected long timeCreated;
     /**
      * Id of the idea associated with this project
      */
@@ -37,6 +39,7 @@ public class Project {
         this.id = UUID.randomUUID().toString();
         this.type = "Project";
         this.projectId = this.id;
+        this.timeCreated = Instant.now().getEpochSecond();
         this.ideaId = ideaId;
         this.name = name;
         this.description = description;

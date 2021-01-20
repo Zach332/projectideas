@@ -856,7 +856,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
                 ideaId +
-                "'",
+                "' ORDER BY c.timeCreated DESC",
                 new CosmosQueryRequestOptions(),
                 Project.class
             )
@@ -869,7 +869,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
                 ideaId +
-                "'",
+                "' ORDER BY c.timeCreated DESC",
                 new CosmosQueryRequestOptions(),
                 Project.class
             )
@@ -882,7 +882,7 @@ public class Database {
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId IN ('" +
                 String.join("', '", projectIds) +
-                "')",
+                "') ORDER BY c.timeCreated DESC",
                 new CosmosQueryRequestOptions(),
                 Project.class
             )
