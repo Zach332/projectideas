@@ -20,12 +20,13 @@ export default function JoinProject() {
             }
         });
         axios
-            .get("/api/ideas/" + params.id + "/projects", {
-                lookingForMembersOnly: true,
-            })
+            .get(
+                "/api/ideas/" +
+                    params.id +
+                    "/projects?lookingForMembersOnly=true"
+            )
             .then((response) => {
                 setProjects(response.data);
-                console.log(projects);
             });
     }, []);
 

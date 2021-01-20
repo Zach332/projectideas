@@ -56,12 +56,18 @@ export default function CreateProject() {
     };
 
     const handleInputChange = (event) => {
-        console.log(project);
         const target = event.target;
         const name = target.id;
         setProject((project) => ({
             ...project,
             [name]: target.value,
+        }));
+    };
+
+    const flipLookingForMembers = () => {
+        setProject((project) => ({
+            ...project,
+            lookingForMembers: !project.lookingForMembers,
         }));
     };
 
@@ -96,7 +102,7 @@ export default function CreateProject() {
                 <div className="form-group mt-2 mb-3">
                     <label htmlFor="description">
                         Description - if you are looking for new members, add
-                        any logistical details or team goals
+                        any important logistical details or team goals
                     </label>
                     <textarea
                         className="form-control"
@@ -110,14 +116,14 @@ export default function CreateProject() {
                         className="form-check-input"
                         type="checkbox"
                         id="lookingForMembers"
-                        onChange={handleInputChange}
-                        checked
+                        onClick={flipLookingForMembers}
+                        defaultChecked
                     />
                     <label
                         className="form-check-label"
                         htmlFor="lookingForMembers"
                     >
-                        Look for new members - your idea will show up as an
+                        Look for new members - your idea will appear as an
                         option if a user wants to join a team
                     </label>
                 </div>
