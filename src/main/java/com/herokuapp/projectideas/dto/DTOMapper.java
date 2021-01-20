@@ -96,6 +96,11 @@ public abstract class DTOMapper {
     }
 
     @Mapping(
+        target = "userIsTeamMember",
+        source = "project",
+        qualifiedByName = "userIsTeamMember"
+    )
+    @Mapping(
         target = "userHasRequestedToJoin",
         source = "project",
         qualifiedByName = "userHasRequestedToJoin"
