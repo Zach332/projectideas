@@ -4,6 +4,7 @@ import { Status } from "../../State";
 import NotFound from "./NotFound";
 import axios from "axios";
 import IdeaSummary from "./../IdeaSummary";
+import ProjectSummary from "./../ProjectSummary";
 
 export default function JoinProject() {
     const [idea, setIdea] = React.useState([]);
@@ -40,7 +41,16 @@ export default function JoinProject() {
 
     const existingProjects =
         projects.length > 0 ? (
-            <div></div>
+            <div className="mt-4">
+                <h4>Existing teams looking for members:</h4>
+                <div className="container mx-auto">
+                    {projects.map((project) => (
+                        <div className="my-2" key={project.id}>
+                            <ProjectSummary project={project} />
+                        </div>
+                    ))}
+                </div>
+            </div>
         ) : (
             <div>
                 No teams are looking for new members right now. Create a new
@@ -54,7 +64,6 @@ export default function JoinProject() {
             <div className="m-3">
                 <IdeaSummary idea={idea} />
             </div>
-            {existingProjects}
             <button
                 type="button"
                 onClick={createProject}
@@ -62,6 +71,7 @@ export default function JoinProject() {
             >
                 Create new project
             </button>
+            {existingProjects}
         </div>
     );
 }
