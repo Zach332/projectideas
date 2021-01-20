@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Status } from "../../State";
 import NotFound from "./NotFound";
+import Success from "../Success";
 import axios from "axios";
 import IdeaSummary from "./../IdeaSummary";
 import { useToasts } from "react-toast-notifications";
@@ -37,6 +38,11 @@ export default function CreateProject() {
             })
             .then(() => {
                 setStatus(Status.Success);
+                setProject({
+                    name: "",
+                    description: "",
+                    lookingForMembers: true,
+                });
             })
             .catch((err) => {
                 console.log("Error creating project: " + err);
@@ -59,6 +65,14 @@ export default function CreateProject() {
 
     if (status === Status.NotFound) {
         return <NotFound />;
+    }
+
+    if (status === Status.Success) {
+        return (
+            <div>
+                <Success />
+            </div>
+        );
     }
 
     return (
