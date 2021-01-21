@@ -1,11 +1,29 @@
 import React from "react";
+import axios from "axios";
+import { useToasts } from "react-toast-notifications";
 
 export default function ProjectSummary({ project }) {
+    const { addToast } = useToasts();
     var ideaLink = "/project/" + project.id;
     const MAX_LENGTH = 480;
     console.log(project);
 
     const sendJoinRequest = (event) => {
+        axios
+            .post("/api/projects/" + project.id + "/joinrequests")
+            .then(() => {
+                project.userHasRequestedToJoin = true;
+                addToast("Your request was submitted.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error submitting request: " + err);
+                addToast("Your request was not submitted. Please try again.", {
+                    appearance: "error",
+                });
+            });
         event.preventDefault();
     };
 
