@@ -36,4 +36,12 @@ public class Tag {
         "iot",
         "app",
     };
+
+    public static String[] STANDARD_PROJECT_TAGS = {
+        "website",
+        "app",
+        "python",
+        "java",
+        "c#",
+    };
 }
