@@ -28,13 +28,15 @@ public class Project {
     protected List<UsernameIdPair> teamMembers;
     protected boolean lookingForMembers;
     protected List<UsernameIdPair> usersRequestingToJoin;
+    protected List<String> tags;
 
     public Project(
         String name,
         String description,
         String ideaId,
         UsernameIdPair initialUser,
-        boolean lookingForMembers
+        boolean lookingForMembers,
+        List<String> tags
     ) {
         this.id = UUID.randomUUID().toString();
         this.type = "Project";
@@ -47,6 +49,7 @@ public class Project {
         this.teamMembers.add(initialUser);
         this.lookingForMembers = lookingForMembers;
         this.usersRequestingToJoin = new ArrayList<>();
+        this.tags = tags;
     }
 
     @JsonIgnore

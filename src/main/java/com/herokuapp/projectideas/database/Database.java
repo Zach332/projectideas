@@ -832,6 +832,14 @@ public class Database {
     // Projects
 
     public void createProject(Project project, String projectCreatorId) {
+        for (String tag : project.getTags()) {
+            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            if (existingTag.isPresent()) {
+                incrementTagUsages(tag, Tag.Type.Project);
+            } else {
+                createTag(new Tag(tag, Tag.Type.Project));
+            }
+        }
         projectContainer.createItem(project);
         User user = findUser(projectCreatorId).get();
         user.getJoinedProjectIds().add(project.getId());

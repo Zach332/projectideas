@@ -204,7 +204,8 @@ public class IdeaController {
                 project.getDescription(),
                 ideaId,
                 new UsernameIdPair(user),
-                project.isLookingForMembers()
+                project.isLookingForMembers(),
+                project.getTags()
             ),
             userId
         );

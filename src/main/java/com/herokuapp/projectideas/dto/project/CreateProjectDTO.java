@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.dto.project;
 
+import java.util.List;
 import lombok.*;
 
 @NoArgsConstructor
@@ -12,4 +13,5 @@ public class CreateProjectDTO {
     // Optional during project creation
     private String githubLink;
     private boolean lookingForMembers;
+    private List<String> tags;
 }
