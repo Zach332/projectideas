@@ -46,7 +46,7 @@ public class IdeaController {
 
     @GetMapping("/api/ideas")
     public PreviewIdeaPageDTO getIdeas(@RequestParam("page") int pageNum) {
-        int lastPageNum = database.getLastPageNum();
+        int lastPageNum = database.getLastIdeaPageNum();
 
         List<PreviewIdeaDTO> ideaPreviews;
         if (pageNum <= 0 || pageNum > lastPageNum) {
@@ -67,7 +67,7 @@ public class IdeaController {
         @RequestParam("page") int pageNum,
         @RequestParam("tag") String tag
     ) {
-        int lastPageNum = database.getLastPageNumForTag(tag);
+        int lastPageNum = database.getLastPageNumForIdeaTag(tag);
 
         List<PreviewIdeaDTO> ideaPreviews;
         if (pageNum <= 0 || pageNum > lastPageNum) {

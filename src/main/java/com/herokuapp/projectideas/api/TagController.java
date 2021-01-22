@@ -35,4 +35,11 @@ public class TagController {
     ) {
         return searchController.searchForIdeaTags(search);
     }
+
+    @GetMapping("/api/tags/suggested/project")
+    public List<String> getSuggestedProjectTags(
+        @RequestParam("search") String search
+    ) {
+        return searchController.searchForProjectTags(search);
+    }
 }

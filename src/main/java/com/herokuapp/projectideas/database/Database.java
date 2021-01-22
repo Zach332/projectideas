@@ -43,7 +43,7 @@ public class Database {
     @Autowired
     IndexController indexController;
 
-    public static final int IDEAS_PER_PAGE = 10;
+    public static final int ITEMS_PER_PAGE = 10;
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -364,23 +364,23 @@ public class Database {
             .get();
     }
 
-    public int getLastPageNum() {
+    public int getLastIdeaPageNum() {
         int numIdeas = getNumIdeas();
-        return ((numIdeas - 1) / IDEAS_PER_PAGE) + 1;
+        return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
     }
 
-    public int getLastPageNumForTag(String tag) {
+    public int getLastPageNumForIdeaTag(String tag) {
         int numIdeas = getNumIdeasForTag(tag);
-        return ((numIdeas - 1) / IDEAS_PER_PAGE) + 1;
+        return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
     }
 
     public List<Idea> findIdeasByPageNum(int pageNum) {
         return postContainer
             .queryItems(
                 "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC OFFSET " +
-                ((pageNum - 1) * IDEAS_PER_PAGE) +
+                ((pageNum - 1) * ITEMS_PER_PAGE) +
                 " LIMIT " +
-                IDEAS_PER_PAGE,
+                ITEMS_PER_PAGE,
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )
@@ -394,9 +394,9 @@ public class Database {
                 "SELECT * FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
                 tag +
                 "') ORDER BY c.timePosted DESC OFFSET " +
-                ((pageNum - 1) * IDEAS_PER_PAGE) +
+                ((pageNum - 1) * ITEMS_PER_PAGE) +
                 " LIMIT " +
-                IDEAS_PER_PAGE,
+                ITEMS_PER_PAGE,
                 new CosmosQueryRequestOptions(),
                 Idea.class
             )
@@ -878,6 +878,41 @@ public class Database {
                 "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
                 ideaId +
                 "' ORDER BY c.timeCreated DESC",
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    public int getNumProjectsForTag(String tag) {
+        return projectContainer
+            .queryItems(
+                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Project' AND ARRAY_CONTAINS(c.tags, '" +
+                tag +
+                "')",
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findFirst()
+            .get();
+    }
+
+    public int getLastPageNumForProjectTag(String tag) {
+        int numProjects = getNumProjectsForTag(tag);
+        return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
+    }
+
+    public List<Project> findProjectsByTagAndPageNum(String tag, int pageNum) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND ARRAY_CONTAINS(c.tags, '" +
+                tag +
+                "') ORDER BY c.timeCreated DESC OFFSET " +
+                ((pageNum - 1) * ITEMS_PER_PAGE) +
+                " LIMIT " +
+                ITEMS_PER_PAGE,
                 new CosmosQueryRequestOptions(),
                 Project.class
             )

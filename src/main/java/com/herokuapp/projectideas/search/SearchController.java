@@ -148,8 +148,8 @@ public class SearchController {
     ) {
         List<Idea> allResults = searchForIdea(queryString);
         List<Idea> pageResults = allResults.subList(
-            clamp((page - 1) * Database.IDEAS_PER_PAGE, allResults.size()),
-            clamp(page * Database.IDEAS_PER_PAGE, allResults.size())
+            clamp((page - 1) * Database.ITEMS_PER_PAGE, allResults.size()),
+            clamp(page * Database.ITEMS_PER_PAGE, allResults.size())
         );
         List<PreviewIdeaDTO> ideaPreviews = pageResults
             .stream()
@@ -157,12 +157,23 @@ public class SearchController {
             .collect(Collectors.toList());
         return new PreviewIdeaPageDTO(
             ideaPreviews,
-            page * Database.IDEAS_PER_PAGE >= allResults.size()
+            page * Database.ITEMS_PER_PAGE >= allResults.size()
         );
     }
 
     public List<String> searchForIdeaTags(String queryString) {
         List<Document> documents = searchTagIndex(queryString, Tag.Type.Idea);
+        return documents
+            .stream()
+            .map(doc -> doc.get("name"))
+            .collect(Collectors.toList());
+    }
+
+    public List<String> searchForProjectTags(String queryString) {
+        List<Document> documents = searchTagIndex(
+            queryString,
+            Tag.Type.Project
+        );
         return documents
             .stream()
             .map(doc -> doc.get("name"))
