@@ -74,6 +74,28 @@ public class ProjectController {
         database.updateProject(existingProject);
     }
 
+    @PutMapping("/api/projects/{projectId}/update")
+    public void updateLookingForMembers(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId,
+        @RequestParam("lookingForMembers") boolean lookingForMembers
+    ) {
+        Project existingProject = database
+            .getProject(projectId)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Project " + projectId + " does not exist."
+                    )
+            );
+        if (!existingProject.userIsTeamMember(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        existingProject.setLookingForMembers(lookingForMembers);
+        database.updateProject(existingProject);
+    }
+
     @PostMapping("/api/projects/{projectId}/joinrequests")
     public void requestToJoinProject(
         @RequestHeader("authorization") String userId,
