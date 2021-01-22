@@ -9,6 +9,7 @@ import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.project.ProjectJoinRequest;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.message.ViewReceivedGroupMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedIndividualMessageDTO;
@@ -25,6 +26,7 @@ import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
+import com.herokuapp.projectideas.dto.project.ViewProjectJoinRequestDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import org.mapstruct.Context;
@@ -135,6 +137,7 @@ public abstract class DTOMapper {
         source = "project",
         qualifiedByName = "userHasRequestedToJoin"
     )
+    @Mapping(target = "joinRequests", source = "usersRequestingToJoin")
     public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
         Project project,
         @Context String userId
@@ -155,6 +158,10 @@ public abstract class DTOMapper {
     ) {
         return project.userHasRequestedToJoin(userId);
     }
+
+    protected abstract ViewProjectJoinRequestDTO viewProjectJoinRequest(
+        ProjectJoinRequest projectJoinRequest
+    );
 
     // DTO updating existing document
 

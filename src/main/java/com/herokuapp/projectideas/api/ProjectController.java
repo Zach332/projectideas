@@ -2,12 +2,14 @@ package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.project.ProjectJoinRequest;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
+import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +131,8 @@ public class ProjectController {
     @PostMapping("/api/projects/{projectId}/joinrequests")
     public void requestToJoinProject(
         @RequestHeader("authorization") String userId,
-        @PathVariable String projectId
+        @PathVariable String projectId,
+        @RequestBody RequestToJoinProjectDTO request
     ) {
         Project project = database.getProject(projectId).get();
 
@@ -168,7 +171,9 @@ public class ProjectController {
             );
         }
 
-        project.getUsersRequestingToJoin().add(new UsernameIdPair(user));
+        project
+            .getUsersRequestingToJoin()
+            .add(new ProjectJoinRequest(user, request.getRequestMessage()));
         database.updateProject(project);
         database.sendGroupAdminMessage(
             projectId,

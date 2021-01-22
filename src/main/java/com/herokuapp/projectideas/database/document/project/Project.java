@@ -27,7 +27,7 @@ public class Project {
     protected String githubLink;
     protected List<UsernameIdPair> teamMembers;
     protected boolean lookingForMembers;
-    protected List<UsernameIdPair> usersRequestingToJoin;
+    protected List<ProjectJoinRequest> usersRequestingToJoin;
     protected List<String> tags;
 
     public Project(
@@ -66,7 +66,8 @@ public class Project {
         return usersRequestingToJoin
             .stream()
             .anyMatch(
-                usernameIdPair -> usernameIdPair.getUserId().equals(userId)
+                projectJoinRequest ->
+                    projectJoinRequest.getUserId().equals(userId)
             );
     }
 
@@ -82,7 +83,7 @@ public class Project {
     public List<String> getJoinRequestUsernames() {
         return usersRequestingToJoin
             .stream()
-            .map(usernameIdPair -> usernameIdPair.getUsername())
+            .map(projectJoinRequest -> projectJoinRequest.getUsername())
             .collect(Collectors.toList());
     }
 }

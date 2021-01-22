@@ -8,5 +8,5 @@ import lombok.*;
 @Setter
 public class ViewProjectAsTeamMemberDTO extends ViewProjectDTO {
 
-    private List<String> joinRequestUsernames;
+    private List<ViewProjectJoinRequestDTO> joinRequests;
 }
