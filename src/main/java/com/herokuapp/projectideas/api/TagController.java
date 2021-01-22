@@ -24,10 +24,22 @@ public class TagController {
         return Arrays.asList(Tag.STANDARD_IDEA_TAGS);
     }
 
+    @GetMapping("/api/tags/standard/project")
+    public List<String> getStandardProjectTags() {
+        return Arrays.asList(Tag.STANDARD_PROJECT_TAGS);
+    }
+
     @GetMapping("/api/tags/suggested/idea")
     public List<String> getSuggestedIdeaTags(
         @RequestParam("search") String search
     ) {
         return searchController.searchForIdeaTags(search);
+    }
+
+    @GetMapping("/api/tags/suggested/project")
+    public List<String> getSuggestedProjectTags(
+        @RequestParam("search") String search
+    ) {
+        return searchController.searchForProjectTags(search);
     }
 }

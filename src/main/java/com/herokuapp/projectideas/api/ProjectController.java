@@ -6,7 +6,12 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +32,31 @@ public class ProjectController {
 
     @Autowired
     DTOMapper mapper;
+
+    @GetMapping("/api/projects/tags")
+    public PreviewProjectPageDTO getProjectsByTag(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @RequestParam("page") int pageNum,
+        @RequestParam("tag") String tag
+    ) {
+        int lastPageNum = database.getLastPageNumForProjectTag(tag);
+
+        List<PreviewProjectDTO> projectPreviews;
+        if (pageNum <= 0 || pageNum > lastPageNum) {
+            projectPreviews = new ArrayList<>();
+        } else {
+            projectPreviews =
+                database
+                    .findProjectsByTagAndPageNum(tag, pageNum)
+                    .stream()
+                    .map(idea -> mapper.previewProjectDTO(idea, userId))
+                    .collect(Collectors.toList());
+        }
+        return new PreviewProjectPageDTO(
+            projectPreviews,
+            pageNum == lastPageNum
+        );
+    }
 
     @GetMapping("/api/projects/{projectId}")
     public ViewProjectDTO getProject(
