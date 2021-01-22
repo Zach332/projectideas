@@ -75,7 +75,7 @@ export default function Project() {
     return (
         <div>
             <div className="d-flex">
-                <div className="me-auto p-2">
+                <div className="me-auto">
                     <h1>{project.name}</h1>
                 </div>
                 <div className="d-flex align-items-center">
