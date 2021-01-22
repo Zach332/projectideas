@@ -8,7 +8,10 @@ import { useToasts } from "react-toast-notifications";
 export default function Project() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
-    const [project, setProject] = React.useState({ teamMemberUsernames: [] });
+    const [project, setProject] = React.useState({
+        teamMemberUsernames: [],
+        lookingForMembers: true,
+    });
     let params = useParams();
 
     useEffect(() => {
@@ -21,6 +24,32 @@ export default function Project() {
             }
         });
     }, []);
+
+    const flipLookingForMembers = () => {
+        axios
+            .put(
+                "/api/projects/" +
+                    project.id +
+                    "/update?lookingForMembers=" +
+                    !project.lookingForMembers
+            )
+            .then(() => {
+                setProject((project) => ({
+                    ...project,
+                    lookingForMembers: !project.lookingForMembers,
+                }));
+                addToast("Your project was changed successfully.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error changing lookingForMembers: " + err);
+                addToast("An error occurred. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
 
     const sendJoinRequest = (event) => {
         axios
@@ -97,6 +126,23 @@ export default function Project() {
                     ))}
                 </tbody>
             </table>
+            {project.userIsTeamMember && (
+                <div className="form-check form-switch">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="lookingForMembers"
+                        onChange={flipLookingForMembers}
+                        checked={project.lookingForMembers}
+                    />
+                    <label
+                        className="form-check-label"
+                        htmlFor="lookingForMembers"
+                    >
+                        Looking for new members
+                    </label>
+                </div>
+            )}
         </div>
     );
 }
