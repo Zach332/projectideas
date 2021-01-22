@@ -123,7 +123,7 @@ export default function CreateProject() {
                         className="form-check-label"
                         htmlFor="lookingForMembers"
                     >
-                        Look for new members - your idea will appear as an
+                        Look for new members - your project will appear as an
                         option if a user wants to join a team
                     </label>
                 </div>
