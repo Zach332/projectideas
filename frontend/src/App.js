@@ -18,6 +18,7 @@ import JoinProject from "./components/pages/JoinProject";
 import CreateProject from "./components/pages/CreateProject";
 import GitHubLogin from "./components/logins/Login";
 import LoginLanding from "./components/logins/LoginLanding";
+import MyProjects from "./components/pages/MyProjects";
 
 function App() {
     return (
@@ -28,6 +29,11 @@ function App() {
                     <div className="container mx-auto">
                         <Switch>
                             <Route path="/" exact component={Home} />
+                            <Route
+                                path="/projects"
+                                exact
+                                component={MyProjects}
+                            />
                             <Route
                                 path="/login"
                                 exact
