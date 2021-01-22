@@ -24,7 +24,6 @@ import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
-import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectJoinRequestDTO;
