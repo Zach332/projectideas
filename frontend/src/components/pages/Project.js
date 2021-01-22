@@ -11,6 +11,7 @@ export default function Project() {
     const [project, setProject] = React.useState({
         teamMemberUsernames: [],
         lookingForMembers: true,
+        githubLink: "",
     });
     let params = useParams();
 
@@ -97,6 +98,17 @@ export default function Project() {
         );
     }
 
+    var githubLink;
+    if (project.githubLink === "") {
+        if (project.userIsTeamMember) {
+            githubLink = <div></div>;
+        } else {
+            githubLink = <div></div>;
+        }
+    } else {
+        githubLink = <a href={githubLink}>{githubLink}</a>;
+    }
+
     if (status === Status.NotFound) {
         return <NotFound />;
     }
@@ -109,6 +121,7 @@ export default function Project() {
                 </div>
                 <div className="d-flex align-items-center">
                     {joinRequestButton}
+                    {githubLink}
                 </div>
             </div>
             <p style={{ whiteSpace: "pre-wrap" }}>{project.description}</p>
