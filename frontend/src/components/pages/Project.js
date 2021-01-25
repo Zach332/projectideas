@@ -124,6 +124,18 @@ export default function Project() {
                     {githubLink}
                 </div>
             </div>
+            {project.tags && project.tags.length > 0 && (
+                <div className="mw-100">
+                    {project.tags.map((tag) => (
+                        <span
+                            className="badge rounded-pill bg-dark me-2"
+                            key={tag}
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            )}
             <p style={{ whiteSpace: "pre-wrap" }}>{project.description}</p>
             <table className="table">
                 <thead className="thead-dark">
