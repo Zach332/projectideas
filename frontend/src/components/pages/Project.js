@@ -136,7 +136,9 @@ export default function Project() {
                     ))}
                 </div>
             )}
-            <p style={{ whiteSpace: "pre-wrap" }}>{project.description}</p>
+            <div className="card p-3 m-3" style={{ whiteSpace: "pre-wrap" }}>
+                {project.description}
+            </div>
             <table className="table">
                 <thead className="thead-dark">
                     <tr>
