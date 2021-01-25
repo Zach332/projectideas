@@ -102,7 +102,7 @@ export default function CreateProject() {
                 <div className="form-group mt-2 mb-3">
                     <label htmlFor="description">
                         Description - if you are looking for new members, add
-                        any important logistical details or team goals
+                        relevant logistical constraints or team goals
                     </label>
                     <textarea
                         className="form-control"
