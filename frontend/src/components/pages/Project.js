@@ -4,8 +4,10 @@ import axios from "axios";
 import NotFound from "./NotFound";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
+import { motion, AnimateSharedLayout } from "framer-motion";
 import ProjectJoinRequestButton from "../ProjectJoinRequestButton";
 import ProjectJoinRequestModal from "./../ProjectJoinRequestModal";
+import ProjectJoinRequestPreview from "./../ProjectJoinRequestPreview";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -15,6 +17,7 @@ export default function Project() {
         lookingForMembers: true,
         githubLink: "",
         id: "",
+        joinRequests: "",
     });
     let params = useParams();
 
@@ -91,6 +94,21 @@ export default function Project() {
                             {tag}
                         </span>
                     ))}
+                </div>
+            )}
+            {project.userIsTeamMember && project.joinRequests.length > 0 && (
+                <div className="mt-3">
+                    <AnimateSharedLayout>
+                        <h4>Join requests</h4>
+                        <motion.div layout className="container pt-2 mx-auto">
+                            {project.joinRequests.map((joinRequest) => (
+                                <ProjectJoinRequestPreview
+                                    key={joinRequest.username}
+                                    request={joinRequest}
+                                />
+                            ))}
+                        </motion.div>
+                    </AnimateSharedLayout>
                 </div>
             )}
             <div className="card p-3 m-3" style={{ whiteSpace: "pre-wrap" }}>
