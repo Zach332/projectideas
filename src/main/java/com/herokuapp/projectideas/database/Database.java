@@ -8,6 +8,7 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
+import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
@@ -16,6 +17,7 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
@@ -57,6 +59,27 @@ public class Database {
         tagContainer = database.getContainer(collectionPrefix + "_tags");
         projectContainer =
             database.getContainer(collectionPrefix + "_projects");
+    }
+
+    // Generic methods
+
+    private CosmosContainer getContainer(
+        Class<? extends RootDocument> classType
+    ) {
+        if (classType.isAssignableFrom(User.class)) {
+            return userContainer;
+        } else if (classType.isAssignableFrom(Post.class)) {
+            return postContainer;
+        } else if (classType.isAssignableFrom(Tag.class)) {
+            return tagContainer;
+        } else if (classType.isAssignableFrom(Project.class)) {
+            return projectContainer;
+        }
+        throw new IllegalArgumentException(
+            "The class " +
+            classType.getName() +
+            " does not have an associated CosmosContainer."
+        );
     }
 
     // Users
