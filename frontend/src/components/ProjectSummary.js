@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
+import { useLeavePageWarning } from "./hooks/LeavePageWarning";
 import Modal from "./Modal";
 
 export default function ProjectSummary({ project }) {
@@ -9,9 +10,13 @@ export default function ProjectSummary({ project }) {
     var ideaLink = "/project/" + project.id;
     const MAX_LENGTH = 480;
 
+    useLeavePageWarning(joinRequestMessage != "");
+
     const sendJoinRequest = (event) => {
         axios
-            .post("/api/projects/" + project.id + "/joinrequests")
+            .post("/api/projects/" + project.id + "/joinrequests", {
+                requestMessage: joinRequestMessage,
+            })
             .then(() => {
                 project.userHasRequestedToJoin = true;
                 addToast("Your request was submitted.", {
