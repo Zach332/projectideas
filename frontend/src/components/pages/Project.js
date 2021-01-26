@@ -97,10 +97,13 @@ export default function Project() {
                 </div>
             )}
             {project.userIsTeamMember && project.joinRequests.length > 0 && (
-                <div className="mt-3">
+                <div
+                    className="mt-3 p-2"
+                    style={{ backgroundColor: "#bdf1fc" }}
+                >
                     <AnimateSharedLayout>
                         <h4>Join requests</h4>
-                        <motion.div layout className="container pt-2 mx-auto">
+                        <motion.div layout className="container mx-auto">
                             {project.joinRequests.map((joinRequest) => (
                                 <ProjectJoinRequestPreview
                                     key={joinRequest.username}
@@ -111,9 +114,12 @@ export default function Project() {
                     </AnimateSharedLayout>
                 </div>
             )}
-            <div className="card p-3 m-3" style={{ whiteSpace: "pre-wrap" }}>
+            <br />
+            <hr />
+            <div className="p-2 m-3" style={{ whiteSpace: "pre-wrap" }}>
                 {project.description}
             </div>
+            <hr />
             <table className="table">
                 <thead className="thead-dark">
                     <tr>
