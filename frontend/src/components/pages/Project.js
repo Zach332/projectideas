@@ -4,6 +4,8 @@ import axios from "axios";
 import NotFound from "./NotFound";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
+import ProjectJoinRequestButton from "../ProjectJoinRequestButton";
+import ProjectJoinRequestModal from "./../ProjectJoinRequestModal";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -12,6 +14,7 @@ export default function Project() {
         teamMemberUsernames: [],
         lookingForMembers: true,
         githubLink: "",
+        id: "",
     });
     let params = useParams();
 
@@ -52,52 +55,6 @@ export default function Project() {
             });
     };
 
-    const sendJoinRequest = (event) => {
-        axios
-            .post("/api/projects/" + project.id + "/joinrequests")
-            .then(() => {
-                project.userHasRequestedToJoin = true;
-                addToast("Your request was submitted.", {
-                    appearance: "success",
-                    autoDismiss: true,
-                });
-            })
-            .catch((err) => {
-                console.log("Error submitting request: " + err);
-                addToast("Your request was not submitted. Please try again.", {
-                    appearance: "error",
-                });
-            });
-        event.preventDefault();
-    };
-
-    var joinRequestButton = <div></div>;
-    if (project.userIsTeamMember) {
-        joinRequestButton = <div></div>;
-    } else if (project.userHasRequestedToJoin) {
-        joinRequestButton = (
-            <button
-                className="btn btn-md btn-success"
-                disabled={true}
-                type="button"
-                id="requestToJoin"
-            >
-                Join request sent
-            </button>
-        );
-    } else if (project.lookingForMembers) {
-        joinRequestButton = (
-            <button
-                className="btn btn-md btn-primary"
-                type="button"
-                id="requestToJoin"
-                onClick={sendJoinRequest}
-            >
-                Request to join
-            </button>
-        );
-    }
-
     var githubLink;
     if (project.githubLink === "") {
         if (project.userIsTeamMember) {
@@ -120,7 +77,7 @@ export default function Project() {
                     <h1>{project.name}</h1>
                 </div>
                 <div className="d-flex align-items-center">
-                    {joinRequestButton}
+                    <ProjectJoinRequestButton project={project} />
                     {githubLink}
                 </div>
             </div>
@@ -170,6 +127,7 @@ export default function Project() {
                     </label>
                 </div>
             )}
+            <ProjectJoinRequestModal project={project} />
         </div>
     );
 }
