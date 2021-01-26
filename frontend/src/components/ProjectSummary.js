@@ -1,12 +1,13 @@
 import React from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
+import Modal from "./Modal";
 
 export default function ProjectSummary({ project }) {
     const { addToast } = useToasts();
+    const [joinRequestMessage, setJoinRequestMessage] = React.useState("");
     var ideaLink = "/project/" + project.id;
     const MAX_LENGTH = 480;
-    console.log(project);
 
     const sendJoinRequest = (event) => {
         axios
@@ -26,6 +27,25 @@ export default function ProjectSummary({ project }) {
             });
         event.preventDefault();
     };
+
+    const handleJoinRequestChange = (event) => {
+        setJoinRequestMessage(event.target.value);
+    };
+
+    const joinRequestForm = (
+        <div className="mx-auto">
+            <form className="py-4">
+                <textarea
+                    className="form-control"
+                    value={joinRequestMessage}
+                    id="content"
+                    rows="8"
+                    placeholder="Enter a message to request to join"
+                    onChange={handleJoinRequestChange}
+                ></textarea>
+            </form>
+        </div>
+    );
 
     var joinRequestButton = <div></div>;
     if (project.userIsTeamMember) {
@@ -47,7 +67,9 @@ export default function ProjectSummary({ project }) {
                 className="btn btn-sm btn-primary float-end"
                 type="button"
                 id="requestToJoin"
-                onClick={sendJoinRequest}
+                onClick={(event) => event.preventDefault()}
+                data-bs-toggle="modal"
+                data-bs-target={"#sendJoinRequest" + project.id}
             >
                 Request to join
             </button>
@@ -55,23 +77,32 @@ export default function ProjectSummary({ project }) {
     }
 
     return (
-        <a
-            href={ideaLink}
-            className="list-group-item list-group-item-action flex-column align-items-start rounded border"
-        >
-            {joinRequestButton}
-            <div className="d-flex justify-content-between">
-                <h5 className="mb-1">{project.name}</h5>
-            </div>
-            <p
-                className="mb-1"
-                style={{
-                    wordBreak: "break-word",
-                }}
+        <div>
+            <a
+                href={ideaLink}
+                className="list-group-item list-group-item-action flex-column align-items-start rounded border"
             >
-                {project.description.substring(0, MAX_LENGTH)}
-                {project.description.length > MAX_LENGTH && "..."}
-            </p>
-        </a>
+                <div>{joinRequestButton}</div>
+                <div className="d-flex justify-content-between">
+                    <h5 className="mb-1">{project.name}</h5>
+                </div>
+                <p
+                    className="mb-1"
+                    style={{
+                        wordBreak: "break-word",
+                    }}
+                >
+                    {project.description.substring(0, MAX_LENGTH)}
+                    {project.description.length > MAX_LENGTH && "..."}
+                </p>
+            </a>
+            <Modal
+                id={"sendJoinRequest" + project.id}
+                title={"Send join request to " + project.name}
+                body={joinRequestForm}
+                submit="Send"
+                onClick={sendJoinRequest}
+            />
+        </div>
     );
 }
