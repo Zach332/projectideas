@@ -16,7 +16,7 @@ export default function ProjectJoinRequestModal({ project }) {
                 requestMessage: joinRequestMessage,
             })
             .then(() => {
-                project.userHasRequestedToJoin = true;
+                setJoinRequestMessage("");
                 addToast("Your request was submitted.", {
                     appearance: "success",
                     autoDismiss: true,
