@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.database.document.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Project {
+public class Project implements RootDocument {
 
     protected String id;
     protected String type;

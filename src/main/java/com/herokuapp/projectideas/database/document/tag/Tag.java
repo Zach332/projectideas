@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.tag;
 
+import com.herokuapp.projectideas.database.document.RootDocument;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Tag {
+public class Tag implements RootDocument {
 
     protected String id;
     protected String name;
