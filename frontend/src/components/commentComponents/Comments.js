@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import Comment from "./Comment";
-import { useGlobalState } from "../State";
+import { useGlobalState } from "../../State";
 import { motion, AnimateSharedLayout } from "framer-motion";
 
 export default function Comments({ ideaId }) {

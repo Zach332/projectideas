@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import CheckMark from "../check.svg";
-import { useKeyPress } from "./hooks/Keys";
+import CheckMark from "../../check.svg";
+import { useKeyPress } from "../hooks/Keys";
 
 export default function Success() {
     const enterPress = useKeyPress("Enter");

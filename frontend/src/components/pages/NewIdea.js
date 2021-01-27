@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import Success from "../Success";
+import Success from "../general/Success";
 import LoginWarning from "../logins/LoginWarning";
 import {
     useGlobalState,
@@ -9,7 +9,7 @@ import {
     post,
 } from "../../State";
 import { useToasts } from "react-toast-notifications";
-import IdeaCard from "../IdeaCard";
+import IdeaCard from "../ideaComponents/IdeaCard";
 import { toQuery } from "../utils/Routing";
 
 export default function NewIdea() {

@@ -1,10 +1,10 @@
 import React from "react";
 import axios from "axios";
-import Modal from "./Modal";
-import { useLeavePageWarning } from "./hooks/LeavePageWarning";
+import Modal from "../layout/Modal";
+import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { motion } from "framer-motion";
 import { useToasts } from "react-toast-notifications";
-import { formatTime } from "../TimeFormatter";
+import { formatTime } from "../../TimeFormatter";
 
 export default function Message({ message, setRerender }) {
     const [messageToSend, setMessageToSend] = React.useState("");

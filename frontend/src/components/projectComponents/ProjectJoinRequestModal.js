@@ -1,8 +1,8 @@
 import React from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
-import { useLeavePageWarning } from "./hooks/LeavePageWarning";
-import Modal from "./Modal";
+import { useLeavePageWarning } from "../hooks/LeavePageWarning";
+import Modal from "../layout/Modal";
 
 export default function ProjectJoinRequestModal({ project, submitRequest }) {
     const { addToast } = useToasts();

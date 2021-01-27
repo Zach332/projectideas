@@ -5,9 +5,9 @@ import NotFound from "./NotFound";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import { motion, AnimateSharedLayout } from "framer-motion";
-import ProjectJoinRequestButton from "../ProjectJoinRequestButton";
-import ProjectJoinRequestModal from "./../ProjectJoinRequestModal";
-import ProjectJoinRequestPreview from "./../ProjectJoinRequestPreview";
+import ProjectJoinRequestButton from "../projectComponents/ProjectJoinRequestButton";
+import ProjectJoinRequestModal from "./../projectComponents/ProjectJoinRequestModal";
+import ProjectJoinRequestPreview from "../projectComponents/ProjectJoinRequestPreview";
 
 export default function Project() {
     const { addToast } = useToasts();

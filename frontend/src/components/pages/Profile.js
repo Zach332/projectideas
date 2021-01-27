@@ -3,7 +3,7 @@ import { login, logout, useGlobalState } from "../../State";
 import LoginWarning from "../logins/LoginWarning";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
-import IdeaSummary from "./../IdeaSummary";
+import IdeaSummary from "../ideaComponents/IdeaSummary";
 
 export default function Profile() {
     const { addToast } = useToasts();

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import IdeaSummary from "./../IdeaSummary";
+import IdeaSummary from "../ideaComponents/IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
 import Spinner from "../general/Spinner";

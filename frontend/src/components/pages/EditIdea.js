@@ -3,7 +3,7 @@ import axios from "axios";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
-import IdeaCard from "../IdeaCard";
+import IdeaCard from "../ideaComponents/IdeaCard";
 
 export default function EditIdea({ originalIdea, setStatus }) {
     const { addToast } = useToasts();

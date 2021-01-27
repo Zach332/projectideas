@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import { Status } from "../../State";
 import NotFound from "./NotFound";
 import axios from "axios";
-import IdeaSummary from "./../IdeaSummary";
-import ProjectSummary from "./../ProjectSummary";
+import IdeaSummary from "../ideaComponents/IdeaSummary";
+import ProjectSummary from "../projectComponents/ProjectSummary";
 
 export default function JoinProject() {
     const [idea, setIdea] = React.useState([]);

@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { useGlobalState } from "../State";
+import { useGlobalState } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import { motion } from "framer-motion";
 
