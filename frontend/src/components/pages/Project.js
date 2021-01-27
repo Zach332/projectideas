@@ -12,7 +12,6 @@ import ProjectJoinRequestPreview from "./../ProjectJoinRequestPreview";
 export default function Project() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
-    const [rerender, setRerender] = React.useState(0);
     const [project, setProject] = React.useState({
         teamMemberUsernames: [],
         lookingForMembers: true,
@@ -63,11 +62,19 @@ export default function Project() {
         setProject({
             ...project,
             teamMemberUsernames: project.teamMemberUsernames.concat([username]),
+            joinRequests: project.joinRequests.filter(
+                (request) => request.username !== username
+            ),
         });
     };
 
-    const denyRequest = () => {
-        setRerender(rerender + 1);
+    const denyRequest = (username) => {
+        setProject({
+            ...project,
+            joinRequests: project.joinRequests.filter(
+                (request) => request.username !== username
+            ),
+        });
     };
 
     var githubLink;

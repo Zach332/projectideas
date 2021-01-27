@@ -28,7 +28,7 @@ export default function ProjectJoinRequestPreview({
                         appearance: "success",
                     });
                 } else {
-                    denyRequest();
+                    denyRequest(request.username);
                 }
             })
             .catch((err) => {
