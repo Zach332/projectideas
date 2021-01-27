@@ -216,6 +216,11 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        // Do not accept request for existing memeber
+        if (project.getJoinRequestUsernames().contains(newTeamMemberUsername)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         project
             .getUsersRequestingToJoin()
             .removeIf(
