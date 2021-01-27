@@ -140,12 +140,11 @@ export default function Project() {
                     </AnimateSharedLayout>
                 </div>
             )}
-            <br />
-            <hr />
-            <div className="p-2 m-3" style={{ whiteSpace: "pre-wrap" }}>
-                {project.description}
-            </div>
-            <hr />
+            {project.description !== "" && (
+                <div className="p-2 m-3" style={{ whiteSpace: "pre-wrap" }}>
+                    {project.description}
+                </div>
+            )}
             <table className="table">
                 <thead className="thead-dark">
                     <tr>
