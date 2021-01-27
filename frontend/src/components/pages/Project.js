@@ -12,6 +12,7 @@ import ProjectJoinRequestPreview from "./../ProjectJoinRequestPreview";
 export default function Project() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
+    const [rerender, setRerender] = React.useState(0);
     const [project, setProject] = React.useState({
         teamMemberUsernames: [],
         lookingForMembers: true,
@@ -27,10 +28,9 @@ export default function Project() {
                 setStatus(Status.NotFound);
             } else {
                 setProject(response.data);
-                console.log(response.data);
             }
         });
-    }, []);
+    }, [rerender]);
 
     const flipLookingForMembers = () => {
         axios
@@ -75,6 +75,10 @@ export default function Project() {
                 (request) => request.username !== username
             ),
         });
+    };
+
+    const submitRequest = () => {
+        setRerender((rerender) => rerender + 1);
     };
 
     var githubLink;
@@ -173,7 +177,10 @@ export default function Project() {
                     </label>
                 </div>
             )}
-            <ProjectJoinRequestModal project={project} />
+            <ProjectJoinRequestModal
+                project={project}
+                submitRequest={submitRequest}
+            />
         </div>
     );
 }
