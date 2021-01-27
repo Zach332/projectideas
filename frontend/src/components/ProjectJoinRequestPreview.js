@@ -26,6 +26,7 @@ export default function ProjectJoinRequestPreview({
                     acceptRequest(request.username);
                     addToast("Member added successfully.", {
                         appearance: "success",
+                        autoDismiss: true,
                     });
                 } else {
                     denyRequest(request.username);
