@@ -4,7 +4,7 @@ import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "./hooks/LeavePageWarning";
 import Modal from "./Modal";
 
-export default function ProjectJoinRequestModal({ project }) {
+export default function ProjectJoinRequestModal({ project, submitRequest }) {
     const { addToast } = useToasts();
     const [joinRequestMessage, setJoinRequestMessage] = React.useState("");
 
@@ -17,6 +17,7 @@ export default function ProjectJoinRequestModal({ project }) {
             })
             .then(() => {
                 setJoinRequestMessage("");
+                submitRequest();
                 addToast("Your request was submitted.", {
                     appearance: "success",
                     autoDismiss: true,

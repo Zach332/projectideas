@@ -2,7 +2,11 @@ import React from "react";
 import ProjectJoinRequestButton from "./ProjectJoinRequestButton";
 import ProjectJoinRequestModal from "./ProjectJoinRequestModal";
 
-export default function ProjectSummary({ project }) {
+export default function ProjectSummary({ project, setRerender }) {
+    const submitRequest = () => {
+        setRerender((rerender) => rerender + 1);
+    };
+
     var ideaLink = "/project/" + project.id;
     const MAX_LENGTH = 480;
 
@@ -28,7 +32,10 @@ export default function ProjectSummary({ project }) {
                     {project.description.length > MAX_LENGTH && "..."}
                 </p>
             </a>
-            <ProjectJoinRequestModal project={project} />
+            <ProjectJoinRequestModal
+                project={project}
+                submitRequest={submitRequest}
+            />
         </div>
     );
 }

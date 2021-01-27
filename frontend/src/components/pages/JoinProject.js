@@ -8,6 +8,7 @@ import ProjectSummary from "./../ProjectSummary";
 
 export default function JoinProject() {
     const [idea, setIdea] = React.useState([]);
+    const [rerender, setRerender] = React.useState(0);
     const [projects, setProjects] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     let params = useParams();
@@ -29,7 +30,7 @@ export default function JoinProject() {
             .then((response) => {
                 setProjects(response.data);
             });
-    }, []);
+    }, [rerender]);
 
     const createProject = () => {
         window.location.href = "/create/idea/" + idea.id;
@@ -46,7 +47,10 @@ export default function JoinProject() {
                 <div className="container mx-auto">
                     {projects.map((project) => (
                         <div className="my-2" key={project.id}>
-                            <ProjectSummary project={project} />
+                            <ProjectSummary
+                                project={project}
+                                setRerender={setRerender}
+                            />
                         </div>
                     ))}
                 </div>
