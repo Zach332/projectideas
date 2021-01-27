@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,6 +48,15 @@ public class Database {
     IndexController indexController;
 
     public static final int ITEMS_PER_PAGE = 10;
+
+    private static final String USER_CONTAINER_PARTITION_KEY = "userId";
+    private static final String POST_CONTAINER_PARTITION_KEY = "ideaId";
+    private static final String TAG_CONTAINER_PARTITION_KEY = "name";
+    private static final String PROJECT_CONTAINER_PARTITION_KEY = "projectId";
+
+    private Reflections reflections = new Reflections(
+        "com.herokuapp.projectideas.database"
+    );
 
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
@@ -80,6 +91,91 @@ public class Database {
             classType.getName() +
             " does not have an associated CosmosContainer."
         );
+    }
+
+    private String getPartitionKey(Class<? extends RootDocument> classType) {
+        if (classType.isAssignableFrom(User.class)) {
+            return USER_CONTAINER_PARTITION_KEY;
+        } else if (classType.isAssignableFrom(Post.class)) {
+            return POST_CONTAINER_PARTITION_KEY;
+        } else if (classType.isAssignableFrom(Tag.class)) {
+            return TAG_CONTAINER_PARTITION_KEY;
+        } else if (classType.isAssignableFrom(Project.class)) {
+            return PROJECT_CONTAINER_PARTITION_KEY;
+        }
+        throw new IllegalArgumentException(
+            "The class " +
+            classType.getName() +
+            " does not have an associated partition key."
+        );
+    }
+
+    private <T extends RootDocument> Optional<T> getDocumentById(
+        String id,
+        Class<T> classType
+    ) {
+        return getContainer(classType)
+            .queryItems(
+                "SELECT * FROM c WHERE c.id = '" +
+                id +
+                "' AND " +
+                getTypeFilterClause(classType),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .findFirst();
+    }
+
+    private <T extends RootDocument> Optional<T> getDocumentByIdAndPartitionKey(
+        String id,
+        String partitionKey,
+        Class<T> classType
+    ) {
+        return getContainer(classType)
+            .queryItems(
+                "SELECT * FROM c WHERE c.id = '" +
+                id +
+                "' AND c." +
+                getPartitionKey(classType) +
+                " = '" +
+                partitionKey +
+                "' AND " +
+                getTypeFilterClause(classType),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .findFirst();
+    }
+
+    private <T extends RootDocument> Optional<T> getDocumentByPartitionKey(
+        String partitionKey,
+        Class<T> classType
+    ) {
+        return getContainer(classType)
+            .queryItems(
+                "SELECT * FROM c WHERE c." +
+                getPartitionKey(classType) +
+                " = '" +
+                partitionKey +
+                "' AND " +
+                getTypeFilterClause(classType),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .findFirst();
+    }
+
+    private <T> String getTypeFilterClause(Class<T> classType) {
+        Set<Class<? extends T>> classes = reflections.getSubTypesOf(classType);
+        List<String> subClassNames = classes
+            .stream()
+            .map(subClassType -> subClassType.getSimpleName())
+            .collect(Collectors.toList());
+
+        return "c.type IN (" + String.join(", ", subClassNames) + ")";
     }
 
     // Users
