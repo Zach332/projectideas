@@ -1,7 +1,44 @@
 import React from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { useToasts } from "react-toast-notifications";
 
-export default function ProjectJoinRequestPreview({ request }) {
+export default function ProjectJoinRequestPreview({
+    request,
+    project,
+    acceptRequest,
+    denyRequest,
+}) {
+    const { addToast } = useToasts();
+
+    const respondToJoinRequest = (accept) => {
+        axios
+            .post(
+                "/api/projects/" +
+                    project.id +
+                    "/joinrequests/" +
+                    request.username +
+                    "?accept=" +
+                    accept
+            )
+            .then(() => {
+                if (accept) {
+                    acceptRequest(request.username);
+                    addToast("Member added successfully.", {
+                        appearance: "success",
+                    });
+                } else {
+                    denyRequest();
+                }
+            })
+            .catch((err) => {
+                console.log("Error responding to join request: " + err);
+                addToast("An error occurred. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
     return (
         <motion.div
             layout
@@ -32,8 +69,18 @@ export default function ProjectJoinRequestPreview({ request }) {
                     className="dropdown-menu"
                     aria-labelledby="dropdownMenuButton"
                 >
-                    <a className="dropdown-item">Accept</a>
-                    <a className="dropdown-item text-danger">Deny</a>
+                    <a
+                        className="dropdown-item"
+                        onClick={() => respondToJoinRequest(true)}
+                    >
+                        Accept
+                    </a>
+                    <a
+                        className="dropdown-item text-danger"
+                        onClick={() => respondToJoinRequest(false)}
+                    >
+                        Deny
+                    </a>
                 </div>
             </div>
             <h6 className="card-subtitle my-2">{"From " + request.username}</h6>
