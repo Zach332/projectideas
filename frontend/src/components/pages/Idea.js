@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import Success from "../general/Success";
-import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { useParams } from "react-router-dom";
 import { toQuery } from "../utils/Routing";
 import axios from "axios";
@@ -8,8 +7,8 @@ import IdeaCard from "../ideaComponents/IdeaCard";
 import NotFound from "./NotFound";
 import EditIdea from "./EditIdea";
 import Comments from "../commentComponents/Comments";
-import LoginWarning from "../logins/LoginWarning";
 import Modal from "../layout/Modal";
+import SendMessageModal from "../messageComponents/SendMessageModal";
 import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import { formatTime } from "../../TimeFormatter";
@@ -18,11 +17,8 @@ export default function Idea() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
     const [idea, setIdea] = React.useState([]);
-    const [message, setMessage] = React.useState("");
     const [user] = useGlobalState("user");
     let params = useParams();
-
-    useLeavePageWarning(message != "");
 
     useEffect(() => {
         axios.get("/api/ideas/" + params.id).then((response) => {
@@ -47,30 +43,6 @@ export default function Idea() {
             .catch((err) => {
                 console.log("Error deleting idea: " + err);
                 addToast("Your idea was not deleted. Please try again.", {
-                    appearance: "error",
-                });
-            });
-    };
-
-    const handleMessageChange = (event) => {
-        setMessage(event.target.value);
-    };
-
-    const sendMessage = () => {
-        axios
-            .post("/api/messages/" + idea.authorUsername, {
-                content: message,
-            })
-            .then(() => {
-                addToast("Your message was sent.", {
-                    appearance: "success",
-                    autoDismiss: true,
-                });
-                setMessage("");
-            })
-            .catch((err) => {
-                console.log("Error submitting message: " + err);
-                addToast("Your message was not sent. Please try again.", {
                     appearance: "error",
                 });
             });
@@ -177,23 +149,6 @@ export default function Idea() {
         );
     }
 
-    const messageForm = user.loggedIn ? (
-        <div className="mx-auto">
-            <form className="py-4">
-                <textarea
-                    className="form-control"
-                    value={message}
-                    id="content"
-                    rows="8"
-                    placeholder="Your message"
-                    onChange={handleMessageChange}
-                ></textarea>
-            </form>
-        </div>
-    ) : (
-        <LoginWarning />
-    );
-
     return (
         <div className="container-fluid">
             <div className="row justify-content-center">
@@ -276,13 +231,9 @@ export default function Idea() {
                 submit="Delete"
                 onClick={deleteIdea}
             />
-            <Modal
+            <SendMessageModal
+                recipient={idea.authorUsername}
                 id="sendMessage"
-                title={"Send message to " + idea.authorUsername}
-                body={messageForm}
-                submit="Send"
-                onClick={sendMessage}
-                customFooter={user.loggedIn ? null : <div></div>}
             />
         </div>
     );

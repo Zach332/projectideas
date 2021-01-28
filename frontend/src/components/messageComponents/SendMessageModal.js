@@ -3,8 +3,11 @@ import axios from "axios";
 import Modal from "../layout/Modal";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { useToasts } from "react-toast-notifications";
+import LoginWarning from "./../logins/LoginWarning";
+import { useGlobalState } from "../../State";
 
-export default function MessageModals({ recipient, id }) {
+export default function SendMessageModal({ recipient, id }) {
+    const [user] = useGlobalState("user");
     const [messageToSend, setMessageToSend] = React.useState("");
 
     useLeavePageWarning(messageToSend != "");
@@ -15,7 +18,7 @@ export default function MessageModals({ recipient, id }) {
         setMessageToSend(event.target.value);
     };
 
-    const messageForm = (
+    const messageForm = user.loggedIn ? (
         <div className="mx-auto">
             <form className="py-4">
                 <textarea
@@ -28,6 +31,8 @@ export default function MessageModals({ recipient, id }) {
                 ></textarea>
             </form>
         </div>
+    ) : (
+        <LoginWarning />
     );
 
     const sendMessage = () => {
@@ -53,11 +58,12 @@ export default function MessageModals({ recipient, id }) {
     return (
         <div>
             <Modal
-                id={"sendMessage" + id}
+                id={id}
                 title={"Send message to " + recipient}
                 body={messageForm}
                 submit="Send"
                 onClick={sendMessage}
+                customFooter={user.loggedIn ? null : <div></div>}
             />
         </div>
     );
