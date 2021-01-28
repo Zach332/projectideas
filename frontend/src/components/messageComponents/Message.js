@@ -69,7 +69,7 @@ export default function Message({ message, setRerender }) {
                     <a
                         className="dropdown-item text-danger"
                         data-bs-toggle="modal"
-                        data-bs-target={"#" + message.id}
+                        data-bs-target={"#deleteMessage" + message.id}
                     >
                         Delete message
                     </a>
