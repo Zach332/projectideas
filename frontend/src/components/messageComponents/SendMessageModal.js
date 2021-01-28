@@ -6,7 +6,12 @@ import { useToasts } from "react-toast-notifications";
 import LoginWarning from "./../logins/LoginWarning";
 import { useGlobalState } from "../../State";
 
-export default function SendMessageModal({ recipient, id }) {
+export default function SendMessageModal({
+    recipient,
+    id,
+    recipientId,
+    isProject,
+}) {
     const [user] = useGlobalState("user");
     const [messageToSend, setMessageToSend] = React.useState("");
 
@@ -36,8 +41,14 @@ export default function SendMessageModal({ recipient, id }) {
     );
 
     const sendMessage = () => {
+        let api;
+        if (isProject) {
+            api = "/api/messages/projects/" + recipientId;
+        } else {
+            api = "/api/messages/" + recipient;
+        }
         axios
-            .post("/api/messages/" + recipient, {
+            .post(api, {
                 content: messageToSend,
             })
             .then(() => {
