@@ -38,6 +38,7 @@ export default function MessageModals({ recipient, id }) {
             .then(() => {
                 addToast("Your message was sent.", {
                     appearance: "success",
+                    autoDismiss: true,
                 });
                 setMessageToSend("");
             })
