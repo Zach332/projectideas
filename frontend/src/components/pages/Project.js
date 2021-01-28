@@ -8,6 +8,7 @@ import { motion, AnimateSharedLayout } from "framer-motion";
 import ProjectJoinRequestButton from "../projectComponents/ProjectJoinRequestButton";
 import ProjectJoinRequestModal from "./../projectComponents/ProjectJoinRequestModal";
 import ProjectJoinRequestPreview from "../projectComponents/ProjectJoinRequestPreview";
+import SendMessageModal from "../messageComponents/SendMessageModal";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -119,6 +120,16 @@ export default function Project() {
                     ))}
                 </div>
             )}
+            {
+                <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#sendMessage"
+                    className="btn btn-outline-secondary btn-md my-2"
+                >
+                    Message team
+                </button>
+            }
             {project.userIsTeamMember && project.joinRequests.length > 0 && (
                 <div
                     className="mt-3 p-2"
@@ -179,6 +190,12 @@ export default function Project() {
             <ProjectJoinRequestModal
                 project={project}
                 submitRequest={submitRequest}
+            />
+            <SendMessageModal
+                recipient={project.name}
+                recipientId={project.id}
+                id="sendMessage"
+                isProject={true}
             />
         </div>
     );
