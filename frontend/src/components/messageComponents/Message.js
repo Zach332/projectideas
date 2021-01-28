@@ -31,6 +31,7 @@ export default function Message({ message, setRerender }) {
         <motion.div
             layout
             className="list-group-item flex-column align-items-start my-2 rounded border"
+            style={message.groupMessage && { backgroundColor: "#bdf1fc" }}
         >
             <div className="dropdown">
                 <button
@@ -82,8 +83,14 @@ export default function Message({ message, setRerender }) {
                     </span>
                 )}
                 {message.senderUsername != null
-                    ? "From " + message.senderUsername
-                    : "To " + message.recipientUsername}
+                    ? "From " +
+                      message.senderUsername +
+                      (message.groupMessage &&
+                          " to team: " + message.recipientProjectName)
+                    : "To " +
+                      (message.groupMessage
+                          ? "team: " + message.recipientProjectName
+                          : message.recipientUsername)}
                 <span className="text-muted">
                     {" "}
                     {formatTime(message.timeSent)}
