@@ -67,6 +67,15 @@ export default function Message({ message, setRerender }) {
                     >
                         Reply
                     </a>
+                    {message.groupMessage && (
+                        <a
+                            className="dropdown-item"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#sendGroupMessage" + message.id}
+                        >
+                            Reply all
+                        </a>
+                    )}
                     <a
                         className="dropdown-item text-danger"
                         data-bs-toggle="modal"
@@ -113,6 +122,12 @@ export default function Message({ message, setRerender }) {
                         : message.recipientUsername
                 }
                 id={message.id}
+            />
+            <SendMessageModal
+                recipient={message.recipientProjectName}
+                recipientId={message.recipientProjectId}
+                id={"sendGroupMessage" + message.id}
+                isProject={true}
             />
         </motion.div>
     );
