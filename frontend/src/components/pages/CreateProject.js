@@ -88,7 +88,7 @@ export default function CreateProject() {
 
     return (
         <div>
-            <h1>Start a project for idea:</h1>
+            <h1>Start a project based on:</h1>
             <div className="m-3">
                 <IdeaSummary idea={idea} />
             </div>
