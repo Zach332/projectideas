@@ -12,7 +12,7 @@ import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../ideaComponents/IdeaCard";
 import TagPicker from "../tagComponents/TagPicker";
 
-export default function NewIdea() {
+export default function CreateIdea() {
     const { addToast } = useToasts();
     const [idea, setIdea] = React.useState({
         title: "",

@@ -9,7 +9,7 @@ import NotFound from "./components/pages/NotFound";
 import Idea from "./components/pages/Idea";
 import Project from "./components/pages/Project";
 import Profile from "./components/pages/Profile";
-import NewIdea from "./components/pages/NewIdea";
+import CreateIdea from "./components/pages/CreateIdea";
 import Messages from "./components/pages/Messages";
 import Markdown from "./components/pages/Markdown";
 import Search from "./components/pages/Search";
@@ -44,7 +44,11 @@ function App() {
                                 exact
                                 component={LoginLanding}
                             />
-                            <Route path="/new-idea" exact component={NewIdea} />
+                            <Route
+                                path="/new-idea"
+                                exact
+                                component={CreateIdea}
+                            />
                             <Route path="/search" exact component={Search} />
                             <Route path="/tags" exact component={Tags} />
                             <Route path="/about" exact component={About} />
