@@ -8,7 +8,6 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
-import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
@@ -17,19 +16,17 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
-import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,15 +46,6 @@ public class Database {
 
     public static final int ITEMS_PER_PAGE = 10;
 
-    private static final String USER_CONTAINER_PARTITION_KEY = "userId";
-    private static final String POST_CONTAINER_PARTITION_KEY = "ideaId";
-    private static final String TAG_CONTAINER_PARTITION_KEY = "name";
-    private static final String PROJECT_CONTAINER_PARTITION_KEY = "projectId";
-
-    private Reflections reflections = new Reflections(
-        "com.herokuapp.projectideas.database"
-    );
-
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
         @Value("${azure.cosmos.key}") String key,
@@ -72,127 +60,18 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
-    // Generic methods
-
-    private CosmosContainer getContainer(
-        Class<? extends RootDocument> classType
-    ) {
-        if (classType.isAssignableFrom(User.class)) {
-            return userContainer;
-        } else if (classType.isAssignableFrom(Post.class)) {
-            return postContainer;
-        } else if (classType.isAssignableFrom(Tag.class)) {
-            return tagContainer;
-        } else if (classType.isAssignableFrom(Project.class)) {
-            return projectContainer;
-        }
-        throw new IllegalArgumentException(
-            "The class " +
-            classType.getName() +
-            " does not have an associated CosmosContainer."
-        );
-    }
-
-    private String getPartitionKey(Class<? extends RootDocument> classType) {
-        if (classType.isAssignableFrom(User.class)) {
-            return USER_CONTAINER_PARTITION_KEY;
-        } else if (classType.isAssignableFrom(Post.class)) {
-            return POST_CONTAINER_PARTITION_KEY;
-        } else if (classType.isAssignableFrom(Tag.class)) {
-            return TAG_CONTAINER_PARTITION_KEY;
-        } else if (classType.isAssignableFrom(Project.class)) {
-            return PROJECT_CONTAINER_PARTITION_KEY;
-        }
-        throw new IllegalArgumentException(
-            "The class " +
-            classType.getName() +
-            " does not have an associated partition key."
-        );
-    }
-
-    private <T extends RootDocument> Optional<T> getDocumentById(
-        String id,
-        Class<T> classType
-    ) {
-        return getContainer(classType)
-            .queryItems(
-                "SELECT * FROM c WHERE c.id = '" +
-                id +
-                "' AND " +
-                getTypeFilterClause(classType),
-                new CosmosQueryRequestOptions(),
-                classType
-            )
-            .stream()
-            .findFirst();
-    }
-
-    private <T extends RootDocument> Optional<T> getDocumentByIdAndPartitionKey(
-        String id,
-        String partitionKey,
-        Class<T> classType
-    ) {
-        return getContainer(classType)
-            .queryItems(
-                "SELECT * FROM c WHERE c.id = '" +
-                id +
-                "' AND c." +
-                getPartitionKey(classType) +
-                " = '" +
-                partitionKey +
-                "' AND " +
-                getTypeFilterClause(classType),
-                new CosmosQueryRequestOptions(),
-                classType
-            )
-            .stream()
-            .findFirst();
-    }
-
-    private <T extends RootDocument> Optional<T> getDocumentByPartitionKey(
-        String partitionKey,
-        Class<T> classType
-    ) {
-        return getContainer(classType)
-            .queryItems(
-                "SELECT * FROM c WHERE c." +
-                getPartitionKey(classType) +
-                " = '" +
-                partitionKey +
-                "' AND " +
-                getTypeFilterClause(classType),
-                new CosmosQueryRequestOptions(),
-                classType
-            )
-            .stream()
-            .findFirst();
-    }
-
-    private <T> String getTypeFilterClause(Class<T> classType) {
-        Set<Class<? extends T>> classes = reflections.getSubTypesOf(classType);
-        List<String> subClassNames = classes
-            .stream()
-            .map(subClassType -> subClassType.getSimpleName())
-            .collect(Collectors.toList());
-
-        return "c.type IN (" + String.join(", ", subClassNames) + ")";
-    }
-
     // Users
 
     public void createUser(User user) {
         userContainer.createItem(user);
     }
 
-    public Optional<User> findUser(String id) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.userId = '" + id + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst();
+    public Optional<User> getUser(String userId) {
+        return GenericQueries.getDocumentByPartitionKey(
+            userContainer,
+            userId,
+            User.class
+        );
     }
 
     public Optional<User> findUserByEmail(String email) {
@@ -217,20 +96,7 @@ public class Database {
             .findFirst();
     }
 
-    public String getUsernameFromId(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.username FROM c WHERE c.type = 'User' AND c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .findFirst()
-            .get();
-    }
-
+    // TODO: Change this to a future call to getDocumentWithParameters
     public boolean containsUserWithUsername(String username) {
         return (
             userContainer
@@ -249,7 +115,7 @@ public class Database {
     }
 
     public void updateUser(String id, User user) {
-        User oldUser = findUser(id).get();
+        User oldUser = getUser(id).get();
 
         // Handle username denormalization
         if (!user.getUsername().equals(oldUser.getUsername())) {
@@ -316,7 +182,7 @@ public class Database {
     }
 
     public void saveIdeaForUser(String ideaId, String userId) {
-        User user = findUser(userId).get();
+        User user = getUser(userId).get();
         if (!user.getSavedIdeaIds().contains(ideaId)) {
             user.getSavedIdeaIds().add(ideaId);
         }
@@ -329,7 +195,7 @@ public class Database {
     }
 
     public void unsaveIdeaForUser(String ideaId, String userId) {
-        User user = findUser(userId).get();
+        User user = getUser(userId).get();
         user.getSavedIdeaIds().remove(ideaId);
         userContainer.replaceItem(
             user,
@@ -451,7 +317,7 @@ public class Database {
             }
         }
         postContainer.createItem(idea);
-        User user = findUser(idea.getAuthorId()).get();
+        User user = getUser(idea.getAuthorId()).get();
         user.getPostedIdeaIds().add(idea.getId());
         updateUser(idea.getAuthorId(), user);
         indexController.tryIndexIdea(idea);
@@ -537,16 +403,11 @@ public class Database {
     }
 
     public Optional<Idea> findIdea(String id) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId = '" +
-                id +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .findFirst();
+        return GenericQueries.getDocumentByPartitionKey(
+            postContainer,
+            id,
+            Idea.class
+        );
     }
 
     public void updateIdea(Idea idea) {
@@ -581,7 +442,7 @@ public class Database {
         indexController.tryDeleteIdea(ideaId);
 
         // Remove ideaId from author's postedIdeaIds list
-        User user = findUser(userId).get();
+        User user = getUser(userId).get();
         user.getPostedIdeaIds().remove(ideaId);
         updateUser(userId, user);
     }
@@ -647,7 +508,7 @@ public class Database {
         String recipientUsername,
         String content
     ) {
-        User sender = findUser(senderId).get();
+        User sender = getUser(senderId).get();
         User recipient = findUserByUsername(recipientUsername).get();
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
@@ -679,7 +540,7 @@ public class Database {
         String recipientProjectId,
         String content
     ) {
-        User sender = findUser(senderId).get();
+        User sender = getUser(senderId).get();
         Project recipientProject = getProject(recipientProjectId).get();
         for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
             String recipientId = recipient.getUserId();
@@ -727,19 +588,12 @@ public class Database {
         String recipientId,
         String messageId
     ) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.userId = '" +
-                recipientId +
-                "' AND c.id = '" +
-                messageId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                ReceivedMessage.class
-            )
-            .stream()
-            .findFirst();
+        return GenericQueries.getDocumentByIdAndPartitionKey(
+            userContainer,
+            messageId,
+            recipientId,
+            ReceivedMessage.class
+        );
     }
 
     public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
@@ -960,22 +814,17 @@ public class Database {
             }
         }
         projectContainer.createItem(project);
-        User user = findUser(projectCreatorId).get();
+        User user = getUser(projectCreatorId).get();
         user.getJoinedProjectIds().add(project.getId());
         updateUser(projectCreatorId, user);
     }
 
     public Optional<Project> getProject(String projectId) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId = '" +
-                projectId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .findFirst();
+        return GenericQueries.getDocumentByPartitionKey(
+            projectContainer,
+            projectId,
+            Project.class
+        );
     }
 
     public List<Project> getProjectsBasedOnIdea(String ideaId) {

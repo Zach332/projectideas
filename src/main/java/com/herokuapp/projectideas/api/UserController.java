@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("/api/users/{id}")
     public ViewUserDTO getUser(@PathVariable String id) {
         User user = database
-            .findUser(id)
+            .getUser(id)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -88,7 +88,7 @@ public class UserController {
         @RequestBody CreateUserDTO user
     ) {
         User existingUser = database
-            .findUser(id)
+            .getUser(id)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
