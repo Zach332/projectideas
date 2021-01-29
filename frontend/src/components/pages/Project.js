@@ -89,7 +89,26 @@ export default function Project() {
         setStatus(Status.NotSubmitted);
     };
 
-    const leave = () => {};
+    const leave = () => {
+        axios
+            .post("/api/projects/" + project.id + "/leave")
+            .then(() => {
+                setProject((project) => ({
+                    ...project,
+                    userIsTeamMember: false,
+                }));
+                addToast("You have left this team successfully.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error leaving team: " + err);
+                addToast("An error occurred. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
 
     var githubLink;
     if (project.githubLink === "") {
