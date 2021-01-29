@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Success from "../general/Success";
 import axios from "axios";
 import NotFound from "./NotFound";
 import { Status } from "../../State";
@@ -104,6 +105,10 @@ export default function Project() {
 
     if (status === Status.NotSubmitted) {
         return <EditProject originalProject={project} setStatus={setStatus} />;
+    }
+
+    if (status === Status.Success) {
+        return <Success />;
     }
 
     return (

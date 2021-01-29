@@ -20,6 +20,9 @@ export default function EditProject({ originalProject, setStatus }) {
                 tags: project.tags,
             })
             .then(() => {
+                addToast("Your idea was updated successfully.", {
+                    appearance: "success",
+                });
                 setStatus(Status.Success);
             })
             .catch((err) => {
