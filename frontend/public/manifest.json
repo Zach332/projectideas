@@ -3,9 +3,8 @@
   "name": "projectideas",
   "icons": [
     {
-      "src": "logo.png",
-      "sizes": "200x200",
-      "type": "image/png"
+      "src": "pifavicon.svg",
+      "type": "image/svg"
     }
   ],
   "start_url": "./index.html",
