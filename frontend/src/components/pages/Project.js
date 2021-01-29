@@ -93,10 +93,7 @@ export default function Project() {
         axios
             .post("/api/projects/" + project.id + "/leave")
             .then(() => {
-                setProject((project) => ({
-                    ...project,
-                    userIsTeamMember: false,
-                }));
+                setRerender((rerender) => rerender + 1);
                 addToast("You have left this team successfully.", {
                     appearance: "success",
                     autoDismiss: true,
