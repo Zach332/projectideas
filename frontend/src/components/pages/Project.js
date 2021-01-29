@@ -11,6 +11,7 @@ import ProjectJoinRequestModal from "./../projectComponents/ProjectJoinRequestMo
 import ProjectJoinRequestPreview from "../projectComponents/ProjectJoinRequestPreview";
 import SendMessageModal from "../messageComponents/SendMessageModal";
 import EditProject from "./EditProject";
+import Modal from "../layout/Modal";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -87,6 +88,8 @@ export default function Project() {
     const edit = () => {
         setStatus(Status.NotSubmitted);
     };
+
+    const leave = () => {};
 
     var githubLink;
     if (project.githubLink === "") {
@@ -192,20 +195,30 @@ export default function Project() {
                 </tbody>
             </table>
             {project.userIsTeamMember && (
-                <div className="form-check form-switch">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="lookingForMembers"
-                        onChange={flipLookingForMembers}
-                        checked={project.lookingForMembers}
-                    />
-                    <label
-                        className="form-check-label"
-                        htmlFor="lookingForMembers"
+                <div>
+                    <div className="form-check form-switch">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="lookingForMembers"
+                            onChange={flipLookingForMembers}
+                            checked={project.lookingForMembers}
+                        />
+                        <label
+                            className="form-check-label"
+                            htmlFor="lookingForMembers"
+                        >
+                            Looking for new members
+                        </label>
+                    </div>
+                    <button
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#leaveConfirmation"
+                        className="btn btn-danger btn-sm mt-4"
                     >
-                        Looking for new members
-                    </label>
+                        Leave team
+                    </button>
                 </div>
             )}
             <ProjectJoinRequestModal
@@ -217,6 +230,13 @@ export default function Project() {
                 recipientId={project.id}
                 id="sendMessage"
                 isProject={true}
+            />
+            <Modal
+                id="leaveConfirmation"
+                title="Leave team"
+                body="Are you sure you want to leave this project? It will be deleted if all members leave."
+                submit="Leave"
+                onClick={leave}
             />
         </div>
     );
