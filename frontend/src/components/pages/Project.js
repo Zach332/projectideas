@@ -142,13 +142,15 @@ export default function Project() {
             >
                 Message team
             </button>
-            <button
-                type="button"
-                onClick={edit}
-                className="btn btn-outline-secondary btn-md my-2"
-            >
-                Edit project
-            </button>
+            <span className="ms-3">
+                <button
+                    type="button"
+                    onClick={edit}
+                    className="btn btn-outline-secondary btn-md my-2"
+                >
+                    Edit project
+                </button>
+            </span>
             {project.userIsTeamMember && project.joinRequests.length > 0 && (
                 <div
                     className="mt-3 p-2"
