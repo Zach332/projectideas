@@ -9,6 +9,7 @@ import ProjectJoinRequestButton from "../projectComponents/ProjectJoinRequestBut
 import ProjectJoinRequestModal from "./../projectComponents/ProjectJoinRequestModal";
 import ProjectJoinRequestPreview from "../projectComponents/ProjectJoinRequestPreview";
 import SendMessageModal from "../messageComponents/SendMessageModal";
+import EditProject from "./EditProject";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -82,6 +83,10 @@ export default function Project() {
         setRerender((rerender) => rerender + 1);
     };
 
+    const edit = () => {
+        setStatus(Status.NotSubmitted);
+    };
+
     var githubLink;
     if (project.githubLink === "") {
         if (project.userIsTeamMember) {
@@ -95,6 +100,10 @@ export default function Project() {
 
     if (status === Status.NotFound) {
         return <NotFound />;
+    }
+
+    if (status === Status.NotSubmitted) {
+        return <EditProject originalProject={project} setStatus={setStatus} />;
     }
 
     return (
@@ -120,16 +129,21 @@ export default function Project() {
                     ))}
                 </div>
             )}
-            {
-                <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#sendMessage"
-                    className="btn btn-outline-secondary btn-md my-2"
-                >
-                    Message team
-                </button>
-            }
+            <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#sendMessage"
+                className="btn btn-outline-secondary btn-md my-2"
+            >
+                Message team
+            </button>
+            <button
+                type="button"
+                onClick={edit}
+                className="btn btn-outline-secondary btn-md my-2"
+            >
+                Edit project
+            </button>
             {project.userIsTeamMember && project.joinRequests.length > 0 && (
                 <div
                     className="mt-3 p-2"
