@@ -206,9 +206,9 @@ export default function Profile() {
             >
                 Log Out
             </button>
-            <h2 className="mt-4">Saved projects</h2>
+            <h2 className="mt-4">Saved ideas</h2>
             {myProjects.length === 0 ? (
-                <p>You haven&apos;t saved any projects.</p>
+                <p>You haven&apos;t saved any ideas.</p>
             ) : (
                 myProjects.map((idea) => (
                     <div key={idea.id} className="container-flex">
