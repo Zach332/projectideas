@@ -805,43 +805,37 @@ public class Database {
     }
 
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
-                ideaId +
-                "' ORDER BY c.timeCreated DESC",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(new RestrictionBuilder().eq("ideaId", ideaId))
+                .orderBy("timeCreated", Order.DESC),
+            projectContainer,
+            Project.class
+        );
     }
 
     public List<Project> getProjectsLookingForMemberBasedOnIdea(String ideaId) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
-                ideaId +
-                "' ORDER BY c.timeCreated DESC",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("ideaId", ideaId),
+                    new RestrictionBuilder().eq("lookingForMembers", true)
+                )
+                .orderBy("timeCreated", Order.DESC),
+            projectContainer,
+            Project.class
+        );
     }
 
     public int getNumProjectsForTag(String tag) {
-        return projectContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Project' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "')",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .arrayContains("tags", tag),
+            projectContainer
+        );
     }
 
     public int getLastPageNumForProjectTag(String tag) {
@@ -866,16 +860,17 @@ public class Database {
     }
 
     private List<Project> getProjectsInList(List<String> projectIds) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId IN ('" +
-                String.join("', '", projectIds) +
-                "') ORDER BY c.timeCreated DESC",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder()
+                    .in("projectId", projectIds.toArray())
+                )
+                .orderBy("timeCreated", Order.DESC),
+            projectContainer,
+            Project.class
+        );
     }
 
     public void updateProject(Project project) {
