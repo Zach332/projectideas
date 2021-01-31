@@ -99,7 +99,8 @@ export default function Idea() {
     };
 
     const searchTag = (tagName) => {
-        window.location.href = "/tags?" + toQuery({ tag: tagName });
+        window.location.href =
+            "/tags?" + toQuery({ type: "ideas", tag: tagName });
     };
 
     if (status === Status.NotFound) {

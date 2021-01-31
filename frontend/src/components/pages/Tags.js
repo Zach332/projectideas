@@ -15,7 +15,9 @@ export default function Tags() {
     useEffect(() => {
         axios
             .get(
-                "/api/ideas/tags?" +
+                "/api/" +
+                    params.type +
+                    "/tags?" +
                     toQuery({ tag: params.tag, page: params.page })
             )
             .then((response) => {
