@@ -466,34 +466,28 @@ public class Database {
     }
 
     public List<Comment> findAllCommentsOnIdea(String ideaId) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
-                ideaId +
-                "' ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Comment.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(ideaId, Comment.class)
+                .orderBy("timePosted", Order.DESC),
+            postContainer,
+            Comment.class
+        );
     }
 
     public Optional<Comment> findCommentOnIdea(
         String ideaId,
         String commentId
     ) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
-                ideaId +
-                "' AND c.id = '" +
-                commentId +
-                "'",
-                new CosmosQueryRequestOptions(),
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByIdAndPartitionKey(
+                commentId,
+                ideaId,
                 Comment.class
-            )
-            .stream()
-            .findFirst();
+            ),
+            postContainer,
+            Comment.class
+        );
     }
 
     public void updateComment(Comment comment) {
