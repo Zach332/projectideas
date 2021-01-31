@@ -8,6 +8,7 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
+import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
@@ -107,43 +108,29 @@ public class Database {
     }
 
     public Optional<User> findUserByEmail(String email) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.email = '" + email + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst();
+        return executeSingleDocumentQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .addRestrictions(new RestrictionBuilder().eq("email", email)),
+            userContainer,
+            User.class
+        );
     }
 
     public Optional<User> findUserByUsername(String username) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.username = '" + username + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst();
+        return executeSingleDocumentQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("username", username)
+                ),
+            userContainer,
+            User.class
+        );
     }
 
-    // TODO: Change this to a future call to getDocumentWithParameters
     public boolean containsUserWithUsername(String username) {
-        return (
-            userContainer
-                .queryItems(
-                    "SELECT VALUE COUNT(1) FROM c WHERE c.username = '" +
-                    username +
-                    "'",
-                    new CosmosQueryRequestOptions(),
-                    Integer.class
-                )
-                .stream()
-                .findFirst()
-                .get() >
-            0
-        );
+        return findUserByUsername(username).isPresent();
     }
 
     public void updateUser(String id, User user) {
@@ -305,17 +292,7 @@ public class Database {
     }
 
     public boolean isUserAdmin(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.admin FROM c WHERE c.type = 'User' AND c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                boolean.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return getUser(userId).get().isAdmin();
     }
 
     public void deleteUser(String id) {
