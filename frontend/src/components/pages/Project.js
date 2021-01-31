@@ -138,6 +138,20 @@ export default function Project() {
             });
     };
 
+    const appendHttp = (link) => {
+        return link.startsWith("http") ? link : "https://" + link;
+    };
+
+    const removeHttp = (link) => {
+        if (link.startsWith("http://")) {
+            return link.substring(7);
+        }
+        if (link.startsWith("https://")) {
+            return link.substring(8);
+        }
+        return link;
+    };
+
     var githubLink;
     if (!project.githubLink || project.githubLink === "") {
         if (project.userIsTeamMember) {
@@ -155,7 +169,15 @@ export default function Project() {
             githubLink = <div></div>;
         }
     } else {
-        githubLink = <a href={githubLink}>{githubLink}</a>;
+        githubLink = (
+            <a
+                href={appendHttp(project.githubLink)}
+                target="_blank"
+                rel="external noreferrer"
+            >
+                {removeHttp(project.githubLink)}
+            </a>
+        );
     }
 
     if (status === Status.NotFound) {
