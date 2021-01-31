@@ -23,28 +23,32 @@ public class GenericQueries {
     private static final String TAG_CONTAINER_PARTITION_KEY = "name";
     private static final String PROJECT_CONTAINER_PARTITION_KEY = "projectId";
 
-    public static <T extends RootDocument> SelectQuery queryById(
-        String id,
+    public static <T extends RootDocument> SelectQuery queryByType(
         Class<T> classType
     ) {
         return new SelectQuery()
         .addRestrictions(
-                new RestrictionBuilder().eq("id", id),
                 new RestrictionBuilder()
                 .in("type", (Object[]) getTypes(classType))
             );
+    }
+
+    public static <T extends RootDocument> SelectQuery queryById(
+        String id,
+        Class<T> classType
+    ) {
+        return queryByType(classType)
+            .addRestrictions(new RestrictionBuilder().eq("id", id));
     }
 
     public static <T extends RootDocument> SelectQuery queryByPartitionKey(
         String partitionKey,
         Class<T> classType
     ) {
-        return new SelectQuery()
-        .addRestrictions(
+        return queryByType(classType)
+            .addRestrictions(
                 new RestrictionBuilder()
-                .eq(getPartitionKey(classType), partitionKey),
-                new RestrictionBuilder()
-                .in("type", (Object[]) getTypes(classType))
+                .eq(getPartitionKey(classType), partitionKey)
             );
     }
 
@@ -53,13 +57,11 @@ public class GenericQueries {
         String partitionKey,
         Class<T> classType
     ) {
-        return new SelectQuery()
-        .addRestrictions(
+        return queryByType(classType)
+            .addRestrictions(
                 new RestrictionBuilder().eq("id", id),
                 new RestrictionBuilder()
-                .eq(getPartitionKey(classType), partitionKey),
-                new RestrictionBuilder()
-                .in("type", (Object[]) getTypes(classType))
+                .eq(getPartitionKey(classType), partitionKey)
             );
     }
 
