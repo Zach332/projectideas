@@ -209,7 +209,7 @@ export default function Idea() {
                             <li className="list-group-item mw-100">
                                 {idea.tags.map((tag) => (
                                     <span
-                                        className="badge btn rounded-pill bg-dark me-2"
+                                        className="badge btn rounded-pill btn-primary me-2"
                                         onClick={() => searchTag(tag)}
                                         key={tag}
                                     >
