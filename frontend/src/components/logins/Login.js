@@ -1,7 +1,7 @@
 import React from "react";
 import GoogleLogin from "react-google-login";
 import axios from "axios";
-import Success from "../Success";
+import Success from "../general/Success";
 import XMark from "../../x.svg";
 import { toQuery } from "../utils/Routing";
 import { login, Status } from "../../State";

@@ -3,7 +3,8 @@ import axios from "axios";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
-import IdeaCard from "../IdeaCard";
+import IdeaCard from "../ideaComponents/IdeaCard";
+import TagPicker from "../tagComponents/TagPicker";
 
 export default function EditIdea({ originalIdea, setStatus }) {
     const { addToast } = useToasts();
@@ -27,6 +28,7 @@ export default function EditIdea({ originalIdea, setStatus }) {
             .put("/api/ideas/" + idea.id, {
                 title: idea.title,
                 content: idea.content,
+                tags: idea.tags,
             })
             .then(() => {
                 addToast("Your idea was updated successfully.", {
@@ -66,6 +68,8 @@ export default function EditIdea({ originalIdea, setStatus }) {
                         onChange={handleInputChange}
                     ></textarea>
                 </div>
+                <TagPicker post={idea} setPost={setIdea} postType="idea" />
+                <br></br>
                 <button type="submit" className="btn btn-primary">
                     Update Idea
                 </button>

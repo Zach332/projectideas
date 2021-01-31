@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import Message from "../Message";
+import Message from "../messageComponents/Message";
 import LoginWarning from "../logins/LoginWarning";
 import { useGlobalState } from "../../State";
 import { motion, AnimateSharedLayout } from "framer-motion";

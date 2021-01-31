@@ -1,17 +1,29 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Success from "../general/Success";
 import axios from "axios";
 import NotFound from "./NotFound";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
+import { motion, AnimateSharedLayout } from "framer-motion";
+import ProjectJoinRequestButton from "../projectComponents/ProjectJoinRequestButton";
+import ProjectJoinRequestModal from "./../projectComponents/ProjectJoinRequestModal";
+import ProjectJoinRequestPreview from "../projectComponents/ProjectJoinRequestPreview";
+import SendMessageModal from "../messageComponents/SendMessageModal";
+import EditProject from "./EditProject";
+import Modal from "../layout/Modal";
+import ProjectGitHubLinkModal from "../projectComponents/ProjectGitHubLinkModal";
 
 export default function Project() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
+    const [rerender, setRerender] = React.useState(0);
     const [project, setProject] = React.useState({
         teamMemberUsernames: [],
         lookingForMembers: true,
         githubLink: "",
+        id: "",
+        joinRequests: "",
     });
     let params = useParams();
 
@@ -21,10 +33,9 @@ export default function Project() {
                 setStatus(Status.NotFound);
             } else {
                 setProject(response.data);
-                console.log(response.data);
             }
         });
-    }, []);
+    }, [rerender]);
 
     const flipLookingForMembers = () => {
         axios
@@ -52,65 +63,163 @@ export default function Project() {
             });
     };
 
-    const sendJoinRequest = (event) => {
+    const acceptRequest = (username) => {
+        setProject({
+            ...project,
+            teamMemberUsernames: project.teamMemberUsernames.concat([username]),
+            joinRequests: project.joinRequests.filter(
+                (request) => request.username !== username
+            ),
+        });
+    };
+
+    const denyRequest = (username) => {
+        setProject({
+            ...project,
+            joinRequests: project.joinRequests.filter(
+                (request) => request.username !== username
+            ),
+        });
+    };
+
+    const submitRequest = () => {
+        setRerender((rerender) => rerender + 1);
+    };
+
+    const editGitHubLink = (newLink) => {
+        setProject({
+            ...project,
+            githubLink: newLink,
+        });
+    };
+
+    const submitLink = () => {
         axios
-            .post("/api/projects/" + project.id + "/joinrequests")
+            .put("/api/projects/" + project.id, {
+                name: project.name,
+                description: project.description,
+                lookingForMembers: project.lookingForMembers,
+                tags: project.tags,
+                githubLink: project.githubLink,
+            })
             .then(() => {
-                project.userHasRequestedToJoin = true;
-                addToast("Your request was submitted.", {
+                addToast("Your idea was updated successfully.", {
                     appearance: "success",
                     autoDismiss: true,
                 });
             })
             .catch((err) => {
-                console.log("Error submitting request: " + err);
-                addToast("Your request was not submitted. Please try again.", {
+                console.log("Error updating project: " + err);
+                addToast("Your project was not updated. Please try again.", {
                     appearance: "error",
                 });
             });
-        event.preventDefault();
     };
 
-    var joinRequestButton = <div></div>;
-    if (project.userIsTeamMember) {
-        joinRequestButton = <div></div>;
-    } else if (project.userHasRequestedToJoin) {
-        joinRequestButton = (
-            <button
-                className="btn btn-md btn-success"
-                disabled={true}
-                type="button"
-                id="requestToJoin"
-            >
-                Join request sent
-            </button>
-        );
-    } else if (project.lookingForMembers) {
-        joinRequestButton = (
-            <button
-                className="btn btn-md btn-primary"
-                type="button"
-                id="requestToJoin"
-                onClick={sendJoinRequest}
-            >
-                Request to join
-            </button>
-        );
-    }
+    const edit = () => {
+        setStatus(Status.NotSubmitted);
+    };
+
+    const leave = () => {
+        axios
+            .post("/api/projects/" + project.id + "/leave")
+            .then(() => {
+                setRerender((rerender) => rerender + 1);
+                addToast("You have left this team successfully.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error leaving team: " + err);
+                addToast("An error occurred. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
+    const appendHttp = (link) => {
+        return link.startsWith("http") ? link : "https://" + link;
+    };
+
+    const removeHttp = (link) => {
+        if (link.startsWith("http://")) {
+            return link.substring(7);
+        }
+        if (link.startsWith("https://")) {
+            return link.substring(8);
+        }
+        return link;
+    };
 
     var githubLink;
-    if (project.githubLink === "") {
+    if (!project.githubLink || project.githubLink === "") {
         if (project.userIsTeamMember) {
-            githubLink = <div></div>;
+            githubLink = (
+                <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#gitHubLink"
+                    className="btn btn-outline-secondary btn-md my-2"
+                >
+                    Add GitHub link
+                </button>
+            );
         } else {
             githubLink = <div></div>;
         }
     } else {
-        githubLink = <a href={githubLink}>{githubLink}</a>;
+        if (project.userIsTeamMember) {
+            githubLink = (
+                <div className="d-flex">
+                    <a
+                        href={appendHttp(project.githubLink)}
+                        target="_blank"
+                        rel="external noreferrer"
+                    >
+                        {removeHttp(project.githubLink)}
+                    </a>
+                    <div
+                        className="btn btn-sm d-flex align-items-center"
+                        data-bs-toggle="modal"
+                        data-bs-target="#gitHubLink"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            className="bi bi-pencil-fill"
+                            viewBox="0 0 16 16"
+                        >
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
+                        </svg>
+                    </div>
+                </div>
+            );
+        } else {
+            githubLink = (
+                <a
+                    href={appendHttp(project.githubLink)}
+                    target="_blank"
+                    rel="external noreferrer"
+                >
+                    {removeHttp(project.githubLink)}
+                </a>
+            );
+        }
     }
 
     if (status === Status.NotFound) {
         return <NotFound />;
+    }
+
+    if (status === Status.NotSubmitted) {
+        return <EditProject originalProject={project} setStatus={setStatus} />;
+    }
+
+    if (status === Status.Success) {
+        return <Success />;
     }
 
     return (
@@ -120,11 +229,67 @@ export default function Project() {
                     <h1>{project.name}</h1>
                 </div>
                 <div className="d-flex align-items-center">
-                    {joinRequestButton}
-                    {githubLink}
+                    <li className="list-group-item border-0">
+                        <ProjectJoinRequestButton project={project} />
+                        <div className="text-end">{githubLink}</div>
+                    </li>
                 </div>
             </div>
-            <p style={{ whiteSpace: "pre-wrap" }}>{project.description}</p>
+            {project.tags && project.tags.length > 0 && (
+                <div className="mw-100">
+                    {project.tags.map((tag) => (
+                        <span
+                            className="badge rounded-pill bg-dark me-2"
+                            key={tag}
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            )}
+            <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#sendMessage"
+                className="btn btn-outline-secondary btn-md my-2"
+            >
+                Message team
+            </button>
+            <span className="ms-3">
+                <button
+                    type="button"
+                    onClick={edit}
+                    className="btn btn-outline-secondary btn-md my-2"
+                >
+                    Edit project
+                </button>
+            </span>
+            {project.userIsTeamMember && project.joinRequests.length > 0 && (
+                <div
+                    className="mt-3 p-2"
+                    style={{ backgroundColor: "#bdf1fc" }}
+                >
+                    <AnimateSharedLayout>
+                        <h4>Join requests</h4>
+                        <motion.div layout className="container mx-auto">
+                            {project.joinRequests.map((joinRequest) => (
+                                <ProjectJoinRequestPreview
+                                    key={joinRequest.username}
+                                    request={joinRequest}
+                                    project={project}
+                                    acceptRequest={acceptRequest}
+                                    denyRequest={denyRequest}
+                                />
+                            ))}
+                        </motion.div>
+                    </AnimateSharedLayout>
+                </div>
+            )}
+            {project.description !== "" && (
+                <div className="p-2 m-3" style={{ whiteSpace: "pre-wrap" }}>
+                    {project.description}
+                </div>
+            )}
             <table className="table">
                 <thead className="thead-dark">
                     <tr>
@@ -140,22 +305,55 @@ export default function Project() {
                 </tbody>
             </table>
             {project.userIsTeamMember && (
-                <div className="form-check form-switch">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="lookingForMembers"
-                        onChange={flipLookingForMembers}
-                        checked={project.lookingForMembers}
-                    />
-                    <label
-                        className="form-check-label"
-                        htmlFor="lookingForMembers"
+                <div>
+                    <div className="form-check form-switch">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="lookingForMembers"
+                            onChange={flipLookingForMembers}
+                            checked={project.lookingForMembers}
+                        />
+                        <label
+                            className="form-check-label"
+                            htmlFor="lookingForMembers"
+                        >
+                            Looking for new members
+                        </label>
+                    </div>
+                    <button
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#leaveConfirmation"
+                        className="btn btn-danger btn-sm mt-4"
                     >
-                        Looking for new members
-                    </label>
+                        Leave team
+                    </button>
                 </div>
             )}
+            <ProjectJoinRequestModal
+                project={project}
+                submitRequest={submitRequest}
+            />
+            <ProjectGitHubLinkModal
+                id="gitHubLink"
+                gitHubLink={project.githubLink}
+                setGitHubLink={editGitHubLink}
+                submitLink={submitLink}
+            />
+            <SendMessageModal
+                recipient={project.name}
+                recipientId={project.id}
+                id="sendMessage"
+                isProject={true}
+            />
+            <Modal
+                id="leaveConfirmation"
+                title="Leave team"
+                body="Are you sure you want to leave this project? It will be deleted if all members leave."
+                submit="Leave"
+                onClick={leave}
+            />
         </div>
     );
 }

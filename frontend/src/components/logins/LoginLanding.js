@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Success from "../Success";
+import Success from "../general/Success";
 import XMark from "../../x.svg";
 import { toParams } from "../utils/Routing";
 import axios from "axios";

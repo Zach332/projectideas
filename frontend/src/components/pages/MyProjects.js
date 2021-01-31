@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import ProjectSummary from "./../ProjectSummary";
+import ProjectSummary from "../projectComponents/ProjectSummary";
 import { useGlobalState } from "../../State";
 
 export default function MyProjects() {

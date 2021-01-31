@@ -1,57 +1,34 @@
-import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React from "react";
 import { Status } from "../../State";
-import NotFound from "./NotFound";
-import Success from "../general/Success";
 import axios from "axios";
-import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../tagComponents/TagPicker";
 
-export default function CreateProject() {
-    const [idea, setIdea] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.Loading);
-    const [project, setProject] = React.useState({
-        name: "",
-        description: "",
-        lookingForMembers: true,
-        tags: [],
-    });
-    let params = useParams();
+export default function EditProject({ originalProject, setStatus }) {
+    const [edited, setEdited] = React.useState(false);
+    const [project, setProject] = React.useState(originalProject);
     const { addToast } = useToasts();
-    useLeavePageWarning(project.name != "" || project.description != "");
-
-    useEffect(() => {
-        axios.get("/api/ideas/" + params.id).then((response) => {
-            if (!response.data) {
-                setStatus(Status.NotFound);
-            } else {
-                setIdea(response.data);
-            }
-        });
-    }, []);
+    useLeavePageWarning(edited);
 
     const handleSubmit = (event) => {
         axios
-            .post("/api/ideas/" + idea.id + "/projects", {
+            .put("/api/projects/" + project.id, {
                 name: project.name,
                 description: project.description,
                 lookingForMembers: project.lookingForMembers,
                 tags: project.tags,
+                githubLink: project.githubLink,
             })
             .then(() => {
-                setStatus(Status.Success);
-                setProject({
-                    name: "",
-                    description: "",
-                    lookingForMembers: true,
+                addToast("Your idea was updated successfully.", {
+                    appearance: "success",
                 });
+                setStatus(Status.Success);
             })
             .catch((err) => {
-                console.log("Error creating project: " + err);
-                setStatus(Status.Failure);
-                addToast("Your project was not created. Please try again.", {
+                console.log("Error updating project: " + err);
+                addToast("Your project was not updated. Please try again.", {
                     appearance: "error",
                 });
             });
@@ -59,6 +36,7 @@ export default function CreateProject() {
     };
 
     const handleInputChange = (event) => {
+        setEdited(true);
         const target = event.target;
         const name = target.id;
         setProject((project) => ({
@@ -74,30 +52,16 @@ export default function CreateProject() {
         }));
     };
 
-    if (status === Status.NotFound) {
-        return <NotFound />;
-    }
-
-    if (status === Status.Success) {
-        return (
-            <div>
-                <Success />
-            </div>
-        );
-    }
-
     return (
         <div>
-            <h1>Start a project based on:</h1>
-            <div className="m-3">
-                <IdeaSummary idea={idea} />
-            </div>
+            <h1>Update project</h1>
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="name">Project name</label>
                     <input
                         type="text"
                         className="form-control"
+                        value={project.name}
                         id="name"
                         onChange={handleInputChange}
                     />
@@ -110,6 +74,7 @@ export default function CreateProject() {
                     <textarea
                         className="form-control"
                         id="description"
+                        value={project.description}
                         rows="5"
                         onChange={handleInputChange}
                     ></textarea>
@@ -120,7 +85,7 @@ export default function CreateProject() {
                         type="checkbox"
                         id="lookingForMembers"
                         onClick={flipLookingForMembers}
-                        defaultChecked
+                        checked={project.lookingForMembers}
                     />
                     <label
                         className="form-check-label"
@@ -141,7 +106,7 @@ export default function CreateProject() {
                     disabled={project.name === ""}
                     className="btn btn-primary mt-4"
                 >
-                    Create project
+                    Update project
                 </button>
             </form>
         </div>
