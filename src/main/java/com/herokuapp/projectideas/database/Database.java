@@ -426,11 +426,11 @@ public class Database {
 
     public void updateIdea(Idea idea) {
         for (String tag : idea.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Project);
+                incrementTagUsages(tag, IdeaTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Project));
+                createTag(new IdeaTag(tag));
             }
         }
         postContainer.replaceItem(
@@ -880,11 +880,11 @@ public class Database {
 
     public void updateProject(Project project) {
         for (String tag : project.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Project);
+                incrementTagUsages(tag, ProjectTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Project));
+                createTag(new ProjectTag(tag));
             }
         }
         projectContainer.replaceItem(
