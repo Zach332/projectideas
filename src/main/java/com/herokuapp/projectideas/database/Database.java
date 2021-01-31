@@ -606,62 +606,45 @@ public class Database {
     }
 
     public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.userId = '" +
-                recipientId +
-                "' ORDER BY c.timeSent DESC",
-                new CosmosQueryRequestOptions(),
-                ReceivedMessage.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(recipientId, ReceivedMessage.class)
+                .orderBy("timeSent", Order.DESC),
+            userContainer,
+            ReceivedMessage.class
+        );
     }
 
     public List<ReceivedMessage> findAllUnreadReceivedMessages(
         String recipientId
     ) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.userId = '" +
-                recipientId +
-                "' AND c.unread = true ORDER BY c.timeSent DESC",
-                new CosmosQueryRequestOptions(),
-                ReceivedMessage.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(recipientId, ReceivedMessage.class)
+                .addRestrictions(new RestrictionBuilder().eq("unread", true))
+                .orderBy("timeSent", Order.DESC),
+            userContainer,
+            ReceivedMessage.class
+        );
     }
 
     public List<SentMessage> findAllSentMessages(String senderId) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'SentIndividualMessage' OR c.type = 'SentGroupMessage') " +
-                "AND c.userId = '" +
-                senderId +
-                "' ORDER BY c.timeSent DESC",
-                new CosmosQueryRequestOptions(),
-                SentMessage.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(senderId, SentMessage.class)
+                .orderBy("timeSent", Order.DESC),
+            userContainer,
+            SentMessage.class
+        );
     }
 
     public int getNumberOfUnreadMessages(String recipientId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.unread = true AND c.userId = '" +
-                recipientId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries
+                .queryByPartitionKey(recipientId, ReceivedMessage.class)
+                .addRestrictions(new RestrictionBuilder().eq("unread", true)),
+            userContainer
+        );
     }
 
     public void markReceivedMessageAsRead(
