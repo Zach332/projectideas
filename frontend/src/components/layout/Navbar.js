@@ -129,6 +129,13 @@ export default function Navbar() {
                         <NavLink
                             className="nav-item nav-link"
                             activeClassName="nav-item nav-link active"
+                            to="/projects"
+                        >
+                            Projects
+                        </NavLink>
+                        <NavLink
+                            className="nav-item nav-link"
+                            activeClassName="nav-item nav-link active"
                             to="/about"
                         >
                             About
