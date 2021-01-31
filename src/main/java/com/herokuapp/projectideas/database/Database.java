@@ -8,6 +8,8 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
+import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
+import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
@@ -60,6 +62,36 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
+    private <T extends RootDocument> Optional<T> executeSingleDocumentQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        Class<T> classType
+    ) {
+        return container
+            .queryItems(
+                query.createQuery(),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .findAny();
+    }
+
+    private <T extends RootDocument> List<T> executeMultipleDocumentQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        Class<T> classType
+    ) {
+        return container
+            .queryItems(
+                query.createQuery(),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     // Users
 
     public void createUser(User user) {
@@ -67,9 +99,9 @@ public class Database {
     }
 
     public Optional<User> getUser(String userId) {
-        return GenericQueries.getDocumentByPartitionKey(
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(userId, User.class),
             userContainer,
-            userId,
             User.class
         );
     }
@@ -403,9 +435,9 @@ public class Database {
     }
 
     public Optional<Idea> findIdea(String id) {
-        return GenericQueries.getDocumentByPartitionKey(
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(id, Idea.class),
             postContainer,
-            id,
             Idea.class
         );
     }
@@ -588,10 +620,13 @@ public class Database {
         String recipientId,
         String messageId
     ) {
-        return GenericQueries.getDocumentByIdAndPartitionKey(
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByIdAndPartitionKey(
+                messageId,
+                recipientId,
+                ReceivedMessage.class
+            ),
             userContainer,
-            messageId,
-            recipientId,
             ReceivedMessage.class
         );
     }
@@ -820,9 +855,9 @@ public class Database {
     }
 
     public Optional<Project> getProject(String projectId) {
-        return GenericQueries.getDocumentByPartitionKey(
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(projectId, Project.class),
             projectContainer,
-            projectId,
             Project.class
         );
     }

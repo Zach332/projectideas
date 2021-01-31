@@ -1,8 +1,7 @@
 package com.herokuapp.projectideas.database.query;
 
-import com.azure.cosmos.CosmosContainer;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.util.CosmosPagedIterable;
+import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
+import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.Message;
 import com.herokuapp.projectideas.database.document.post.Post;
@@ -10,10 +9,7 @@ import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
 import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.reflections.Reflections;
 
 public class GenericQueries {
@@ -27,110 +23,44 @@ public class GenericQueries {
     private static final String TAG_CONTAINER_PARTITION_KEY = "name";
     private static final String PROJECT_CONTAINER_PARTITION_KEY = "projectId";
 
-    public static <T extends RootDocument> Optional<T> getDocumentById(
-        CosmosContainer container,
+    public static <T extends RootDocument> SelectQuery queryById(
         String id,
         Class<T> classType
     ) {
-        return getCosmosPagedIterableById(container, id, classType)
-            .stream()
-            .findAny();
+        return new SelectQuery()
+        .addRestrictions(
+                new RestrictionBuilder().eq("id", id),
+                new RestrictionBuilder()
+                .in("type", (Object[]) getTypes(classType))
+            );
     }
 
-    public static <T extends RootDocument> Optional<T> getDocumentByIdAndPartitionKey(
-        CosmosContainer container,
-        String id,
+    public static <T extends RootDocument> SelectQuery queryByPartitionKey(
         String partitionKey,
         Class<T> classType
     ) {
-        return getCosmosPagedIterableByIdAndPartitionKey(
-            container,
-            id,
-            partitionKey,
-            classType
-        )
-            .stream()
-            .findAny();
+        return new SelectQuery()
+        .addRestrictions(
+                new RestrictionBuilder()
+                .eq(getPartitionKey(classType), partitionKey),
+                new RestrictionBuilder()
+                .in("type", (Object[]) getTypes(classType))
+            );
     }
 
-    public static <T extends RootDocument> Optional<T> getDocumentByPartitionKey(
-        CosmosContainer container,
-        String partitionKey,
-        Class<T> classType
-    ) {
-        return getCosmosPagedIterableByPartitionKey(
-            container,
-            partitionKey,
-            classType
-        )
-            .stream()
-            .findAny();
-    }
-
-    public static <T extends RootDocument> List<T> getDocumentsByPartitionKey(
-        CosmosContainer container,
-        String partitionKey,
-        Class<T> classType
-    ) {
-        return getCosmosPagedIterableByPartitionKey(
-            container,
-            partitionKey,
-            classType
-        )
-            .stream()
-            .collect(Collectors.toList());
-    }
-
-    private static <T extends RootDocument> CosmosPagedIterable<T> getCosmosPagedIterableById(
-        CosmosContainer container,
-        String id,
-        Class<T> classType
-    ) {
-        return container.queryItems(
-            "SELECT * FROM c WHERE c.id = '" +
-            id +
-            "' AND " +
-            getTypeFilterClause(classType),
-            new CosmosQueryRequestOptions(),
-            classType
-        );
-    }
-
-    private static <T extends RootDocument> CosmosPagedIterable<T> getCosmosPagedIterableByIdAndPartitionKey(
-        CosmosContainer container,
+    public static <T extends RootDocument> SelectQuery queryByIdAndPartitionKey(
         String id,
         String partitionKey,
         Class<T> classType
     ) {
-        return container.queryItems(
-            "SELECT * FROM c WHERE c.id = '" +
-            id +
-            "' AND c." +
-            getPartitionKey(classType) +
-            " = '" +
-            partitionKey +
-            "' AND " +
-            getTypeFilterClause(classType),
-            new CosmosQueryRequestOptions(),
-            classType
-        );
-    }
-
-    private static <T extends RootDocument> CosmosPagedIterable<T> getCosmosPagedIterableByPartitionKey(
-        CosmosContainer container,
-        String partitionKey,
-        Class<T> classType
-    ) {
-        return container.queryItems(
-            "SELECT * FROM c WHERE c." +
-            getPartitionKey(classType) +
-            " = '" +
-            partitionKey +
-            "' AND " +
-            getTypeFilterClause(classType),
-            new CosmosQueryRequestOptions(),
-            classType
-        );
+        return new SelectQuery()
+        .addRestrictions(
+                new RestrictionBuilder().eq("id", id),
+                new RestrictionBuilder()
+                .eq(getPartitionKey(classType), partitionKey),
+                new RestrictionBuilder()
+                .in("type", (Object[]) getTypes(classType))
+            );
     }
 
     private static String getPartitionKey(
@@ -155,18 +85,16 @@ public class GenericQueries {
         );
     }
 
-    private static <T> String getTypeFilterClause(Class<T> classType) {
+    private static <T> String[] getTypes(Class<T> classType) {
         Set<Class<? extends T>> classes = reflections.getSubTypesOf(classType);
         classes.add(classType);
-        List<String> subClassNames = classes
+        return classes
             .stream()
             .filter(
                 classTypeArg ->
                     !Modifier.isAbstract(classTypeArg.getModifiers())
             )
             .map(classTypeArg -> classTypeArg.getSimpleName())
-            .collect(Collectors.toList());
-
-        return "c.type IN ('" + String.join("', '", subClassNames) + "')";
+            .toArray(String[]::new);
     }
 }
