@@ -96,7 +96,7 @@ public class Database {
             .collect(Collectors.toList());
     }
 
-    private <T extends RootDocument> int executeCountQuery(
+    private int executeCountQuery(
         SelectQuery query,
         CosmosContainer container
     ) {
