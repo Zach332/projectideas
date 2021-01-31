@@ -13,11 +13,12 @@ export default function EditProject({ originalProject, setStatus }) {
 
     const handleSubmit = (event) => {
         axios
-            .put("/api//projects/" + project.id, {
+            .put("/api/projects/" + project.id, {
                 name: project.name,
                 description: project.description,
                 lookingForMembers: project.lookingForMembers,
                 tags: project.tags,
+                githubLink: project.githubLink,
             })
             .then(() => {
                 addToast("Your idea was updated successfully.", {

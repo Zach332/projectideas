@@ -12,6 +12,7 @@ import ProjectJoinRequestPreview from "../projectComponents/ProjectJoinRequestPr
 import SendMessageModal from "../messageComponents/SendMessageModal";
 import EditProject from "./EditProject";
 import Modal from "../layout/Modal";
+import ProjectGitHubLinkModal from "../projectComponents/ProjectGitHubLinkModal";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -85,6 +86,36 @@ export default function Project() {
         setRerender((rerender) => rerender + 1);
     };
 
+    const editGitHubLink = (newLink) => {
+        setProject({
+            ...project,
+            githubLink: newLink,
+        });
+    };
+
+    const submitLink = () => {
+        axios
+            .put("/api/projects/" + project.id, {
+                name: project.name,
+                description: project.description,
+                lookingForMembers: project.lookingForMembers,
+                tags: project.tags,
+                githubLink: project.githubLink,
+            })
+            .then(() => {
+                addToast("Your idea was updated successfully.", {
+                    appearance: "success",
+                });
+                setStatus(Status.Success);
+            })
+            .catch((err) => {
+                console.log("Error updating project: " + err);
+                addToast("Your project was not updated. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
     const edit = () => {
         setStatus(Status.NotSubmitted);
     };
@@ -108,9 +139,18 @@ export default function Project() {
     };
 
     var githubLink;
-    if (project.githubLink === "") {
+    if (!project.githubLink || project.githubLink === "") {
         if (project.userIsTeamMember) {
-            githubLink = <div></div>;
+            githubLink = (
+                <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#gitHubLink"
+                    className="btn btn-outline-secondary btn-md my-2"
+                >
+                    Add GitHub link
+                </button>
+            );
         } else {
             githubLink = <div></div>;
         }
@@ -240,6 +280,12 @@ export default function Project() {
             <ProjectJoinRequestModal
                 project={project}
                 submitRequest={submitRequest}
+            />
+            <ProjectGitHubLinkModal
+                id="gitHubLink"
+                gitHubLink={project.githubLink}
+                setGitHubLink={editGitHubLink}
+                submitLink={submitLink}
             />
             <SendMessageModal
                 recipient={project.name}
