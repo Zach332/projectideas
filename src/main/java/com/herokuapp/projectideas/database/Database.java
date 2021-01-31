@@ -10,6 +10,7 @@ import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
+import com.github.mohitgoyal91.cosmosdbqueryutils.utilities.Constants.Order;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
@@ -91,6 +92,21 @@ public class Database {
             )
             .stream()
             .collect(Collectors.toList());
+    }
+
+    private <T extends RootDocument> int executeCountQuery(
+        SelectQuery query,
+        CosmosContainer container
+    ) {
+        return container
+            .queryItems(
+                query.count().createQuery(),
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findAny()
+            .get();
     }
 
     // Users
@@ -306,14 +322,13 @@ public class Database {
     // Ideas
 
     public List<Idea> getAllIdeas() {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .orderBy("timePosted", Order.DESC),
+            postContainer,
+            Idea.class
+        );
     }
 
     public void createIdea(Idea idea) {
@@ -333,29 +348,17 @@ public class Database {
     }
 
     public int getNumIdeas() {
-        return postContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Idea'",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries.queryByType(Idea.class),
+            postContainer
+        );
     }
 
     public int getNumIdeasForTag(String tag) {
-        return postContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "')",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries.queryByType(Idea.class).arrayContains("tags", tag),
+            postContainer
+        );
     }
 
     public int getLastIdeaPageNum() {
@@ -399,16 +402,16 @@ public class Database {
     }
 
     public List<Idea> getIdeasInList(List<String> ideaIds) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
-                String.join("', '", ideaIds) +
-                "') ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .addRestrictions(
+                    new RestrictionBuilder().in("ideaId", ideaIds.toArray())
+                )
+                .orderBy("timePosted", Order.DESC),
+            postContainer,
+            Idea.class
+        );
     }
 
     public Optional<Idea> findIdea(String id) {
