@@ -21,6 +21,8 @@ import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.tag.IdeaTag;
+import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
@@ -333,11 +335,11 @@ public class Database {
 
     public void createIdea(Idea idea) {
         for (String tag : idea.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Idea);
+            Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Idea);
+                incrementTagUsages(tag, IdeaTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Idea));
+                createTag(new IdeaTag(tag));
             }
         }
         postContainer.createItem(idea);
@@ -719,68 +721,43 @@ public class Database {
         tagContainer.createItem(tag);
     }
 
-    public List<Tag> getIdeaTags() {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<IdeaTag> getIdeaTags() {
+        return executeMultipleDocumentQuery(
+            GenericQueries.queryByType(IdeaTag.class),
+            tagContainer,
+            IdeaTag.class
+        );
     }
 
-    public List<Tag> getProjectTags() {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<ProjectTag> getProjectTags() {
+        return executeMultipleDocumentQuery(
+            GenericQueries.queryByType(ProjectTag.class),
+            tagContainer,
+            ProjectTag.class
+        );
     }
 
     public List<Tag> getAllTags() {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries.queryByType(Tag.class),
+            tagContainer,
+            Tag.class
+        );
     }
 
-    public Optional<Tag> getTag(String name, Tag.Type type) {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.name = '" +
-                name +
-                "' AND c.type = '" +
-                type.toString() +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .findFirst();
+    public <T extends Tag> Optional<T> getTag(String name, Class<T> classType) {
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(name, classType),
+            tagContainer,
+            classType
+        );
     }
 
-    public void incrementTagUsages(String name, Tag.Type type) {
-        Tag tag = tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.name = '" +
-                name +
-                "' AND c.type = '" +
-                type.toString() +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+    public <T extends Tag> void incrementTagUsages(
+        String name,
+        Class<T> classType
+    ) {
+        Tag tag = getTag(name, classType).get();
         tag.setUsages(tag.getUsages() + 1);
         tagContainer.replaceItem(
             tag,
@@ -798,11 +775,11 @@ public class Database {
 
     public void createProject(Project project, String projectCreatorId) {
         for (String tag : project.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Project);
+                incrementTagUsages(tag, ProjectTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Project));
+                createTag(new ProjectTag(tag));
             }
         }
         projectContainer.createItem(project);

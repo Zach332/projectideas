@@ -2,6 +2,8 @@ package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.tag.IdeaTag;
+import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
@@ -87,7 +89,10 @@ public class SearchController {
         }
     }
 
-    private List<Document> searchTagIndex(String queryString, Tag.Type type) {
+    private <T extends Tag> List<Document> searchTagIndex(
+        String queryString,
+        Class<T> classType
+    ) {
         try {
             tagSearcherManager.maybeRefresh();
             IndexSearcher indexSearcher = tagSearcherManager.acquire();
@@ -95,7 +100,9 @@ public class SearchController {
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
             booleanQuery.add(
-                new TermQuery(new Term("type", type.toString().toLowerCase())),
+                new TermQuery(
+                    new Term("type", classType.getSimpleName().toLowerCase())
+                ),
                 Occur.MUST
             );
             booleanQuery.add(
@@ -162,7 +169,7 @@ public class SearchController {
     }
 
     public List<String> searchForIdeaTags(String queryString) {
-        List<Document> documents = searchTagIndex(queryString, Tag.Type.Idea);
+        List<Document> documents = searchTagIndex(queryString, IdeaTag.class);
         return documents
             .stream()
             .map(doc -> doc.get("name"))
@@ -172,7 +179,7 @@ public class SearchController {
     public List<String> searchForProjectTags(String queryString) {
         List<Document> documents = searchTagIndex(
             queryString,
-            Tag.Type.Project
+            ProjectTag.class
         );
         return documents
             .stream()
