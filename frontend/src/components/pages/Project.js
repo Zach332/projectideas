@@ -105,8 +105,8 @@ export default function Project() {
             .then(() => {
                 addToast("Your idea was updated successfully.", {
                     appearance: "success",
+                    autoDismiss: true,
                 });
-                setStatus(Status.Success);
             })
             .catch((err) => {
                 console.log("Error updating project: " + err);
