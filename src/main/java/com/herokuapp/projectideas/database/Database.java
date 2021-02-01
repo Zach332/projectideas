@@ -815,12 +815,15 @@ public class Database {
         );
     }
 
-    public List<Project> getProjectsLookingForMemberBasedOnIdea(String ideaId) {
+    public List<Project> getPublicProjectsLookingForMemberBasedOnIdea(
+        String ideaId
+    ) {
         return executeMultipleDocumentQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .addRestrictions(
                     new RestrictionBuilder().eq("ideaId", ideaId),
+                    new RestrictionBuilder().eq("publicProject", true),
                     new RestrictionBuilder().eq("lookingForMembers", true)
                 )
                 .orderBy("timeCreated", Order.DESC),

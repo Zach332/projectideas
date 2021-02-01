@@ -10,6 +10,7 @@ public class ViewProjectDTO extends PreviewProjectDTO {
 
     private String githubLink;
     private List<String> teamMemberUsernames;
+    private boolean publicProject;
     private boolean lookingForMembers;
     private List<String> tags;
 }
