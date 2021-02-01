@@ -1,7 +1,8 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.tag.Tag;
+import com.herokuapp.projectideas.database.document.tag.IdeaTag;
+import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.search.SearchController;
 import java.util.Arrays;
 import java.util.List;
@@ -21,12 +22,12 @@ public class TagController {
 
     @GetMapping("/api/tags/standard/idea")
     public List<String> getStandardIdeaTags() {
-        return Arrays.asList(Tag.STANDARD_IDEA_TAGS);
+        return Arrays.asList(IdeaTag.STANDARD_TAGS);
     }
 
     @GetMapping("/api/tags/standard/project")
     public List<String> getStandardProjectTags() {
-        return Arrays.asList(Tag.STANDARD_PROJECT_TAGS);
+        return Arrays.asList(ProjectTag.STANDARD_TAGS);
     }
 
     @GetMapping("/api/tags/suggested/idea")

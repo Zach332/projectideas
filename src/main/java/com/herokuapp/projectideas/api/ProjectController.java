@@ -144,7 +144,7 @@ public class ProjectController {
         }
 
         User user = database
-            .findUser(userId)
+            .getUser(userId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
@@ -272,7 +272,7 @@ public class ProjectController {
             database.updateProject(project);
         }
 
-        User user = database.findUser(userId).get();
+        User user = database.getUser(userId).get();
         user.getJoinedProjectIds().remove(projectId);
         database.updateUser(userId, user);
     }

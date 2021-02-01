@@ -1,10 +1,11 @@
 package com.herokuapp.projectideas.database.document.post;
 
+import com.herokuapp.projectideas.database.document.RootDocument;
 import lombok.*;
 
 @Getter
 @Setter
-public abstract class Post {
+public abstract class Post implements RootDocument {
 
     protected String id;
     protected String type;

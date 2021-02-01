@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.user;
 
+import com.herokuapp.projectideas.database.document.RootDocument;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class User {
+public class User implements RootDocument {
 
     protected String id;
     protected String type;

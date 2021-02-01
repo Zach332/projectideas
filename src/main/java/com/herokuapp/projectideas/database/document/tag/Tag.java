@@ -1,5 +1,9 @@
 package com.herokuapp.projectideas.database.document.tag;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.herokuapp.projectideas.database.document.RootDocument;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,40 +12,26 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Tag {
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true
+)
+@JsonSubTypes({ @Type(IdeaTag.class), @Type(ProjectTag.class) })
+public abstract class Tag implements RootDocument {
 
     protected String id;
+    protected String type;
     protected String name;
     protected int usages;
-    protected Type type;
     protected boolean standard;
 
-    public Tag(String name, Type type) {
+    public Tag(String name) {
         this.id = UUID.randomUUID().toString();
+        this.type = "Tag";
         this.name = name;
         this.usages = 1;
-        this.type = type;
         this.standard = false;
     }
-
-    public static enum Type {
-        Project,
-        Idea,
-    }
-
-    public static String[] STANDARD_IDEA_TAGS = {
-        "simple",
-        "complex",
-        "website",
-        "iot",
-        "app",
-    };
-
-    public static String[] STANDARD_PROJECT_TAGS = {
-        "website",
-        "app",
-        "python",
-        "java",
-        "c#",
-    };
 }

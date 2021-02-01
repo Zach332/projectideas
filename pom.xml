@@ -79,6 +79,18 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>7.1.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.mohitgoyal91</groupId>
+            <artifactId>cosmosdbquery-utils</artifactId>
+            <version>1.6.8</version>
+          </dependency>
     </dependencies>
 
     <build>

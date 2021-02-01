@@ -147,7 +147,7 @@ public class IdeaController {
         // TODO: Move this call into the createIdea function
         // As is, creating an idea requires calling the findUser function twice
         User user = database
-            .findUser(userId)
+            .getUser(userId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
@@ -177,7 +177,7 @@ public class IdeaController {
         @RequestBody PostCommentDTO comment
     ) {
         User user = database
-            .findUser(userId)
+            .getUser(userId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
             );
@@ -197,7 +197,7 @@ public class IdeaController {
         @PathVariable String ideaId,
         @RequestBody CreateProjectDTO project
     ) {
-        User user = database.findUser(userId).get();
+        User user = database.getUser(userId).get();
         database.createProject(
             new Project(
                 project.getName(),

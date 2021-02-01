@@ -8,6 +8,10 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
+import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
+import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
+import com.github.mohitgoyal91.cosmosdbqueryutils.utilities.Constants.Order;
+import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
@@ -17,9 +21,12 @@ import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
+import com.herokuapp.projectideas.database.document.tag.IdeaTag;
+import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,78 +66,93 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
+    private <T extends RootDocument> Optional<T> executeSingleDocumentQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        Class<T> classType
+    ) {
+        return container
+            .queryItems(
+                query.createQuery(),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .findAny();
+    }
+
+    private <T extends RootDocument> List<T> executeMultipleDocumentQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        Class<T> classType
+    ) {
+        return container
+            .queryItems(
+                query.createQuery(),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
+    private int executeCountQuery(
+        SelectQuery query,
+        CosmosContainer container
+    ) {
+        return container
+            .queryItems(
+                query.count().createQuery(),
+                new CosmosQueryRequestOptions(),
+                Integer.class
+            )
+            .stream()
+            .findAny()
+            .get();
+    }
+
     // Users
 
     public void createUser(User user) {
         userContainer.createItem(user);
     }
 
-    public Optional<User> findUser(String id) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.userId = '" + id + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst();
-    }
-
-    public Optional<User> findUserByEmail(String email) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.email = '" + email + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst();
-    }
-
-    public Optional<User> findUserByUsername(String username) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.username = '" + username + "'",
-                new CosmosQueryRequestOptions(),
-                User.class
-            )
-            .stream()
-            .findFirst();
-    }
-
-    public String getUsernameFromId(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.username FROM c WHERE c.type = 'User' AND c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .findFirst()
-            .get();
-    }
-
-    public boolean containsUserWithUsername(String username) {
-        return (
-            userContainer
-                .queryItems(
-                    "SELECT VALUE COUNT(1) FROM c WHERE c.username = '" +
-                    username +
-                    "'",
-                    new CosmosQueryRequestOptions(),
-                    Integer.class
-                )
-                .stream()
-                .findFirst()
-                .get() >
-            0
+    public Optional<User> getUser(String userId) {
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(userId, User.class),
+            userContainer,
+            User.class
         );
     }
 
+    public Optional<User> findUserByEmail(String email) {
+        return executeSingleDocumentQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .addRestrictions(new RestrictionBuilder().eq("email", email)),
+            userContainer,
+            User.class
+        );
+    }
+
+    public Optional<User> findUserByUsername(String username) {
+        return executeSingleDocumentQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("username", username)
+                ),
+            userContainer,
+            User.class
+        );
+    }
+
+    public boolean containsUserWithUsername(String username) {
+        return findUserByUsername(username).isPresent();
+    }
+
     public void updateUser(String id, User user) {
-        User oldUser = findUser(id).get();
+        User oldUser = getUser(id).get();
 
         // Handle username denormalization
         if (!user.getUsername().equals(oldUser.getUsername())) {
@@ -197,7 +219,7 @@ public class Database {
     }
 
     public void saveIdeaForUser(String ideaId, String userId) {
-        User user = findUser(userId).get();
+        User user = getUser(userId).get();
         if (!user.getSavedIdeaIds().contains(ideaId)) {
             user.getSavedIdeaIds().add(ideaId);
         }
@@ -210,7 +232,7 @@ public class Database {
     }
 
     public void unsaveIdeaForUser(String ideaId, String userId) {
-        User user = findUser(userId).get();
+        User user = getUser(userId).get();
         user.getSavedIdeaIds().remove(ideaId);
         userContainer.replaceItem(
             user,
@@ -288,17 +310,7 @@ public class Database {
     }
 
     public boolean isUserAdmin(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.admin FROM c WHERE c.type = 'User' AND c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                boolean.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return getUser(userId).get().isAdmin();
     }
 
     public void deleteUser(String id) {
@@ -312,56 +324,43 @@ public class Database {
     // Ideas
 
     public List<Idea> getAllIdeas() {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .orderBy("timePosted", Order.DESC),
+            postContainer,
+            Idea.class
+        );
     }
 
     public void createIdea(Idea idea) {
         for (String tag : idea.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Idea);
+            Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Idea);
+                incrementTagUsages(tag, IdeaTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Idea));
+                createTag(new IdeaTag(tag));
             }
         }
         postContainer.createItem(idea);
-        User user = findUser(idea.getAuthorId()).get();
+        User user = getUser(idea.getAuthorId()).get();
         user.getPostedIdeaIds().add(idea.getId());
         updateUser(idea.getAuthorId(), user);
         indexController.tryIndexIdea(idea);
     }
 
     public int getNumIdeas() {
-        return postContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Idea'",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries.queryByType(Idea.class),
+            postContainer
+        );
     }
 
     public int getNumIdeasForTag(String tag) {
-        return postContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "')",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries.queryByType(Idea.class).arrayContains("tags", tag),
+            postContainer
+        );
     }
 
     public int getLastIdeaPageNum() {
@@ -405,38 +404,33 @@ public class Database {
     }
 
     public List<Idea> getIdeasInList(List<String> ideaIds) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId IN ('" +
-                String.join("', '", ideaIds) +
-                "') ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .addRestrictions(
+                    new RestrictionBuilder().in("ideaId", ideaIds.toArray())
+                )
+                .orderBy("timePosted", Order.DESC),
+            postContainer,
+            Idea.class
+        );
     }
 
     public Optional<Idea> findIdea(String id) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND c.ideaId = '" +
-                id +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .findFirst();
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(id, Idea.class),
+            postContainer,
+            Idea.class
+        );
     }
 
     public void updateIdea(Idea idea) {
         for (String tag : idea.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Project);
+                incrementTagUsages(tag, IdeaTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Project));
+                createTag(new IdeaTag(tag));
             }
         }
         postContainer.replaceItem(
@@ -470,7 +464,7 @@ public class Database {
         indexController.tryDeleteIdea(ideaId);
 
         // Remove ideaId from author's postedIdeaIds list
-        User user = findUser(userId).get();
+        User user = getUser(userId).get();
         user.getPostedIdeaIds().remove(ideaId);
         updateUser(userId, user);
     }
@@ -482,34 +476,28 @@ public class Database {
     }
 
     public List<Comment> findAllCommentsOnIdea(String ideaId) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
-                ideaId +
-                "' ORDER BY c.timePosted DESC",
-                new CosmosQueryRequestOptions(),
-                Comment.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(ideaId, Comment.class)
+                .orderBy("timePosted", Order.DESC),
+            postContainer,
+            Comment.class
+        );
     }
 
     public Optional<Comment> findCommentOnIdea(
         String ideaId,
         String commentId
     ) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Comment' AND c.ideaId = '" +
-                ideaId +
-                "' AND c.id = '" +
-                commentId +
-                "'",
-                new CosmosQueryRequestOptions(),
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByIdAndPartitionKey(
+                commentId,
+                ideaId,
                 Comment.class
-            )
-            .stream()
-            .findFirst();
+            ),
+            postContainer,
+            Comment.class
+        );
     }
 
     public void updateComment(Comment comment) {
@@ -536,7 +524,7 @@ public class Database {
         String recipientUsername,
         String content
     ) {
-        User sender = findUser(senderId).get();
+        User sender = getUser(senderId).get();
         User recipient = findUserByUsername(recipientUsername).get();
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
@@ -568,7 +556,7 @@ public class Database {
         String recipientProjectId,
         String content
     ) {
-        User sender = findUser(senderId).get();
+        User sender = getUser(senderId).get();
         Project recipientProject = getProject(recipientProjectId).get();
         for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
             String recipientId = recipient.getUserId();
@@ -616,78 +604,57 @@ public class Database {
         String recipientId,
         String messageId
     ) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.userId = '" +
-                recipientId +
-                "' AND c.id = '" +
-                messageId +
-                "'",
-                new CosmosQueryRequestOptions(),
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByIdAndPartitionKey(
+                messageId,
+                recipientId,
                 ReceivedMessage.class
-            )
-            .stream()
-            .findFirst();
+            ),
+            userContainer,
+            ReceivedMessage.class
+        );
     }
 
     public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.userId = '" +
-                recipientId +
-                "' ORDER BY c.timeSent DESC",
-                new CosmosQueryRequestOptions(),
-                ReceivedMessage.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(recipientId, ReceivedMessage.class)
+                .orderBy("timeSent", Order.DESC),
+            userContainer,
+            ReceivedMessage.class
+        );
     }
 
     public List<ReceivedMessage> findAllUnreadReceivedMessages(
         String recipientId
     ) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.userId = '" +
-                recipientId +
-                "' AND c.unread = true ORDER BY c.timeSent DESC",
-                new CosmosQueryRequestOptions(),
-                ReceivedMessage.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(recipientId, ReceivedMessage.class)
+                .addRestrictions(new RestrictionBuilder().eq("unread", true))
+                .orderBy("timeSent", Order.DESC),
+            userContainer,
+            ReceivedMessage.class
+        );
     }
 
     public List<SentMessage> findAllSentMessages(String senderId) {
-        return userContainer
-            .queryItems(
-                "SELECT * FROM c WHERE (c.type = 'SentIndividualMessage' OR c.type = 'SentGroupMessage') " +
-                "AND c.userId = '" +
-                senderId +
-                "' ORDER BY c.timeSent DESC",
-                new CosmosQueryRequestOptions(),
-                SentMessage.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(senderId, SentMessage.class)
+                .orderBy("timeSent", Order.DESC),
+            userContainer,
+            SentMessage.class
+        );
     }
 
     public int getNumberOfUnreadMessages(String recipientId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.unread = true AND c.userId = '" +
-                recipientId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries
+                .queryByPartitionKey(recipientId, ReceivedMessage.class)
+                .addRestrictions(new RestrictionBuilder().eq("unread", true)),
+            userContainer
+        );
     }
 
     public void markReceivedMessageAsRead(
@@ -762,68 +729,43 @@ public class Database {
         tagContainer.createItem(tag);
     }
 
-    public List<Tag> getIdeaTags() {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<IdeaTag> getIdeaTags() {
+        return executeMultipleDocumentQuery(
+            GenericQueries.queryByType(IdeaTag.class),
+            tagContainer,
+            IdeaTag.class
+        );
     }
 
-    public List<Tag> getProjectTags() {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<ProjectTag> getProjectTags() {
+        return executeMultipleDocumentQuery(
+            GenericQueries.queryByType(ProjectTag.class),
+            tagContainer,
+            ProjectTag.class
+        );
     }
 
     public List<Tag> getAllTags() {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries.queryByType(Tag.class),
+            tagContainer,
+            Tag.class
+        );
     }
 
-    public Optional<Tag> getTag(String name, Tag.Type type) {
-        return tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.name = '" +
-                name +
-                "' AND c.type = '" +
-                type.toString() +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .findFirst();
+    public <T extends Tag> Optional<T> getTag(String name, Class<T> classType) {
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(name, classType),
+            tagContainer,
+            classType
+        );
     }
 
-    public void incrementTagUsages(String name, Tag.Type type) {
-        Tag tag = tagContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.name = '" +
-                name +
-                "' AND c.type = '" +
-                type.toString() +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Tag.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+    public <T extends Tag> void incrementTagUsages(
+        String name,
+        Class<T> classType
+    ) {
+        Tag tag = getTag(name, classType).get();
         tag.setUsages(tag.getUsages() + 1);
         tagContainer.replaceItem(
             tag,
@@ -841,70 +783,59 @@ public class Database {
 
     public void createProject(Project project, String projectCreatorId) {
         for (String tag : project.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Project);
+                incrementTagUsages(tag, ProjectTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Project));
+                createTag(new ProjectTag(tag));
             }
         }
         projectContainer.createItem(project);
-        User user = findUser(projectCreatorId).get();
+        User user = getUser(projectCreatorId).get();
         user.getJoinedProjectIds().add(project.getId());
         updateUser(projectCreatorId, user);
     }
 
     public Optional<Project> getProject(String projectId) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId = '" +
-                projectId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .findFirst();
+        return executeSingleDocumentQuery(
+            GenericQueries.queryByPartitionKey(projectId, Project.class),
+            projectContainer,
+            Project.class
+        );
     }
 
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.ideaId = '" +
-                ideaId +
-                "' ORDER BY c.timeCreated DESC",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(new RestrictionBuilder().eq("ideaId", ideaId))
+                .orderBy("timeCreated", Order.DESC),
+            projectContainer,
+            Project.class
+        );
     }
 
     public List<Project> getProjectsLookingForMemberBasedOnIdea(String ideaId) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.lookingForMembers = true AND c.ideaId = '" +
-                ideaId +
-                "' ORDER BY c.timeCreated DESC",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("ideaId", ideaId),
+                    new RestrictionBuilder().eq("lookingForMembers", true)
+                )
+                .orderBy("timeCreated", Order.DESC),
+            projectContainer,
+            Project.class
+        );
     }
 
     public int getNumProjectsForTag(String tag) {
-        return projectContainer
-            .queryItems(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'Project' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "')",
-                new CosmosQueryRequestOptions(),
-                Integer.class
-            )
-            .stream()
-            .findFirst()
-            .get();
+        return executeCountQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .arrayContains("tags", tag),
+            projectContainer
+        );
     }
 
     public int getLastPageNumForProjectTag(String tag) {
@@ -929,25 +860,26 @@ public class Database {
     }
 
     private List<Project> getProjectsInList(List<String> projectIds) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.projectId IN ('" +
-                String.join("', '", projectIds) +
-                "') ORDER BY c.timeCreated DESC",
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder()
+                    .in("projectId", projectIds.toArray())
+                )
+                .orderBy("timeCreated", Order.DESC),
+            projectContainer,
+            Project.class
+        );
     }
 
     public void updateProject(Project project) {
         for (String tag : project.getTags()) {
-            Optional<Tag> existingTag = getTag(tag, Tag.Type.Project);
+            Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {
-                incrementTagUsages(tag, Tag.Type.Project);
+                incrementTagUsages(tag, ProjectTag.class);
             } else {
-                createTag(new Tag(tag, Tag.Type.Project));
+                createTag(new ProjectTag(tag));
             }
         }
         projectContainer.replaceItem(
