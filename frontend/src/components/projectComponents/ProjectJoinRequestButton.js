@@ -1,9 +1,23 @@
 import React from "react";
+import { useGlobalState } from "../../State";
 
 export default function ProjectJoinRequestButton({ project }) {
+    const [user] = useGlobalState("user");
+
     var joinRequestButton = <div></div>;
     if (project.userIsTeamMember) {
         joinRequestButton = <div></div>;
+    } else if (!user.isLoggedIn) {
+        joinRequestButton = (
+            <button
+                className="btn btn-sm btn-primary float-end"
+                disabled={true}
+                type="button"
+                id="requestToJoin"
+            >
+                Login to join
+            </button>
+        );
     } else if (project.userHasRequestedToJoin) {
         joinRequestButton = (
             <button

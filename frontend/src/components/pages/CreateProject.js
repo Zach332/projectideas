@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Status } from "../../State";
+import { Status, useGlobalState } from "../../State";
+import LoginWarning from "../logins/LoginWarning";
 import NotFound from "./NotFound";
 import Success from "../general/Success";
 import axios from "axios";
@@ -10,6 +11,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../tagComponents/TagPicker";
 
 export default function CreateProject() {
+    const [user] = useGlobalState("user");
     const [idea, setIdea] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [project, setProject] = React.useState({
@@ -84,6 +86,10 @@ export default function CreateProject() {
                 <Success />
             </div>
         );
+    }
+
+    if (!user.loggedIn) {
+        return <LoginWarning />;
     }
 
     return (

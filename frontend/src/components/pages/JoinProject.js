@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Status } from "../../State";
+import { Status, useGlobalState } from "../../State";
 import NotFound from "./NotFound";
 import axios from "axios";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import ProjectSummary from "../projectComponents/ProjectSummary";
+import LoginWarning from "./../logins/LoginWarning";
 
 export default function JoinProject() {
+    const [user] = useGlobalState("user");
     const [idea, setIdea] = React.useState([]);
     const [rerender, setRerender] = React.useState(0);
     const [projects, setProjects] = React.useState([]);
@@ -61,6 +63,10 @@ export default function JoinProject() {
                 one!
             </div>
         );
+
+    if (!user.loggedIn) {
+        return <LoginWarning />;
+    }
 
     return (
         <div>
