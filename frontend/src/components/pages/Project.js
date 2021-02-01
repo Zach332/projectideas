@@ -4,6 +4,7 @@ import Success from "../general/Success";
 import axios from "axios";
 import NotFound from "./NotFound";
 import { Status } from "../../State";
+import { toQuery } from "../utils/Routing";
 import { useToasts } from "react-toast-notifications";
 import { motion, AnimateSharedLayout } from "framer-motion";
 import ProjectJoinRequestButton from "../projectComponents/ProjectJoinRequestButton";
@@ -152,6 +153,11 @@ export default function Project() {
         return link;
     };
 
+    const searchTag = (tagName) => {
+        window.location.href =
+            "/tags?" + toQuery({ type: "project", tag: tagName });
+    };
+
     var githubLink;
     if (!project.githubLink || project.githubLink === "") {
         if (project.userIsTeamMember) {
@@ -239,7 +245,8 @@ export default function Project() {
                 <div className="mw-100">
                     {project.tags.map((tag) => (
                         <span
-                            className="badge rounded-pill bg-dark me-2"
+                            className="badge btn rounded-pill btn-primary me-2"
+                            onClick={() => searchTag(tag)}
                             key={tag}
                         >
                             {tag}

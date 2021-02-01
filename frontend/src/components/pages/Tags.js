@@ -4,9 +4,10 @@ import axios from "axios";
 import { Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
+import ProjectSummary from "./../projectComponents/ProjectSummary";
 
 export default function Tags() {
-    const [ideas, setIdeas] = React.useState([]);
+    const [posts, setPosts] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
     const params = toParams(window.location.search.replace(/^\?/, ""));
@@ -17,11 +18,16 @@ export default function Tags() {
             .get(
                 "/api/" +
                     params.type +
-                    "/tags?" +
+                    "s/tags?" +
                     toQuery({ tag: params.tag, page: params.page })
             )
             .then((response) => {
-                setIdeas(response.data.ideaPreviews);
+                if (params.type === "idea") {
+                    setPosts(response.data.ideaPreviews);
+                }
+                if (params.type === "project") {
+                    setPosts(response.data.projectPreviews);
+                }
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
@@ -30,30 +36,46 @@ export default function Tags() {
     const next = () => {
         window.location.href =
             "/tags?" +
-            toQuery({ tag: params.tag, page: parseInt(params.page) + 1 });
+            toQuery({
+                type: params.type,
+                tag: params.tag,
+                page: parseInt(params.page) + 1,
+            });
     };
 
     const previous = () => {
         window.location.href =
             "/tags?" +
-            toQuery({ tag: params.tag, page: parseInt(params.page) - 1 });
+            toQuery({
+                type: params.type,
+                tag: params.tag,
+                page: parseInt(params.page) - 1,
+            });
     };
 
-    let ideaElements;
-    if (status == Status.Success && ideas.length > 0) {
-        ideaElements = (
+    let postElements;
+    if (status == Status.Success && posts.length > 0) {
+        postElements = (
             <div className="container mx-auto">
-                {ideas.map((idea) => (
-                    <div className="my-2" key={idea.id}>
-                        <IdeaSummary idea={idea} />
-                    </div>
-                ))}
+                {posts.map((post) =>
+                    params.type === "idea" ? (
+                        <div className="my-2" key={post.id}>
+                            <IdeaSummary idea={post} />
+                        </div>
+                    ) : (
+                        <div className="my-2" key={post.id}>
+                            <ProjectSummary project={post} />
+                        </div>
+                    )
+                )}
             </div>
         );
     } else if (status == Status.Loading) {
-        ideaElements = <Spinner />;
+        postElements = <Spinner />;
     } else {
-        ideaElements = <p className="ms-2">No ideas match this tag.</p>;
+        postElements = (
+            <p className="ms-2">No {params.type}s match this tag.</p>
+        );
     }
 
     return (
@@ -63,7 +85,7 @@ export default function Tags() {
                     <h1>Tag: {params.tag}</h1>
                 </div>
             </div>
-            {ideaElements}
+            {postElements}
             <div className="d-flex">
                 <div className="me-auto p-2">
                     {params.page > 1 && (
@@ -77,7 +99,7 @@ export default function Tags() {
                     )}
                 </div>
                 <div className="p-2">
-                    {!lastPage && ideas.length > 0 && (
+                    {!lastPage && posts.length > 0 && (
                         <button
                             type="btn btn-primary"
                             className="btn btn-primary btn-md"
