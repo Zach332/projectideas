@@ -35,6 +35,30 @@ public class ProjectController {
     @Autowired
     DTOMapper mapper;
 
+    @GetMapping("/api/projects")
+    public PreviewProjectPageDTO getPublicProjects(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @RequestParam("page") int pageNum
+    ) {
+        int lastPageNum = database.getLastProjectPageNum();
+
+        List<PreviewProjectDTO> projectPreviews;
+        if (pageNum <= 0 || pageNum > lastPageNum) {
+            projectPreviews = new ArrayList<>();
+        } else {
+            projectPreviews =
+                database
+                    .findPublicProjectsByPageNum(pageNum)
+                    .stream()
+                    .map(project -> mapper.previewProjectDTO(project, userId))
+                    .collect(Collectors.toList());
+        }
+        return new PreviewProjectPageDTO(
+            projectPreviews,
+            pageNum == lastPageNum
+        );
+    }
+
     @GetMapping("/api/projects/tags")
     public PreviewProjectPageDTO getProjectsByTag(
         @RequestHeader(value = "authorization", required = false) String userId,
@@ -90,6 +114,13 @@ public class ProjectController {
         @PathVariable String projectId,
         @RequestBody CreateProjectDTO project
     ) {
+        if (!project.isPublicProject() && project.isLookingForMembers()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "A project cannot be looking for members while private."
+            );
+        }
+
         Project existingProject = database
             .getProject(projectId)
             .orElseThrow(
@@ -121,10 +152,44 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
+        if (!existingProject.isPublicProject() && lookingForMembers) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "A project cannot be looking for members while private."
+            );
+        }
         if (!existingProject.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         existingProject.setLookingForMembers(lookingForMembers);
+        database.updateProject(existingProject);
+    }
+
+    @PutMapping("/api/projects/{projectId}/updatepublicstatus")
+    public void updatePublicProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId,
+        @RequestParam("publicProject") boolean publicProject
+    ) {
+        Project existingProject = database
+            .getProject(projectId)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Project " + projectId + " does not exist."
+                    )
+            );
+        if (!publicProject && existingProject.isLookingForMembers()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "A project cannot be private while looking for members."
+            );
+        }
+        if (!existingProject.userIsTeamMember(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        existingProject.setPublicProject(publicProject);
         database.updateProject(existingProject);
     }
 
