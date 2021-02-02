@@ -126,7 +126,7 @@ public class IdeaController {
     ) {
         if (lookingForMembersOnly) {
             return database
-                .getProjectsLookingForMemberBasedOnIdea(ideaId)
+                .getPublicProjectsLookingForMemberBasedOnIdea(ideaId)
                 .stream()
                 .map(project -> mapper.previewProjectDTO(project, userId))
                 .collect(Collectors.toList());
@@ -198,12 +198,21 @@ public class IdeaController {
         @RequestBody CreateProjectDTO project
     ) {
         User user = database.getUser(userId).get();
+
+        if (!project.isPublicProject() && project.isLookingForMembers()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "A project cannot be looking for members while private."
+            );
+        }
+
         database.createProject(
             new Project(
                 project.getName(),
                 project.getDescription(),
                 ideaId,
                 new UsernameIdPair(user),
+                project.isPublicProject(),
                 project.isLookingForMembers(),
                 project.getTags()
             ),

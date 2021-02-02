@@ -18,6 +18,7 @@ export default function CreateProject() {
         name: "",
         description: "",
         lookingForMembers: true,
+        publicProject: true,
         tags: [],
     });
     let params = useParams();
@@ -40,6 +41,7 @@ export default function CreateProject() {
                 name: project.name,
                 description: project.description,
                 lookingForMembers: project.lookingForMembers,
+                publicProject: project.publicProject,
                 tags: project.tags,
             })
             .then(() => {

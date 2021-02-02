@@ -27,6 +27,7 @@ public class Project implements RootDocument {
     protected String description;
     protected String githubLink;
     protected List<UsernameIdPair> teamMembers;
+    protected boolean publicProject;
     protected boolean lookingForMembers;
     protected List<ProjectJoinRequest> usersRequestingToJoin;
     protected List<String> tags;
@@ -36,6 +37,7 @@ public class Project implements RootDocument {
         String description,
         String ideaId,
         UsernameIdPair initialUser,
+        boolean publicProject,
         boolean lookingForMembers,
         List<String> tags
     ) {
@@ -48,6 +50,7 @@ public class Project implements RootDocument {
         this.description = description;
         this.teamMembers = new ArrayList<>();
         this.teamMembers.add(initialUser);
+        this.publicProject = publicProject;
         this.lookingForMembers = lookingForMembers;
         this.usersRequestingToJoin = new ArrayList<>();
         this.tags = tags;
