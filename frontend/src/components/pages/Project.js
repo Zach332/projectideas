@@ -23,6 +23,7 @@ export default function Project() {
     const [project, setProject] = React.useState({
         teamMemberUsernames: [],
         lookingForMembers: true,
+        publicProject: true,
         githubLink: "",
         id: "",
         joinRequests: "",
@@ -52,6 +53,7 @@ export default function Project() {
                 setProject((project) => ({
                     ...project,
                     lookingForMembers: !project.lookingForMembers,
+                    publicProject: true,
                 }));
                 addToast("Your project was changed successfully.", {
                     appearance: "success",
@@ -60,6 +62,32 @@ export default function Project() {
             })
             .catch((err) => {
                 console.log("Error changing lookingForMembers: " + err);
+                addToast("An error occurred. Please try again.", {
+                    appearance: "error",
+                });
+            });
+    };
+
+    const flipPublicProject = () => {
+        axios
+            .put(
+                "/api/projects/" +
+                    project.id +
+                    "/updatepublicstatus?publicProject=" +
+                    !project.publicProject
+            )
+            .then(() => {
+                setProject((project) => ({
+                    ...project,
+                    publicProject: !project.publicProject,
+                }));
+                addToast("Your project was changed successfully.", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error changing publicProject: " + err);
                 addToast("An error occurred. Please try again.", {
                     appearance: "error",
                 });
@@ -328,6 +356,21 @@ export default function Project() {
                             htmlFor="lookingForMembers"
                         >
                             Looking for new members
+                        </label>
+                    </div>
+                    <div className="form-check form-switch">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="publicProject"
+                            onChange={flipPublicProject}
+                            checked={project.publicProject}
+                        />
+                        <label
+                            className="form-check-label"
+                            htmlFor="publicProject"
+                        >
+                            Public
                         </label>
                     </div>
                     <button
