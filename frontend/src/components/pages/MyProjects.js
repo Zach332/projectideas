@@ -2,14 +2,18 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import ProjectSummary from "../projectComponents/ProjectSummary";
 import { useGlobalState } from "../../State";
+import { Status } from "./../../State";
+import LoadingDiv from "./../general/LoadingDiv";
 
 export default function MyProjects() {
     const [projects, setProjects] = React.useState([]);
+    const [status, setStatus] = React.useState(Status.Loading);
     const [user] = useGlobalState("user");
 
     useEffect(() => {
         axios.get("/api/users/" + user.id + "/projects").then((response) => {
             setProjects(response.data);
+            setStatus(Status.Loaded);
         });
     }, []);
 
@@ -32,9 +36,9 @@ export default function MyProjects() {
         );
 
     return (
-        <div>
+        <LoadingDiv isLoading={status === Status.Loading}>
             <h1>My Projects</h1>
             {existingProjects}
-        </div>
+        </LoadingDiv>
     );
 }

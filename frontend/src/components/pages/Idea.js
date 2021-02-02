@@ -12,6 +12,7 @@ import SendMessageModal from "../messageComponents/SendMessageModal";
 import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import { formatTime } from "../../TimeFormatter";
+import LoadingDiv from "./../general/LoadingDiv";
 
 export default function Idea() {
     const { addToast } = useToasts();
@@ -25,6 +26,7 @@ export default function Idea() {
             if (!response.data) {
                 setStatus(Status.NotFound);
             } else {
+                setStatus(Status.Loaded);
                 setIdea(response.data);
             }
         });
@@ -151,91 +153,93 @@ export default function Idea() {
     }
 
     return (
-        <div className="container-fluid">
-            <div className="row justify-content-center">
-                <div className="col-lg-8 col-md-8 col-sm-auto mb-2">
-                    <IdeaCard title={idea.title} content={idea.content} />
-                </div>
-                <div className="col-md-3 col-sm-auto">
-                    <ul className="card list-group list-group-flush">
-                        <li className="list-group-item">
-                            <div className="d-flex">
-                                <div className="me-auto">
-                                    By {idea.authorUsername}
-                                    <br></br>
-                                    {formatTime(idea.timePosted)}
+        <LoadingDiv isLoading={status == Status.Loading}>
+            <div className="container-fluid">
+                <div className="row justify-content-center">
+                    <div className="col-lg-8 col-md-8 col-sm-auto mb-2">
+                        <IdeaCard title={idea.title} content={idea.content} />
+                    </div>
+                    <div className="col-md-3 col-sm-auto">
+                        <ul className="card list-group list-group-flush">
+                            <li className="list-group-item">
+                                <div className="d-flex">
+                                    <div className="me-auto">
+                                        By {idea.authorUsername}
+                                        <br></br>
+                                        {formatTime(idea.timePosted)}
+                                    </div>
+                                    <div className="d-flex align-items-center">
+                                        {idea.savedByUser ? (
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger btn-md"
+                                                onClick={unsaveIdea}
+                                            >
+                                                Unsave
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary btn-md"
+                                                onClick={saveIdea}
+                                            >
+                                                Save
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="d-flex align-items-center">
-                                    {idea.savedByUser ? (
-                                        <button
-                                            type="button"
-                                            className="btn btn-danger btn-md"
-                                            onClick={unsaveIdea}
-                                        >
-                                            Unsave
-                                        </button>
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary btn-md"
-                                            onClick={saveIdea}
-                                        >
-                                            Save
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </li>
-                        <li className="list-group-item">
-                            <button
-                                type="button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#sendMessage"
-                                className="btn btn-outline-secondary btn-md"
-                            >
-                                Message author
-                            </button>
-                        </li>
-                        <li className="list-group-item">
-                            <button
-                                type="button"
-                                className="btn btn-info btn-md"
-                                onClick={joinProject}
-                            >
-                                Join or start a project
-                            </button>
-                        </li>
-                        {more}
-                        {idea.tags && idea.tags.length > 0 && (
-                            <li className="list-group-item mw-100">
-                                {idea.tags.map((tag) => (
-                                    <span
-                                        className="badge btn rounded-pill btn-primary me-2"
-                                        onClick={() => searchTag(tag)}
-                                        key={tag}
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
                             </li>
-                        )}
-                    </ul>
+                            <li className="list-group-item">
+                                <button
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#sendMessage"
+                                    className="btn btn-outline-secondary btn-md"
+                                >
+                                    Message author
+                                </button>
+                            </li>
+                            <li className="list-group-item">
+                                <button
+                                    type="button"
+                                    className="btn btn-info btn-md"
+                                    onClick={joinProject}
+                                >
+                                    Join or start a project
+                                </button>
+                            </li>
+                            {more}
+                            {idea.tags && idea.tags.length > 0 && (
+                                <li className="list-group-item mw-100">
+                                    {idea.tags.map((tag) => (
+                                        <span
+                                            className="badge btn rounded-pill btn-primary me-2"
+                                            onClick={() => searchTag(tag)}
+                                            key={tag}
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </li>
+                            )}
+                        </ul>
+                    </div>
                 </div>
+                <div className="row justify-content-center">
+                    <Comments ideaId={params.id} />
+                </div>
+                <Modal
+                    id="deleteConfirmation"
+                    title="Delete Idea"
+                    body="Are you sure you want to delete this idea? The data cannot be recovered."
+                    submit="Delete"
+                    onClick={deleteIdea}
+                />
+                <SendMessageModal
+                    recipient={idea.authorUsername}
+                    id="sendMessage"
+                />
             </div>
-            <div className="row justify-content-center">
-                <Comments ideaId={params.id} />
-            </div>
-            <Modal
-                id="deleteConfirmation"
-                title="Delete Idea"
-                body="Are you sure you want to delete this idea? The data cannot be recovered."
-                submit="Delete"
-                onClick={deleteIdea}
-            />
-            <SendMessageModal
-                recipient={idea.authorUsername}
-                id="sendMessage"
-            />
-        </div>
+        </LoadingDiv>
     );
 }

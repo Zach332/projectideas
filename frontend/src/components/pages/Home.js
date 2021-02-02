@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
-import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
+import LoadingDiv from "./../general/LoadingDiv";
 
 export default function Home() {
     const [ideas, setIdeas] = React.useState([]);
@@ -47,8 +47,6 @@ export default function Home() {
                 ))}
             </div>
         );
-    } else if (status == Status.Loading) {
-        ideaElements = <Spinner />;
     } else {
         ideaElements = (
             <p className="ms-2">There are no ideas posted here yet.</p>
@@ -56,7 +54,7 @@ export default function Home() {
     }
 
     return (
-        <div>
+        <LoadingDiv isLoading={status == Status.Loading}>
             <div className="d-flex">
                 <div className="me-auto p-2">
                     <h1>Home</h1>
@@ -109,6 +107,6 @@ export default function Home() {
                     )}
                 </div>
             </div>
-        </div>
+        </LoadingDiv>
     );
 }
