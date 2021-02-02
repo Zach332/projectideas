@@ -3,6 +3,7 @@ import axios from "axios";
 
 export const Status = {
     Loading: "Loading",
+    Loaded: "Loaded",
     Success: "Success",
     Failure: "Failure",
     NotSubmitted: "NotSubmitted",

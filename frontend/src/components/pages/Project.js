@@ -14,6 +14,7 @@ import SendMessageModal from "../messageComponents/SendMessageModal";
 import EditProject from "./EditProject";
 import Modal from "../layout/Modal";
 import ProjectGitHubLinkModal from "../projectComponents/ProjectGitHubLinkModal";
+import LoadingDiv from "../general/LoadingDiv";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -34,6 +35,7 @@ export default function Project() {
                 setStatus(Status.NotFound);
             } else {
                 setProject(response.data);
+                setStatus(Status.Loaded);
             }
         });
     }, [rerender]);
@@ -229,7 +231,7 @@ export default function Project() {
     }
 
     return (
-        <div>
+        <LoadingDiv isLoading={status === Status.Loading}>
             <div className="d-flex">
                 <div className="me-auto">
                     <h1>{project.name}</h1>
@@ -361,6 +363,6 @@ export default function Project() {
                 submit="Leave"
                 onClick={leave}
             />
-        </div>
+        </LoadingDiv>
     );
 }
