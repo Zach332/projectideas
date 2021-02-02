@@ -796,6 +796,36 @@ public class Database {
         updateUser(projectCreatorId, user);
     }
 
+    public int getNumProjects() {
+        return executeCountQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("publicProject", true)
+                ),
+            projectContainer
+        );
+    }
+
+    public int getLastProjectPageNum() {
+        int numProjects = getNumProjects();
+        return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
+    }
+
+    public List<Project> findPublicProjectsByPageNum(int pageNum) {
+        return projectContainer
+            .queryItems(
+                "SELECT * FROM c WHERE c.type = 'Project' AND c.publicProject = true ORDER BY c.timeCreated DESC OFFSET " +
+                ((pageNum - 1) * ITEMS_PER_PAGE) +
+                " LIMIT " +
+                ITEMS_PER_PAGE,
+                new CosmosQueryRequestOptions(),
+                Project.class
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     public Optional<Project> getProject(String projectId) {
         return executeSingleDocumentQuery(
             GenericQueries.queryByPartitionKey(projectId, Project.class),

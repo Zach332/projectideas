@@ -35,6 +35,30 @@ public class ProjectController {
     @Autowired
     DTOMapper mapper;
 
+    @GetMapping("/api/projects")
+    public PreviewProjectPageDTO getPublicProjects(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @RequestParam("page") int pageNum
+    ) {
+        int lastPageNum = database.getLastProjectPageNum();
+
+        List<PreviewProjectDTO> projectPreviews;
+        if (pageNum <= 0 || pageNum > lastPageNum) {
+            projectPreviews = new ArrayList<>();
+        } else {
+            projectPreviews =
+                database
+                    .findPublicProjectsByPageNum(pageNum)
+                    .stream()
+                    .map(project -> mapper.previewProjectDTO(project, userId))
+                    .collect(Collectors.toList());
+        }
+        return new PreviewProjectPageDTO(
+            projectPreviews,
+            pageNum == lastPageNum
+        );
+    }
+
     @GetMapping("/api/projects/tags")
     public PreviewProjectPageDTO getProjectsByTag(
         @RequestHeader(value = "authorization", required = false) String userId,
