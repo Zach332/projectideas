@@ -152,14 +152,11 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (!existingProject.isPublicProject() && lookingForMembers) {
-            throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "A project cannot be looking for members while private."
-            );
-        }
         if (!existingProject.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        if (lookingForMembers) {
+            existingProject.setPublicProject(true);
         }
         existingProject.setLookingForMembers(lookingForMembers);
         database.updateProject(existingProject);
