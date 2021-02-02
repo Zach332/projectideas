@@ -17,6 +17,7 @@ export default function EditProject({ originalProject, setStatus }) {
                 name: project.name,
                 description: project.description,
                 lookingForMembers: project.lookingForMembers,
+                publicProject: project.publicProject,
                 tags: project.tags,
                 githubLink: project.githubLink,
             })
