@@ -50,6 +50,14 @@ export default function EditProject({ originalProject, setStatus }) {
         setProject((project) => ({
             ...project,
             lookingForMembers: !project.lookingForMembers,
+            publicProject: true,
+        }));
+    };
+
+    const flipPublicProject = () => {
+        setProject((project) => ({
+            ...project,
+            publicProject: !project.publicProject,
         }));
     };
 
@@ -96,6 +104,25 @@ export default function EditProject({ originalProject, setStatus }) {
                         option if a user wants to join a team
                     </label>
                 </div>
+                {!project.lookingForMembers && (
+                    <div className="form-check form-switch mb-3">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="publicProject"
+                            onClick={flipPublicProject}
+                            checked={project.publicProject}
+                        />
+                        <label
+                            className="form-check-label"
+                            htmlFor="publicProject"
+                        >
+                            Public - your project will appear when people browse
+                            projects (anyone with the link can still see private
+                            projects)
+                        </label>
+                    </div>
+                )}
                 <TagPicker
                     post={project}
                     setPost={setProject}
