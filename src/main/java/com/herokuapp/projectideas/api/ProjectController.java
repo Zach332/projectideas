@@ -165,6 +165,34 @@ public class ProjectController {
         database.updateProject(existingProject);
     }
 
+    @PutMapping("/api/projects/{projectId}/updatepublicstatus")
+    public void updatePublicProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId,
+        @RequestParam("publicProject") boolean publicProject
+    ) {
+        Project existingProject = database
+            .getProject(projectId)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Project " + projectId + " does not exist."
+                    )
+            );
+        if (!publicProject && existingProject.isLookingForMembers()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "A project cannot be private while looking for members."
+            );
+        }
+        if (!existingProject.userIsTeamMember(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        existingProject.setPublicProject(publicProject);
+        database.updateProject(existingProject);
+    }
+
     @PostMapping("/api/projects/{projectId}/joinrequests")
     public void requestToJoinProject(
         @RequestHeader("authorization") String userId,
