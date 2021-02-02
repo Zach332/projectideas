@@ -358,21 +358,23 @@ export default function Project() {
                             Looking for new members
                         </label>
                     </div>
-                    <div className="form-check form-switch">
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="publicProject"
-                            onChange={flipPublicProject}
-                            checked={project.publicProject}
-                        />
-                        <label
-                            className="form-check-label"
-                            htmlFor="publicProject"
-                        >
-                            Public
-                        </label>
-                    </div>
+                    {!project.lookingForMembers && (
+                        <div className="form-check form-switch">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="publicProject"
+                                onChange={flipPublicProject}
+                                checked={project.publicProject}
+                            />
+                            <label
+                                className="form-check-label"
+                                htmlFor="publicProject"
+                            >
+                                Public
+                            </label>
+                        </div>
+                    )}
                     <button
                         type="button"
                         data-bs-toggle="modal"
