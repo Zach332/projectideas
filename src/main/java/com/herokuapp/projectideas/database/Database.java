@@ -10,6 +10,7 @@ import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
+import com.github.mohitgoyal91.cosmosdbqueryutils.restriction.Restriction;
 import com.github.mohitgoyal91.cosmosdbqueryutils.utilities.Constants.Order;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
@@ -111,6 +112,21 @@ public class Database {
             .get();
     }
 
+    private <T> List<T> executeMultipleValueQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        Class<T> classType
+    ) {
+        return container
+            .queryItems(
+                query.createQuery(),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     // Users
 
     public void createUser(User user) {
@@ -163,14 +179,16 @@ public class Database {
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
             // Handle posts container
-            List<PartitionKey> ideaPartitionKeys = postContainer
-                .queryItems(
-                    "SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" +
-                    user.getId() +
-                    "'",
-                    new CosmosQueryRequestOptions(),
-                    String.class
-                )
+            List<PartitionKey> ideaPartitionKeys = executeMultipleValueQuery(
+                GenericQueries
+                    .queryByType(Idea.class)
+                    .valueOf("ideaId")
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("authorId", user.getId())
+                    ),
+                postContainer,
+                String.class
+            )
                 .stream()
                 .distinct()
                 .map(ideaId -> new PartitionKey(ideaId))
@@ -243,42 +261,36 @@ public class Database {
     }
 
     private List<String> getSavedIdeaIdsForUser(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.savedIdeaIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleValueQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .valueOf("savedIdeaIds")
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            userContainer,
+            String.class
+        );
     }
 
     private List<String> getPostedIdeaIdsForUser(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.postedIdeaIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleValueQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .valueOf("postedIdeaIds")
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            userContainer,
+            String.class
+        );
     }
 
     private List<String> getJoinedProjectIdsForUser(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.joinedProjectIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleValueQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .valueOf("joinedProjectIds")
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            userContainer,
+            String.class
+        );
     }
 
     public List<Idea> getSavedIdeasForUser(String userId) {
