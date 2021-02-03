@@ -9,7 +9,7 @@ export default function Profile() {
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
     const [userData, setUserData] = React.useState([]);
-    const [myProjects, setMyProjects] = React.useState([]);
+    const [savedIdeas, setSavedIdeas] = React.useState([]);
     const [myIdeas, setMyIdeas] = React.useState([]);
     const [rerender, setRerender] = React.useState(0);
     const [changingUsername, setChangingUsername] = React.useState(false);
@@ -22,7 +22,7 @@ export default function Profile() {
             axios
                 .get("/api/users/" + user.id + "/savedIdeas")
                 .then((response) => {
-                    setMyProjects(response.data);
+                    setSavedIdeas(response.data);
                 });
             axios
                 .get("/api/users/" + user.id + "/postedideas")
@@ -32,7 +32,7 @@ export default function Profile() {
         }
     }, [rerender]);
 
-    const removeIdeaFromProjects = (ideaId) => {
+    const removeIdeaFromSaved = (ideaId) => {
         axios
             .post("/api/ideas/" + ideaId + "/unsave", {})
             .then(() => {
@@ -207,10 +207,10 @@ export default function Profile() {
                 Log Out
             </button>
             <h2 className="mt-4">Saved ideas</h2>
-            {myProjects.length === 0 ? (
+            {savedIdeas.length === 0 ? (
                 <p>You haven&apos;t saved any ideas.</p>
             ) : (
-                myProjects.map((idea) => (
+                savedIdeas.map((idea) => (
                     <div key={idea.id} className="container-flex">
                         <div className="row my-2">
                             <div className="col me-auto">
@@ -220,9 +220,7 @@ export default function Profile() {
                                 <button
                                     className="btn btn-sm"
                                     type="button"
-                                    onClick={() =>
-                                        removeIdeaFromProjects(idea.id)
-                                    }
+                                    onClick={() => removeIdeaFromSaved(idea.id)}
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
