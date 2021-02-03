@@ -4,7 +4,7 @@
   "description": "Have you ever wished there was an app for something? If you're a developer, do you want to create apps that serve a real purpose and are built with the end user in mind?",
   "main": "index.js",
   "dependencies": {
-    
+    "react-helmet": "^6.1.0"
   },
   "devDependencies": {
     "eslint": "^7.14.0",
