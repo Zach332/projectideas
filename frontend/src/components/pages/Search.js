@@ -4,6 +4,8 @@ import axios from "axios";
 import { Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Search() {
     const [ideas, setIdeas] = React.useState([]);
@@ -74,6 +76,11 @@ export default function Search() {
 
     return (
         <div>
+            <Helmet>
+                <title>
+                    {"Search for " + decodeURI(params.query)} | {Globals.Title}
+                </title>
+            </Helmet>
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="row w-75 mx-auto">
                     <div className="col me-auto">

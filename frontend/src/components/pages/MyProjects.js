@@ -4,6 +4,8 @@ import ProjectSummary from "../projectComponents/ProjectSummary";
 import { useGlobalState } from "../../State";
 import { Status } from "./../../State";
 import LoadingDiv from "./../general/LoadingDiv";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function MyProjects() {
     const [projects, setProjects] = React.useState([]);
@@ -37,6 +39,9 @@ export default function MyProjects() {
 
     return (
         <LoadingDiv isLoading={status === Status.Loading}>
+            <Helmet>
+                <title>My Projects | {Globals.Title}</title>
+            </Helmet>
             <h1>My Projects</h1>
             {existingProjects}
         </LoadingDiv>

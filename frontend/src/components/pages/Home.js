@@ -4,6 +4,8 @@ import axios from "axios";
 import { Status } from "../../State";
 import { toParams, toQuery } from "../utils/Routing";
 import LoadingDiv from "./../general/LoadingDiv";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Home() {
     const [ideas, setIdeas] = React.useState([]);
@@ -55,6 +57,9 @@ export default function Home() {
 
     return (
         <LoadingDiv isLoading={status == Status.Loading}>
+            <Helmet>
+                <title>Home | {Globals.Title}</title>
+            </Helmet>
             <div className="d-flex">
                 <div className="me-auto p-2">
                     <h1>Home</h1>

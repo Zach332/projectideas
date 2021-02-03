@@ -4,6 +4,8 @@ import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../tagComponents/TagPicker";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function EditProject({ originalProject, setStatus }) {
     const [edited, setEdited] = React.useState(false);
@@ -63,6 +65,9 @@ export default function EditProject({ originalProject, setStatus }) {
 
     return (
         <div>
+            <Helmet>
+                <title>Edit Project | {Globals.Title}</title>
+            </Helmet>
             <h1>Update project</h1>
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="form-group">

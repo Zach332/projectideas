@@ -5,6 +5,8 @@ import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../ideaComponents/IdeaCard";
 import TagPicker from "../tagComponents/TagPicker";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function EditIdea({ originalIdea, setStatus }) {
     const { addToast } = useToasts();
@@ -47,6 +49,9 @@ export default function EditIdea({ originalIdea, setStatus }) {
 
     return (
         <div className="mx-auto">
+            <Helmet>
+                <title>Edit Idea | {Globals.Title}</title>
+            </Helmet>
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="title">Title</label>

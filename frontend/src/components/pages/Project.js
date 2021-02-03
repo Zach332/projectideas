@@ -15,6 +15,8 @@ import EditProject from "./EditProject";
 import Modal from "../layout/Modal";
 import ProjectGitHubLinkModal from "../projectComponents/ProjectGitHubLinkModal";
 import LoadingDiv from "../general/LoadingDiv";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Project() {
     const { addToast } = useToasts();
@@ -260,6 +262,11 @@ export default function Project() {
 
     return (
         <LoadingDiv isLoading={status === Status.Loading}>
+            <Helmet>
+                <title>
+                    {project.title} | {Globals.Title}
+                </title>
+            </Helmet>
             <div className="d-flex">
                 <div className="me-auto">
                     <h1>{project.name}</h1>

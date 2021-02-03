@@ -13,6 +13,8 @@ import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import { formatTime } from "../../TimeFormatter";
 import LoadingDiv from "./../general/LoadingDiv";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Idea() {
     const { addToast } = useToasts();
@@ -154,6 +156,11 @@ export default function Idea() {
 
     return (
         <LoadingDiv isLoading={status == Status.Loading}>
+            <Helmet>
+                <title>
+                    {idea.title} | {Globals.Title}
+                </title>
+            </Helmet>
             <div className="container-fluid">
                 <div className="row justify-content-center">
                     <div className="col-lg-8 col-md-8 col-sm-auto mb-2">

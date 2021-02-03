@@ -5,6 +5,8 @@ import { Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Tags() {
     const [posts, setPosts] = React.useState([]);
@@ -80,6 +82,12 @@ export default function Tags() {
 
     return (
         <div>
+            <Helmet>
+                <title>
+                    {params.type.charAt(0).toUpperCase() + params.type.slice(1)}{" "}
+                    Tags matching {params.tag} | {Globals.Title}
+                </title>
+            </Helmet>
             <div className="d-flex">
                 <div className="me-auto p-2">
                     <h1>Tag: {params.tag}</h1>

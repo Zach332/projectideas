@@ -1,5 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Markdown() {
     const [tryIt, setTryIt] = React.useState("");
@@ -16,6 +18,9 @@ export default function Markdown() {
 
     return (
         <div>
+            <Helmet>
+                <title>Markdown | {Globals.Title}</title>
+            </Helmet>
             <h1 className="pb-3">Guide to basic Markdown syntax</h1>
             <button onClick={onCLick} className="btn btn-link btn-lg mb-4">
                 Try it

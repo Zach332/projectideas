@@ -6,6 +6,8 @@ import { useGlobalState } from "../../State";
 import { motion, AnimateSharedLayout } from "framer-motion";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Status } from "./../../State";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Messages() {
     const [messages, setMessages] = React.useState([]);
@@ -48,6 +50,9 @@ export default function Messages() {
         <div>
             <AnimateSharedLayout>
                 <h1>Messages</h1>
+                <Helmet>
+                    <title>Messages | {Globals.Title}</title>
+                </Helmet>
                 <motion.button
                     type="button"
                     animate={{ rotateY: rotateMode }}

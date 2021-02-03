@@ -1,8 +1,13 @@
 import React from "react";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Privacy() {
     return (
         <div>
+            <Helmet>
+                <title>Privacy | {Globals.Title}</title>
+            </Helmet>
             <h2>Privacy Policy</h2>
             <p>
                 Your privacy is important to us. It is projectideas&apos; policy

@@ -7,6 +7,8 @@ import IdeaSummary from "../ideaComponents/IdeaSummary";
 import ProjectSummary from "../projectComponents/ProjectSummary";
 import LoginWarning from "./../logins/LoginWarning";
 import LoadingDiv from "./../general/LoadingDiv";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function JoinProject() {
     const [user] = useGlobalState("user");
@@ -72,6 +74,9 @@ export default function JoinProject() {
 
     return (
         <LoadingDiv isLoading={status === Status.Loading}>
+            <Helmet>
+                <title>Join Project | {Globals.Title}</title>
+            </Helmet>
             <h1>Join or start a project for idea:</h1>
             <div className="m-3">
                 <IdeaSummary idea={idea} />

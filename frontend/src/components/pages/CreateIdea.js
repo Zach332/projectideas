@@ -73,7 +73,7 @@ export default function CreateIdea() {
         return (
             <div className="mx-auto">
                 <Helmet>
-                    <title>About | {Globals.Title}</title>
+                    <title>Create Idea | {Globals.Title}</title>
                 </Helmet>
                 <form className="py-4" onSubmit={handleSubmit}>
                     <div className="form-group">

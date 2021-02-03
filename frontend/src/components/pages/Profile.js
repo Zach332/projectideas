@@ -6,6 +6,8 @@ import { useToasts } from "react-toast-notifications";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { Status } from "./../../State";
 import LoadingDiv from "../general/LoadingDiv";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Profile() {
     const { addToast } = useToasts();
@@ -193,6 +195,9 @@ export default function Profile() {
 
     return (
         <div>
+            <Helmet>
+                <title>Profile | {Globals.Title}</title>
+            </Helmet>
             <h1>Profile</h1>
             <LoadingDiv isLoading={status.userData === Status.Loading}>
                 {usernameForm}

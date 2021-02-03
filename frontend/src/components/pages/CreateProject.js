@@ -9,6 +9,8 @@ import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../tagComponents/TagPicker";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function CreateProject() {
     const [user] = useGlobalState("user");
@@ -104,6 +106,9 @@ export default function CreateProject() {
 
     return (
         <div>
+            <Helmet>
+                <title>Create Project | {Globals.Title}</title>
+            </Helmet>
             <h1>Start a project based on:</h1>
             <div className="m-3">
                 <IdeaSummary idea={idea} />
