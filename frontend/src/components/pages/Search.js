@@ -78,7 +78,8 @@ export default function Search() {
         <div>
             <Helmet>
                 <title>
-                    {"Search for " + decodeURI(params.query)} | {Globals.Title}
+                    {query === "" ? "Search" : "Search for " + query} |{" "}
+                    {Globals.Title}
                 </title>
             </Helmet>
             <form className="py-4" onSubmit={handleSubmit}>
