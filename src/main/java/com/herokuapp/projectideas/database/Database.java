@@ -21,6 +21,7 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
@@ -386,33 +387,32 @@ public class Database {
     }
 
     public List<Idea> findIdeasByPageNum(int pageNum) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .orderBy("timePosted", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            postContainer,
+            Idea.class
+        );
     }
 
     public List<Idea> findIdeasByTagAndPageNum(String tag, int pageNum) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "') ORDER BY c.timePosted DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .arrayContains("tags", tag)
+                .orderBy("timePosted", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            postContainer,
+            Idea.class
+        );
     }
 
     public List<Idea> getIdeasInList(List<String> ideaIds) {
@@ -456,14 +456,13 @@ public class Database {
     public void deleteIdea(String ideaId, String userId) {
         // Delete idea and all associated comments
         PartitionKey partitionKey = new PartitionKey(ideaId);
-        List<String> ids = postContainer
-            .queryItems(
-                "SELECT VALUE c.id FROM c WHERE c.ideaId = '" + ideaId + "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        List<String> ids = executeMultipleValueQuery(
+            GenericQueries
+                .queryByPartitionKey(ideaId, Post.class)
+                .valueOf("id"),
+            postContainer,
+            String.class
+        );
         for (String postId : ids) {
             postContainer.deleteItem(
                 postId,
