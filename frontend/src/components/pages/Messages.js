@@ -4,25 +4,30 @@ import Message from "../messageComponents/Message";
 import LoginWarning from "../logins/LoginWarning";
 import { useGlobalState } from "../../State";
 import { motion, AnimateSharedLayout } from "framer-motion";
+import LoadingDiv from "./../general/LoadingDiv";
+import { Status } from "./../../State";
 
 export default function Messages() {
     const [messages, setMessages] = React.useState([]);
     const [user] = useGlobalState("user");
     const [rerender, setRerender] = React.useState(0);
+    const [status, setStatus] = React.useState(Status.Loading);
 
     const [rotateMode, setRotateMode] = React.useState(0);
     const [mode, setMode] = React.useState("Received");
 
     useEffect(() => {
+        setStatus(Status.Loading);
         if (mode === "Received") {
             axios.get("/api/messages/received").then((response) => {
                 setMessages(response.data);
+                setStatus(Status.Loaded);
                 axios.post("/api/messages/received/markallasread");
             });
         } else {
             axios.get("/api/messages/sent").then((response) => {
-                console.log(response.data);
                 setMessages(response.data);
+                setStatus(Status.Loaded);
             });
         }
     }, [rerender, mode]);
@@ -64,15 +69,17 @@ export default function Messages() {
                         />
                     </svg>
                 </motion.button>
-                <motion.div layout className="container pt-2 mx-auto">
-                    {messages.map((message) => (
-                        <Message
-                            key={message.id}
-                            message={message}
-                            setRerender={setRerender}
-                        />
-                    ))}
-                </motion.div>
+                <LoadingDiv isLoading={status === Status.Loading}>
+                    <motion.div layout className="container pt-2 mx-auto">
+                        {messages.map((message) => (
+                            <Message
+                                key={message.id}
+                                message={message}
+                                setRerender={setRerender}
+                            />
+                        ))}
+                    </motion.div>
+                </LoadingDiv>
             </AnimateSharedLayout>
         </div>
     );

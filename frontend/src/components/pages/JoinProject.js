@@ -6,6 +6,7 @@ import axios from "axios";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import ProjectSummary from "../projectComponents/ProjectSummary";
 import LoginWarning from "./../logins/LoginWarning";
+import LoadingDiv from "./../general/LoadingDiv";
 
 export default function JoinProject() {
     const [user] = useGlobalState("user");
@@ -31,6 +32,7 @@ export default function JoinProject() {
             )
             .then((response) => {
                 setProjects(response.data);
+                setStatus(Status.Loaded);
             });
     }, [rerender]);
 
@@ -69,7 +71,7 @@ export default function JoinProject() {
     }
 
     return (
-        <div>
+        <LoadingDiv isLoading={status === Status.Loading}>
             <h1>Join or start a project for idea:</h1>
             <div className="m-3">
                 <IdeaSummary idea={idea} />
@@ -82,6 +84,6 @@ export default function JoinProject() {
                 Create new project
             </button>
             {existingProjects}
-        </div>
+        </LoadingDiv>
     );
 }
