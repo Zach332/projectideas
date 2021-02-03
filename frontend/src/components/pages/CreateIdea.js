@@ -11,6 +11,8 @@ import {
 import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../ideaComponents/IdeaCard";
 import TagPicker from "../tagComponents/TagPicker";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function CreateIdea() {
     const { addToast } = useToasts();
@@ -70,6 +72,9 @@ export default function CreateIdea() {
     if (status === Status.NotSubmitted || status === Status.Failure) {
         return (
             <div className="mx-auto">
+                <Helmet>
+                    <title>About | {Globals.Title}</title>
+                </Helmet>
                 <form className="py-4" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="title">Title</label>

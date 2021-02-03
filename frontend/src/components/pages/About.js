@@ -1,9 +1,14 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import { Helmet } from "react-helmet";
+import { Globals } from "../../GlobalData";
 
 export default function Home() {
     return (
         <div>
+            <Helmet>
+                <title>About | {Globals.Title}</title>
+            </Helmet>
             <h1>About</h1>
             <ReactMarkdown>{markdown}</ReactMarkdown>
         </div>
