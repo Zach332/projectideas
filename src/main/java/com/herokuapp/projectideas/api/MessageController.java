@@ -30,7 +30,7 @@ public class MessageController {
         @RequestHeader("authorization") String userId
     ) {
         return database
-            .findAllReceivedMessages(userId)
+            .getAllReceivedMessages(userId)
             .stream()
             .map(message -> mapper.viewReceivedMessageDTO(message))
             .collect(Collectors.toList());
@@ -41,7 +41,7 @@ public class MessageController {
         @RequestHeader("authorization") String userId
     ) {
         return database
-            .findAllSentMessages(userId)
+            .getAllSentMessages(userId)
             .stream()
             .map(message -> mapper.viewSentMessageDTO(message))
             .collect(Collectors.toList());

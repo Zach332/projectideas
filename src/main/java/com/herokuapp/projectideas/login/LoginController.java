@@ -56,10 +56,10 @@ public class LoginController {
     }
 
     public User getUserByEmail(String email) {
-        Optional<User> user = database.findUserByEmail(email);
+        Optional<User> user = database.getUserByEmail(email);
         if (!user.isPresent()) {
             database.createUser(new User(generateUsername(), email));
-            return database.findUserByEmail(email).get();
+            return database.getUserByEmail(email).get();
         }
         return user.get();
     }
