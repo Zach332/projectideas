@@ -19,6 +19,7 @@ import CreateProject from "./components/pages/CreateProject";
 import GitHubLogin from "./components/logins/Login";
 import LoginLanding from "./components/logins/LoginLanding";
 import MyProjects from "./components/pages/MyProjects";
+import Projects from "./components/pages/Projects";
 
 function App() {
     return (
@@ -31,6 +32,11 @@ function App() {
                             <Route path="/" exact component={Home} />
                             <Route
                                 path="/projects"
+                                exact
+                                component={Projects}
+                            />
+                            <Route
+                                path="/my-projects"
                                 exact
                                 component={MyProjects}
                             />
