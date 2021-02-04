@@ -19,7 +19,7 @@ import { Globals } from "../../GlobalData";
 export default function Idea() {
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
-    const [idea, setIdea] = React.useState([]);
+    const [idea, setIdea] = React.useState({ title: "" });
     const [user] = useGlobalState("user");
     let params = useParams();
 

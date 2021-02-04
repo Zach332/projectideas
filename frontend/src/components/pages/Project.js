@@ -23,6 +23,7 @@ export default function Project() {
     const [status, setStatus] = React.useState(Status.Loading);
     const [rerender, setRerender] = React.useState(0);
     const [project, setProject] = React.useState({
+        name: "",
         teamMemberUsernames: [],
         lookingForMembers: true,
         publicProject: true,
@@ -264,7 +265,7 @@ export default function Project() {
         <LoadingDiv isLoading={status === Status.Loading}>
             <Helmet>
                 <title>
-                    {project.title} | {Globals.Title}
+                    {project.name} | {Globals.Title}
                 </title>
             </Helmet>
             <div className="d-flex">
