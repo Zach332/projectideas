@@ -52,7 +52,7 @@ export default function Projects() {
                     <div className="p-2">
                         <button
                             onClick={goToMyProjects}
-                            className="btn btn-primary btn-md"
+                            className="btn btn-secondary btn-md"
                         >
                             My Projects
                             <svg
