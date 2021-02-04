@@ -825,17 +825,20 @@ public class Database {
     }
 
     public List<Project> findPublicProjectsByPageNum(int pageNum) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.publicProject = true ORDER BY c.timeCreated DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("publicProject", true)
+                )
+                .orderBy("timeCreated", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            projectContainer,
+            Project.class
+        );
     }
 
     public Optional<Project> getProject(String projectId) {
@@ -889,19 +892,18 @@ public class Database {
     }
 
     public List<Project> findProjectsByTagAndPageNum(String tag, int pageNum) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "') ORDER BY c.timeCreated DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return executeMultipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .arrayContains("tags", tag)
+                .orderBy("timeCreated", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            projectContainer,
+            Project.class
+        );
     }
 
     private List<Project> getProjectsInList(List<String> projectIds) {
