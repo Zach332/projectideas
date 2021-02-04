@@ -18,7 +18,6 @@ export default function Projects() {
         axios
             .get("/api/projects?" + toQuery({ page: params.page }))
             .then((response) => {
-                console.log(response.data);
                 setProjects(response.data.projectPreviews);
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);

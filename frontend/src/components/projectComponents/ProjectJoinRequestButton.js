@@ -7,7 +7,7 @@ export default function ProjectJoinRequestButton({ project }) {
     var joinRequestButton = <div></div>;
     if (project.userIsTeamMember) {
         joinRequestButton = <div></div>;
-    } else if (!user.isLoggedIn && project.lookingForMembers) {
+    } else if (!user.loggedIn && project.lookingForMembers) {
         joinRequestButton = (
             <button
                 className="btn btn-sm btn-primary float-end"
