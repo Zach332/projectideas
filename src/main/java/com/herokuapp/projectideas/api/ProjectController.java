@@ -48,7 +48,7 @@ public class ProjectController {
         } else {
             projectPreviews =
                 database
-                    .findPublicProjectsByPageNum(pageNum)
+                    .getPublicProjectsByPageNum(pageNum)
                     .stream()
                     .map(project -> mapper.previewProjectDTO(project, userId))
                     .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class ProjectController {
         } else {
             projectPreviews =
                 database
-                    .findProjectsByTagAndPageNum(tag, pageNum)
+                    .getProjectsByTagAndPageNum(tag, pageNum)
                     .stream()
                     .map(idea -> mapper.previewProjectDTO(idea, userId))
                     .collect(Collectors.toList());
@@ -256,7 +256,7 @@ public class ProjectController {
         @RequestParam("accept") boolean accept
     ) {
         User newTeamMember = database
-            .findUserByUsername(newTeamMemberUsername)
+            .getUserByUsername(newTeamMemberUsername)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
