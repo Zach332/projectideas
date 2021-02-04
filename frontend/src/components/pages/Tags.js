@@ -84,8 +84,9 @@ export default function Tags() {
         <div>
             <Helmet>
                 <title>
-                    {params.type.charAt(0).toUpperCase() + params.type.slice(1)}{" "}
-                    Tags matching {params.tag} | {Globals.Title}
+                    {params.type.charAt(0).toUpperCase() + params.type.slice(1)}
+                    {"s "}
+                    matching tag: {params.tag} | {Globals.Title}
                 </title>
             </Helmet>
             <div className="d-flex">
