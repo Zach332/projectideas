@@ -10,7 +10,6 @@ import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
-import com.github.mohitgoyal91.cosmosdbqueryutils.restriction.Restriction;
 import com.github.mohitgoyal91.cosmosdbqueryutils.utilities.Constants.Order;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
@@ -683,15 +682,17 @@ public class Database {
     }
 
     public void markAllReceivedMessagesAsRead(String recipientId) {
-        userContainer
-            .queryItems(
-                "SELECT VALUE c.id FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.unread = true AND c.userId = '" +
-                recipientId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
+        executeMultipleValueQuery(
+            GenericQueries
+                .queryByType(ReceivedMessage.class)
+                .valueOf("id")
+                .addRestrictions(
+                    new RestrictionBuilder().eq("userId", recipientId),
+                    new RestrictionBuilder().eq("unread", true)
+                ),
+            userContainer,
+            String.class
+        )
             .stream()
             .forEach(
                 messageId -> markReceivedMessageAsRead(messageId, recipientId)
