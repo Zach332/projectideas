@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import { Status } from "../../State";
+import { Status, useGlobalState } from "../../State";
 import { toParams, toQuery } from "../utils/Routing";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
@@ -8,6 +8,7 @@ import { Globals } from "../../GlobalData";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
 
 export default function Projects() {
+    const [user] = useGlobalState("user");
     const [projects, setProjects] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
@@ -47,27 +48,29 @@ export default function Projects() {
                 <div className="me-auto p-2">
                     <h1>Projects</h1>
                 </div>
-                <div className="p-2">
-                    <button
-                        onClick={goToMyProjects}
-                        className="btn btn-primary btn-md"
-                    >
-                        My Projects
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-arrow-90deg-right ms-1"
-                            viewBox="0 0 16 16"
+                {user.loggedIn && (
+                    <div className="p-2">
+                        <button
+                            onClick={goToMyProjects}
+                            className="btn btn-primary btn-md"
                         >
-                            <path
-                                fillRule="evenodd"
-                                d="M14.854 4.854a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 4H3.5A2.5 2.5 0 0 0 1 6.5v8a.5.5 0 0 0 1 0v-8A1.5 1.5 0 0 1 3.5 5h9.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4z"
-                            />
-                        </svg>
-                    </button>
-                </div>
+                            My Projects
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                className="bi bi-arrow-90deg-right ms-1"
+                                viewBox="0 0 16 16"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M14.854 4.854a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 4H3.5A2.5 2.5 0 0 0 1 6.5v8a.5.5 0 0 0 1 0v-8A1.5 1.5 0 0 1 3.5 5h9.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                )}
             </div>
             <div className="container mx-auto">
                 {projects.map((project) => (
