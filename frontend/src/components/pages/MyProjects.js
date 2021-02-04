@@ -6,6 +6,7 @@ import { Status } from "./../../State";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import LoginWarning from "./../logins/LoginWarning";
 
 export default function MyProjects() {
     const [projects, setProjects] = React.useState([]);
@@ -36,6 +37,10 @@ export default function MyProjects() {
                 clicking the button beside an idea!
             </div>
         );
+
+    if (!user.loggedIn) {
+        return <LoginWarning />;
+    }
 
     return (
         <LoadingDiv isLoading={status === Status.Loading}>
