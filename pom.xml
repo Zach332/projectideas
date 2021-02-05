@@ -89,7 +89,7 @@
         <dependency>
             <groupId>com.github.mohitgoyal91</groupId>
             <artifactId>cosmosdbquery-utils</artifactId>
-            <version>1.6.8</version>
+            <version>1.6.10</version>
           </dependency>
     </dependencies>
 

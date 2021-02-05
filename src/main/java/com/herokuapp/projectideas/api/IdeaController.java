@@ -54,7 +54,7 @@ public class IdeaController {
         } else {
             ideaPreviews =
                 database
-                    .findIdeasByPageNum(pageNum)
+                    .getIdeasByPageNum(pageNum)
                     .stream()
                     .map(idea -> mapper.previewIdeaDTO(idea))
                     .collect(Collectors.toList());
@@ -75,7 +75,7 @@ public class IdeaController {
         } else {
             ideaPreviews =
                 database
-                    .findIdeasByTagAndPageNum(tag, pageNum)
+                    .getIdeasByTagAndPageNum(tag, pageNum)
                     .stream()
                     .map(idea -> mapper.previewIdeaDTO(idea))
                     .collect(Collectors.toList());
@@ -89,7 +89,7 @@ public class IdeaController {
         @RequestHeader(value = "authorization", required = false) String userId
     ) {
         Idea idea = database
-            .findIdea(ideaId)
+            .getIdea(ideaId)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -109,7 +109,7 @@ public class IdeaController {
     @GetMapping("/api/ideas/{ideaId}/comments")
     public List<ViewCommentDTO> getCommentsOnIdea(@PathVariable String ideaId) {
         return database
-            .findAllCommentsOnIdea(ideaId)
+            .getAllCommentsOnIdea(ideaId)
             .stream()
             .map(comment -> mapper.viewCommentDTO(comment))
             .collect(Collectors.toList());
@@ -227,7 +227,7 @@ public class IdeaController {
         @RequestBody PostIdeaDTO idea
     ) {
         Idea existingIdea = database
-            .findIdea(id)
+            .getIdea(id)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -253,7 +253,7 @@ public class IdeaController {
         @RequestBody PostCommentDTO comment
     ) {
         Comment existingComment = database
-            .findCommentOnIdea(ideaId, commentId)
+            .getCommentOnIdea(ideaId, commentId)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -293,7 +293,7 @@ public class IdeaController {
         @PathVariable String id
     ) {
         Idea ideaToDelete = database
-            .findIdea(id)
+            .getIdea(id)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -317,7 +317,7 @@ public class IdeaController {
         @PathVariable String commentId
     ) {
         Comment commentToDelete = database
-            .findCommentOnIdea(ideaId, commentId)
+            .getCommentOnIdea(ideaId, commentId)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(

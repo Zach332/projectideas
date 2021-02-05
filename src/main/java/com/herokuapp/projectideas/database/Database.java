@@ -20,6 +20,7 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
@@ -66,7 +67,7 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
-    private <T extends RootDocument> Optional<T> executeSingleDocumentQuery(
+    private <T extends RootDocument> Optional<T> singleDocumentQuery(
         SelectQuery query,
         CosmosContainer container,
         Class<T> classType
@@ -81,7 +82,7 @@ public class Database {
             .findAny();
     }
 
-    private <T extends RootDocument> List<T> executeMultipleDocumentQuery(
+    private <T extends RootDocument> List<T> multipleDocumentQuery(
         SelectQuery query,
         CosmosContainer container,
         Class<T> classType
@@ -96,10 +97,7 @@ public class Database {
             .collect(Collectors.toList());
     }
 
-    private int executeCountQuery(
-        SelectQuery query,
-        CosmosContainer container
-    ) {
+    private int countQuery(SelectQuery query, CosmosContainer container) {
         return container
             .queryItems(
                 query.count().createQuery(),
@@ -111,6 +109,21 @@ public class Database {
             .get();
     }
 
+    private <T> List<T> multipleValueQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        Class<T> classType
+    ) {
+        return container
+            .queryItems(
+                query.createQuery(),
+                new CosmosQueryRequestOptions(),
+                classType
+            )
+            .stream()
+            .collect(Collectors.toList());
+    }
+
     // Users
 
     public void createUser(User user) {
@@ -118,15 +131,15 @@ public class Database {
     }
 
     public Optional<User> getUser(String userId) {
-        return executeSingleDocumentQuery(
+        return singleDocumentQuery(
             GenericQueries.queryByPartitionKey(userId, User.class),
             userContainer,
             User.class
         );
     }
 
-    public Optional<User> findUserByEmail(String email) {
-        return executeSingleDocumentQuery(
+    public Optional<User> getUserByEmail(String email) {
+        return singleDocumentQuery(
             GenericQueries
                 .queryByType(User.class)
                 .addRestrictions(new RestrictionBuilder().eq("email", email)),
@@ -135,8 +148,8 @@ public class Database {
         );
     }
 
-    public Optional<User> findUserByUsername(String username) {
-        return executeSingleDocumentQuery(
+    public Optional<User> getUserByUsername(String username) {
+        return singleDocumentQuery(
             GenericQueries
                 .queryByType(User.class)
                 .addRestrictions(
@@ -148,7 +161,7 @@ public class Database {
     }
 
     public boolean containsUserWithUsername(String username) {
-        return findUserByUsername(username).isPresent();
+        return getUserByUsername(username).isPresent();
     }
 
     public void updateUser(String id, User user) {
@@ -163,14 +176,16 @@ public class Database {
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
             // Handle posts container
-            List<PartitionKey> ideaPartitionKeys = postContainer
-                .queryItems(
-                    "SELECT VALUE c.ideaId FROM c WHERE c.authorId = '" +
-                    user.getId() +
-                    "'",
-                    new CosmosQueryRequestOptions(),
-                    String.class
-                )
+            List<PartitionKey> ideaPartitionKeys = multipleValueQuery(
+                GenericQueries
+                    .queryByType(Idea.class)
+                    .valueOf("ideaId")
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("authorId", user.getId())
+                    ),
+                postContainer,
+                String.class
+            )
                 .stream()
                 .distinct()
                 .map(ideaId -> new PartitionKey(ideaId))
@@ -243,42 +258,36 @@ public class Database {
     }
 
     private List<String> getSavedIdeaIdsForUser(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.savedIdeaIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return multipleValueQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .valueOf("savedIdeaIds")
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            userContainer,
+            String.class
+        );
     }
 
     private List<String> getPostedIdeaIdsForUser(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.postedIdeaIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return multipleValueQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .valueOf("postedIdeaIds")
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            userContainer,
+            String.class
+        );
     }
 
     private List<String> getJoinedProjectIdsForUser(String userId) {
-        return userContainer
-            .queryItems(
-                "SELECT VALUE c.joinedProjectIds FROM c WHERE c.userId = '" +
-                userId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        return multipleValueQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .valueOf("joinedProjectIds")
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            userContainer,
+            String.class
+        );
     }
 
     public List<Idea> getSavedIdeasForUser(String userId) {
@@ -287,7 +296,7 @@ public class Database {
         // Return ideas in newest-first order
         Collections.reverse(ideaIds);
         for (String ideaId : ideaIds) {
-            Optional<Idea> idea = findIdea(ideaId);
+            Optional<Idea> idea = getIdea(ideaId);
             if (idea.isPresent()) {
                 ideas.add(idea.get());
             }
@@ -324,7 +333,7 @@ public class Database {
     // Ideas
 
     public List<Idea> getAllIdeas() {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Idea.class)
                 .orderBy("timePosted", Order.DESC),
@@ -350,14 +359,14 @@ public class Database {
     }
 
     public int getNumIdeas() {
-        return executeCountQuery(
+        return countQuery(
             GenericQueries.queryByType(Idea.class),
             postContainer
         );
     }
 
     public int getNumIdeasForTag(String tag) {
-        return executeCountQuery(
+        return countQuery(
             GenericQueries.queryByType(Idea.class).arrayContains("tags", tag),
             postContainer
         );
@@ -373,38 +382,37 @@ public class Database {
         return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
     }
 
-    public List<Idea> findIdeasByPageNum(int pageNum) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' ORDER BY c.timePosted DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<Idea> getIdeasByPageNum(int pageNum) {
+        return multipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .orderBy("timePosted", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            postContainer,
+            Idea.class
+        );
     }
 
-    public List<Idea> findIdeasByTagAndPageNum(String tag, int pageNum) {
-        return postContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Idea' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "') ORDER BY c.timePosted DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Idea.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<Idea> getIdeasByTagAndPageNum(String tag, int pageNum) {
+        return multipleDocumentQuery(
+            GenericQueries
+                .queryByType(Idea.class)
+                .arrayContains("tags", tag)
+                .orderBy("timePosted", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            postContainer,
+            Idea.class
+        );
     }
 
     public List<Idea> getIdeasInList(List<String> ideaIds) {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Idea.class)
                 .addRestrictions(
@@ -416,8 +424,8 @@ public class Database {
         );
     }
 
-    public Optional<Idea> findIdea(String id) {
-        return executeSingleDocumentQuery(
+    public Optional<Idea> getIdea(String id) {
+        return singleDocumentQuery(
             GenericQueries.queryByPartitionKey(id, Idea.class),
             postContainer,
             Idea.class
@@ -444,14 +452,13 @@ public class Database {
     public void deleteIdea(String ideaId, String userId) {
         // Delete idea and all associated comments
         PartitionKey partitionKey = new PartitionKey(ideaId);
-        List<String> ids = postContainer
-            .queryItems(
-                "SELECT VALUE c.id FROM c WHERE c.ideaId = '" + ideaId + "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+        List<String> ids = multipleValueQuery(
+            GenericQueries
+                .queryByPartitionKey(ideaId, Post.class)
+                .valueOf("id"),
+            postContainer,
+            String.class
+        );
         for (String postId : ids) {
             postContainer.deleteItem(
                 postId,
@@ -475,8 +482,8 @@ public class Database {
         postContainer.createItem(comment);
     }
 
-    public List<Comment> findAllCommentsOnIdea(String ideaId) {
-        return executeMultipleDocumentQuery(
+    public List<Comment> getAllCommentsOnIdea(String ideaId) {
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByPartitionKey(ideaId, Comment.class)
                 .orderBy("timePosted", Order.DESC),
@@ -485,11 +492,8 @@ public class Database {
         );
     }
 
-    public Optional<Comment> findCommentOnIdea(
-        String ideaId,
-        String commentId
-    ) {
-        return executeSingleDocumentQuery(
+    public Optional<Comment> getCommentOnIdea(String ideaId, String commentId) {
+        return singleDocumentQuery(
             GenericQueries.queryByIdAndPartitionKey(
                 commentId,
                 ideaId,
@@ -525,7 +529,7 @@ public class Database {
         String content
     ) {
         User sender = getUser(senderId).get();
-        User recipient = findUserByUsername(recipientUsername).get();
+        User recipient = getUserByUsername(recipientUsername).get();
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
             sender.getUsername(),
@@ -600,11 +604,11 @@ public class Database {
         }
     }
 
-    public Optional<ReceivedMessage> findReceivedMessage(
+    public Optional<ReceivedMessage> getReceivedMessage(
         String recipientId,
         String messageId
     ) {
-        return executeSingleDocumentQuery(
+        return singleDocumentQuery(
             GenericQueries.queryByIdAndPartitionKey(
                 messageId,
                 recipientId,
@@ -615,8 +619,8 @@ public class Database {
         );
     }
 
-    public List<ReceivedMessage> findAllReceivedMessages(String recipientId) {
-        return executeMultipleDocumentQuery(
+    public List<ReceivedMessage> getAllReceivedMessages(String recipientId) {
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByPartitionKey(recipientId, ReceivedMessage.class)
                 .orderBy("timeSent", Order.DESC),
@@ -625,10 +629,10 @@ public class Database {
         );
     }
 
-    public List<ReceivedMessage> findAllUnreadReceivedMessages(
+    public List<ReceivedMessage> getAllUnreadReceivedMessages(
         String recipientId
     ) {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByPartitionKey(recipientId, ReceivedMessage.class)
                 .addRestrictions(new RestrictionBuilder().eq("unread", true))
@@ -638,8 +642,8 @@ public class Database {
         );
     }
 
-    public List<SentMessage> findAllSentMessages(String senderId) {
-        return executeMultipleDocumentQuery(
+    public List<SentMessage> getAllSentMessages(String senderId) {
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByPartitionKey(senderId, SentMessage.class)
                 .orderBy("timeSent", Order.DESC),
@@ -649,7 +653,7 @@ public class Database {
     }
 
     public int getNumberOfUnreadMessages(String recipientId) {
-        return executeCountQuery(
+        return countQuery(
             GenericQueries
                 .queryByPartitionKey(recipientId, ReceivedMessage.class)
                 .addRestrictions(new RestrictionBuilder().eq("unread", true)),
@@ -672,15 +676,17 @@ public class Database {
     }
 
     public void markAllReceivedMessagesAsRead(String recipientId) {
-        userContainer
-            .queryItems(
-                "SELECT VALUE c.id FROM c WHERE (c.type = 'ReceivedIndividualMessage' OR c.type = 'ReceivedGroupMessage') " +
-                "AND c.unread = true AND c.userId = '" +
-                recipientId +
-                "'",
-                new CosmosQueryRequestOptions(),
-                String.class
-            )
+        multipleValueQuery(
+            GenericQueries
+                .queryByType(ReceivedMessage.class)
+                .valueOf("id")
+                .addRestrictions(
+                    new RestrictionBuilder().eq("userId", recipientId),
+                    new RestrictionBuilder().eq("unread", true)
+                ),
+            userContainer,
+            String.class
+        )
             .stream()
             .forEach(
                 messageId -> markReceivedMessageAsRead(messageId, recipientId)
@@ -692,7 +698,7 @@ public class Database {
         String recipientId,
         boolean unread
     ) {
-        ReceivedMessage message = findReceivedMessage(recipientId, messageId)
+        ReceivedMessage message = getReceivedMessage(recipientId, messageId)
             .get();
         message.setUnread(unread);
         updateReceivedMessage(message);
@@ -730,7 +736,7 @@ public class Database {
     }
 
     public List<IdeaTag> getIdeaTags() {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries.queryByType(IdeaTag.class),
             tagContainer,
             IdeaTag.class
@@ -738,7 +744,7 @@ public class Database {
     }
 
     public List<ProjectTag> getProjectTags() {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries.queryByType(ProjectTag.class),
             tagContainer,
             ProjectTag.class
@@ -746,7 +752,7 @@ public class Database {
     }
 
     public List<Tag> getAllTags() {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries.queryByType(Tag.class),
             tagContainer,
             Tag.class
@@ -754,7 +760,7 @@ public class Database {
     }
 
     public <T extends Tag> Optional<T> getTag(String name, Class<T> classType) {
-        return executeSingleDocumentQuery(
+        return singleDocumentQuery(
             GenericQueries.queryByPartitionKey(name, classType),
             tagContainer,
             classType
@@ -797,7 +803,7 @@ public class Database {
     }
 
     public int getNumProjects() {
-        return executeCountQuery(
+        return countQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .addRestrictions(
@@ -812,22 +818,25 @@ public class Database {
         return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
     }
 
-    public List<Project> findPublicProjectsByPageNum(int pageNum) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND c.publicProject = true ORDER BY c.timeCreated DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<Project> getPublicProjectsByPageNum(int pageNum) {
+        return multipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("publicProject", true)
+                )
+                .orderBy("timeCreated", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            projectContainer,
+            Project.class
+        );
     }
 
     public Optional<Project> getProject(String projectId) {
-        return executeSingleDocumentQuery(
+        return singleDocumentQuery(
             GenericQueries.queryByPartitionKey(projectId, Project.class),
             projectContainer,
             Project.class
@@ -835,7 +844,7 @@ public class Database {
     }
 
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .addRestrictions(new RestrictionBuilder().eq("ideaId", ideaId))
@@ -848,7 +857,7 @@ public class Database {
     public List<Project> getPublicProjectsLookingForMemberBasedOnIdea(
         String ideaId
     ) {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .addRestrictions(
@@ -863,7 +872,7 @@ public class Database {
     }
 
     public int getNumProjectsForTag(String tag) {
-        return executeCountQuery(
+        return countQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .arrayContains("tags", tag),
@@ -876,24 +885,23 @@ public class Database {
         return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
     }
 
-    public List<Project> findProjectsByTagAndPageNum(String tag, int pageNum) {
-        return projectContainer
-            .queryItems(
-                "SELECT * FROM c WHERE c.type = 'Project' AND ARRAY_CONTAINS(c.tags, '" +
-                tag +
-                "') ORDER BY c.timeCreated DESC OFFSET " +
-                ((pageNum - 1) * ITEMS_PER_PAGE) +
-                " LIMIT " +
-                ITEMS_PER_PAGE,
-                new CosmosQueryRequestOptions(),
-                Project.class
-            )
-            .stream()
-            .collect(Collectors.toList());
+    public List<Project> getProjectsByTagAndPageNum(String tag, int pageNum) {
+        return multipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .arrayContains("tags", tag)
+                .orderBy("timeCreated", Order.DESC)
+                .offsetAndLimitResults(
+                    (pageNum - 1) * ITEMS_PER_PAGE,
+                    ITEMS_PER_PAGE
+                ),
+            projectContainer,
+            Project.class
+        );
     }
 
     private List<Project> getProjectsInList(List<String> projectIds) {
-        return executeMultipleDocumentQuery(
+        return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .addRestrictions(
