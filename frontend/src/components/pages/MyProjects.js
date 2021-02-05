@@ -23,7 +23,7 @@ export default function MyProjects({ noHeading }) {
     const existingProjects =
         projects.length > 0 ? (
             <div className="mt-4">
-                <div className="container mx-auto">
+                <div className="container-flex mx-auto">
                     {projects.map((project) => (
                         <div className="my-2" key={project.id}>
                             <ProjectSummary project={project} />
