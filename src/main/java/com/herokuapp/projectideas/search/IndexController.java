@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ public class IndexController {
     private IndexWriter ideaIndexWriter;
 
     @Autowired
+    private IndexWriter projectIndexWriter;
+
+    @Autowired
     private IndexWriter tagIndexWriter;
 
     @Autowired
@@ -34,6 +38,13 @@ public class IndexController {
         List<Idea> ideaList = database.getAllIdeas();
         try {
             indexIdeas(ideaList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<Project> projectList = database.getAllPublicProjects();
+        try {
+            indexProjects(projectList);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,6 +72,25 @@ public class IndexController {
         ideaIndexWriter.commit();
     }
 
+    private void indexProjects(List<Project> projectList) throws IOException {
+        List<Document> docs = new ArrayList<Document>();
+        for (Project project : projectList) {
+            Document doc = new Document();
+            doc.add(new TextField("name", project.getName(), Field.Store.YES));
+            doc.add(
+                new TextField(
+                    "description",
+                    project.getDescription(),
+                    Field.Store.YES
+                )
+            );
+            doc.add(new TextField("id", project.getId(), Field.Store.YES));
+            docs.add(doc);
+        }
+        projectIndexWriter.addDocuments(docs);
+        projectIndexWriter.commit();
+    }
+
     private void indexTags(List<Tag> tagList) throws IOException {
         List<Document> docs = new ArrayList<Document>();
         for (Tag tag : tagList) {
@@ -85,9 +115,31 @@ public class IndexController {
         ideaIndexWriter.commit();
     }
 
+    public void indexProject(Project project) throws IOException {
+        Document doc = new Document();
+        doc.add(new TextField("name", project.getName(), Field.Store.YES));
+        doc.add(
+            new TextField(
+                "description",
+                project.getDescription(),
+                Field.Store.YES
+            )
+        );
+        doc.add(new TextField("id", project.getId(), Field.Store.YES));
+        projectIndexWriter.addDocument(doc);
+        projectIndexWriter.commit();
+    }
+
     public void deleteIdea(String ideaId) throws IOException {
         ideaIndexWriter.deleteDocuments(SearchController.getIdQuery(ideaId));
         ideaIndexWriter.commit();
+    }
+
+    public void deleteProject(String projectId) throws IOException {
+        projectIndexWriter.deleteDocuments(
+            SearchController.getIdQuery(projectId)
+        );
+        projectIndexWriter.commit();
     }
 
     public void tryIndexIdea(Idea idea) {
@@ -96,9 +148,21 @@ public class IndexController {
         } catch (Exception ignored) {}
     }
 
+    public void tryIndexProject(Project project) {
+        try {
+            indexProject(project);
+        } catch (Exception ignored) {}
+    }
+
     public void tryDeleteIdea(String ideaId) {
         try {
             deleteIdea(ideaId);
+        } catch (Exception ignored) {}
+    }
+
+    public void tryDeleteProject(String projectId) {
+        try {
+            deleteProject(projectId);
         } catch (Exception ignored) {}
     }
 }

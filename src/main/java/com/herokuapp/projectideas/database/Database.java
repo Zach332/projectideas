@@ -800,6 +800,8 @@ public class Database {
         User user = getUser(projectCreatorId).get();
         user.getJoinedProjectIds().add(project.getId());
         updateUser(projectCreatorId, user);
+
+        if (project.isPublicProject()) indexController.tryIndexProject(project);
     }
 
     public int getNumProjects() {
@@ -830,6 +832,19 @@ public class Database {
                     (pageNum - 1) * ITEMS_PER_PAGE,
                     ITEMS_PER_PAGE
                 ),
+            projectContainer,
+            Project.class
+        );
+    }
+
+    public List<Project> getAllPublicProjects() {
+        return multipleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("publicProject", true)
+                )
+                .orderBy("timeCreated", Order.DESC),
             projectContainer,
             Project.class
         );
@@ -914,7 +929,13 @@ public class Database {
         );
     }
 
-    public void updateProject(Project project) {
+    public void updateProject(
+        Project project,
+        boolean toPublic,
+        boolean toPrivate
+    ) {
+        if (toPublic) indexController.tryIndexProject(project);
+        if (toPrivate) indexController.tryDeleteProject(project.getId());
         for (String tag : project.getTags()) {
             Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {
@@ -937,5 +958,8 @@ public class Database {
             new PartitionKey(projectId),
             new CosmosItemRequestOptions()
         );
+
+        //Remove project from index
+        indexController.tryDeleteProject(projectId);
     }
 }

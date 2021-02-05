@@ -133,8 +133,16 @@ public class ProjectController {
         if (!existingProject.userIsTeamMember(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+        boolean toPublic = false;
+        boolean toPrivate = false;
+        if (existingProject.isPublicProject() && !project.isPublicProject()) {
+            toPrivate = true;
+        }
+        if (!existingProject.isPublicProject() && project.isPublicProject()) {
+            toPublic = true;
+        }
         mapper.updateProjectFromDTO(existingProject, project);
-        database.updateProject(existingProject);
+        database.updateProject(existingProject, toPublic, toPrivate);
     }
 
     @PutMapping("/api/projects/{projectId}/update")
@@ -159,7 +167,7 @@ public class ProjectController {
             existingProject.setPublicProject(true);
         }
         existingProject.setLookingForMembers(lookingForMembers);
-        database.updateProject(existingProject);
+        database.updateProject(existingProject, false, false);
     }
 
     @PutMapping("/api/projects/{projectId}/updatepublicstatus")
@@ -187,7 +195,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         existingProject.setPublicProject(publicProject);
-        database.updateProject(existingProject);
+        database.updateProject(existingProject, publicProject, !publicProject);
     }
 
     @PostMapping("/api/projects/{projectId}/joinrequests")
@@ -236,7 +244,7 @@ public class ProjectController {
         project
             .getUsersRequestingToJoin()
             .add(new ProjectJoinRequest(user, request.getRequestMessage()));
-        database.updateProject(project);
+        database.updateProject(project, false, false);
         database.sendGroupAdminMessage(
             projectId,
             user.getUsername() +
@@ -309,7 +317,7 @@ public class ProjectController {
             );
         }
 
-        database.updateProject(project);
+        database.updateProject(project, false, false);
     }
 
     @PostMapping("/api/projects/{projectId}/leave")
@@ -331,7 +339,7 @@ public class ProjectController {
         if (project.getTeamMembers().size() == 0) {
             database.deleteProject(projectId);
         } else {
-            database.updateProject(project);
+            database.updateProject(project, false, false);
         }
 
         User user = database.getUser(userId).get();

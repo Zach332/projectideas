@@ -19,11 +19,24 @@ import org.springframework.context.annotation.Configuration;
 public class LuceneConfig {
 
     private static final String IDEA_LUCENE_INDEX_PATH = "lucene/ideaIndex/";
+    private static final String PROJECT_LUCENE_INDEX_PATH =
+        "lucene/projectIndex/";
     private static final String TAG_LUCENE_INDEX_PATH = "lucene/tagIndex/";
 
     @Bean
     public Directory ideaDirectory() throws IOException {
         Path path = Paths.get(IDEA_LUCENE_INDEX_PATH);
+        File file = path.toFile();
+        if (!file.exists()) {
+            // Create the folder if it does not exist
+            file.mkdirs();
+        }
+        return FSDirectory.open(path);
+    }
+
+    @Bean
+    public Directory projectDirectory() throws IOException {
+        Path path = Paths.get(PROJECT_LUCENE_INDEX_PATH);
         File file = path.toFile();
         if (!file.exists()) {
             // Create the folder if it does not exist
@@ -64,6 +77,21 @@ public class LuceneConfig {
     }
 
     @Bean
+    public IndexWriter projectIndexWriter(
+        Directory projectDirectory,
+        Analyzer analyzer
+    ) throws IOException {
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
+        IndexWriter indexWriter = new IndexWriter(
+            projectDirectory,
+            indexWriterConfig
+        );
+        indexWriter.deleteAll();
+        indexWriter.commit();
+        return indexWriter;
+    }
+
+    @Bean
     public IndexWriter tagIndexWriter(
         Directory tagDirectory,
         Analyzer analyzer
@@ -85,6 +113,20 @@ public class LuceneConfig {
     ) throws IOException {
         SearcherManager searcherManager = new SearcherManager(
             ideaIndexWriter,
+            false,
+            false,
+            new SearcherFactory()
+        );
+        return searcherManager;
+    }
+
+    @Bean
+    public SearcherManager projectSearcherManager(
+        Directory projectDirectory,
+        IndexWriter projectIndexWriter
+    ) throws IOException {
+        SearcherManager searcherManager = new SearcherManager(
+            projectIndexWriter,
             false,
             false,
             new SearcherFactory()
