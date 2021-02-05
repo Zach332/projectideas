@@ -202,13 +202,12 @@ public class Database {
             List<PartitionKey> projectPartitionKeys = projectContainer
                 .queryItems(
                     "SELECT VALUE p.projectId FROM p " +
-                    "JOIN t IN p.teamMembers " +
-                    "JOIN r IN p.usersRequestingToJoin " +
-                    "WHERE t.userId = '" +
-                    user.getId() +
-                    "' OR r.userId = '" +
-                    user.getId() +
-                    "'",
+                    "WHERE ARRAY_CONTAINS(p.teamMembers, { \"userId\": '" +
+                    id +
+                    "'}, true) OR " +
+                    "ARRAY_CONTAINS(p.usersRequestingToJoin, { \"userId\": '" +
+                    id +
+                    "'}, true)",
                     new CosmosQueryRequestOptions(),
                     String.class
                 )
