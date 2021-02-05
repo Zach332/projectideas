@@ -8,7 +8,7 @@ import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import LoginWarning from "./../logins/LoginWarning";
 
-export default function MyProjects() {
+export default function MyProjects({ noHeading }) {
     const [projects, setProjects] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [user] = useGlobalState("user");
@@ -44,10 +44,12 @@ export default function MyProjects() {
 
     return (
         <LoadingDiv isLoading={status === Status.Loading}>
-            <Helmet>
-                <title>My Projects | {Globals.Title}</title>
-            </Helmet>
-            <h1>My Projects</h1>
+            {!noHeading && (
+                <Helmet>
+                    <title>My Projects | {Globals.Title}</title>
+                </Helmet>
+            )}
+            {!noHeading && <h1>My Projects</h1>}
             {existingProjects}
         </LoadingDiv>
     );

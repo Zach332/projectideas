@@ -8,6 +8,7 @@ import { Status } from "./../../State";
 import LoadingDiv from "../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import MyProjects from "./MyProjects";
 
 export default function Profile() {
     const { addToast } = useToasts();
@@ -251,104 +252,106 @@ export default function Profile() {
                     id="user-info"
                     role="tabpanel"
                 >
-                    User
+                    <LoadingDiv isLoading={status.userData === Status.Loading}>
+                        {usernameForm}
+                        <form className="my-5 row row-cols-lg-auto g-3 align-items-center">
+                            <div className="col-12">
+                                <label htmlFor="email">Email</label>
+                            </div>
+                            <div className="mx-sm-3 col-12">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="email"
+                                    defaultValue={userData.email}
+                                    readOnly
+                                />
+                            </div>
+                            <label
+                                htmlFor="email"
+                                id="emailComment"
+                                className="text-muted col-12"
+                            >
+                                Primary email from GitHub/Google
+                            </label>
+                        </form>
+                        <button
+                            type="button"
+                            onClick={onCLick}
+                            className="btn btn-danger btn-md"
+                        >
+                            Log Out
+                        </button>
+                    </LoadingDiv>
                 </div>
                 <div className="tab-pane fade" id="projects" role="tabpanel">
-                    Projects
+                    <h5 className="mt-4">My projects</h5>
+                    <MyProjects noHeading={true} />
                 </div>
                 <div className="tab-pane fade" id="saved" role="tabpanel">
-                    Saved.
+                    <h5 className="my-4">My saved ideas</h5>
+                    <LoadingDiv
+                        isLoading={status.savedIdeas === Status.Loading}
+                    >
+                        {savedIdeas.length === 0 ? (
+                            <p>You haven&apos;t saved any ideas.</p>
+                        ) : (
+                            savedIdeas.map((idea) => (
+                                <div key={idea.id} className="container-flex">
+                                    <div className="row my-2">
+                                        <div className="col me-auto">
+                                            <IdeaSummary idea={idea} />
+                                        </div>
+                                        <div className="col-auto my-auto">
+                                            <button
+                                                className="btn btn-sm"
+                                                type="button"
+                                                onClick={() =>
+                                                    removeIdeaFromSaved(idea.id)
+                                                }
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="25"
+                                                    height="25"
+                                                    fill="currentColor"
+                                                    className="bi bi-dash-circle"
+                                                    viewBox="0 0 16 16"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                                                    />
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </LoadingDiv>
                 </div>
                 <div className="tab-pane fade" id="my-ideas" role="tabpanel">
-                    My ideas.
-                </div>
-            </div>
-            <LoadingDiv isLoading={status.userData === Status.Loading}>
-                {usernameForm}
-                <form className="my-5 row row-cols-lg-auto g-3 align-items-center">
-                    <div className="col-12">
-                        <label htmlFor="email">Email</label>
-                    </div>
-                    <div className="mx-sm-3 col-12">
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="email"
-                            defaultValue={userData.email}
-                            readOnly
-                        />
-                    </div>
-                    <label
-                        htmlFor="email"
-                        id="emailComment"
-                        className="text-muted col-12"
+                    <h5 className="my-4">My posted ideas</h5>
+                    <LoadingDiv
+                        isLoading={status.savedIdeas === Status.Loading}
                     >
-                        Primary email from GitHub/Google
-                    </label>
-                </form>
-                <button
-                    type="button"
-                    onClick={onCLick}
-                    className="btn btn-danger btn-md"
-                >
-                    Log Out
-                </button>
-            </LoadingDiv>
-            <h2 className="mt-4">Saved ideas</h2>
-            <LoadingDiv isLoading={status.savedIdeas === Status.Loading}>
-                {savedIdeas.length === 0 ? (
-                    <p>You haven&apos;t saved any ideas.</p>
-                ) : (
-                    savedIdeas.map((idea) => (
-                        <div key={idea.id} className="container-flex">
-                            <div className="row my-2">
-                                <div className="col me-auto">
+                        {myIdeas.length === 0 ? (
+                            <p>You haven&apos;t posted any ideas.</p>
+                        ) : (
+                            myIdeas.map((idea) => (
+                                <div className="my-2" key={idea.id}>
                                     <IdeaSummary idea={idea} />
                                 </div>
-                                <div className="col-auto my-auto">
-                                    <button
-                                        className="btn btn-sm"
-                                        type="button"
-                                        onClick={() =>
-                                            removeIdeaFromSaved(idea.id)
-                                        }
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="25"
-                                            height="25"
-                                            fill="currentColor"
-                                            className="bi bi-dash-circle"
-                                            viewBox="0 0 16 16"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
-                                            />
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"
-                                            />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </LoadingDiv>
-            <h2 className="mt-4">My ideas</h2>
-            <LoadingDiv isLoading={status.savedIdeas === Status.Loading}>
-                {myIdeas.length === 0 ? (
-                    <p>You haven&apos;t posted any ideas.</p>
-                ) : (
-                    myIdeas.map((idea) => (
-                        <div className="my-2" key={idea.id}>
-                            <IdeaSummary idea={idea} />
-                        </div>
-                    ))
-                )}
-            </LoadingDiv>
+                            ))
+                        )}
+                    </LoadingDiv>
+                </div>
+            </div>
         </div>
     );
 }
