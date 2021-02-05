@@ -28,7 +28,6 @@ export default function Profile() {
         if (user.loggedIn) {
             axios.get("/api/users/" + user.id).then((response) => {
                 setUserData(response.data);
-                console.log("here");
                 setStatus((status) => {
                     return { ...status, userData: Status.Loaded };
                 });
