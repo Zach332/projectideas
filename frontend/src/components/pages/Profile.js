@@ -199,6 +199,70 @@ export default function Profile() {
                 <title>Profile | {Globals.Title}</title>
             </Helmet>
             <h1>Profile</h1>
+            <ul className="nav nav-tabs" id="myTab" role="tablist">
+                <li className="nav-item" role="presentation">
+                    <a
+                        className="nav-link active"
+                        id="user-info-tab"
+                        data-bs-toggle="tab"
+                        href="#user-info"
+                        role="tab"
+                    >
+                        User Information
+                    </a>
+                </li>
+                <li className="nav-item" role="presentation">
+                    <a
+                        className="nav-link"
+                        id="projects-tab"
+                        data-bs-toggle="tab"
+                        href="#projects"
+                        role="tab"
+                    >
+                        Projects
+                    </a>
+                </li>
+                <li className="nav-item" role="presentation">
+                    <a
+                        className="nav-link"
+                        id="saved-tab"
+                        data-bs-toggle="tab"
+                        href="#saved"
+                        role="tab"
+                    >
+                        Saved
+                    </a>
+                </li>
+                <li className="nav-item" role="presentation">
+                    <a
+                        className="nav-link"
+                        id="my-ideas-tab"
+                        data-bs-toggle="tab"
+                        href="#my-ideas"
+                        role="tab"
+                    >
+                        My Ideas
+                    </a>
+                </li>
+            </ul>
+            <div className="tab-content" id="myTabContent">
+                <div
+                    className="tab-pane fade show active"
+                    id="user-info"
+                    role="tabpanel"
+                >
+                    User
+                </div>
+                <div className="tab-pane fade" id="projects" role="tabpanel">
+                    Projects
+                </div>
+                <div className="tab-pane fade" id="saved" role="tabpanel">
+                    Saved.
+                </div>
+                <div className="tab-pane fade" id="my-ideas" role="tabpanel">
+                    My ideas.
+                </div>
+            </div>
             <LoadingDiv isLoading={status.userData === Status.Loading}>
                 {usernameForm}
                 <form className="my-5 row row-cols-lg-auto g-3 align-items-center">
