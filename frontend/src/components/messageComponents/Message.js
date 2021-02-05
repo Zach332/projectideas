@@ -94,8 +94,9 @@ export default function Message({ message, setRerender }) {
                 {message.senderUsername != null
                     ? "From " +
                       message.senderUsername +
-                      (message.groupMessage &&
-                          " to team: " + message.recipientProjectName)
+                      (message.groupMessage
+                          ? " to team: " + message.recipientProjectName
+                          : "")
                     : "To " +
                       (message.groupMessage
                           ? "team: " + message.recipientProjectName
