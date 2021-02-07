@@ -13,7 +13,7 @@ export default function Search() {
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [query, setQuery] = React.useState("");
     const [lastPage, setLastPage] = React.useState(true);
-    const [type] = React.useState("ideas");
+    const [type, setType] = React.useState("ideas");
     const params = toParams(window.location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
@@ -23,7 +23,7 @@ export default function Search() {
             setStatus(Status.Loading);
             executeSearch();
         }
-    }, []);
+    }, [type]);
 
     const executeSearch = () => {
         axios
@@ -69,13 +69,20 @@ export default function Search() {
         setQuery(event.target.value);
     };
 
+    const changeType = (event) => {
+        setStatus(Status.Loading);
+        setType(event.target.value);
+    };
+
     const handleSubmit = () => {
         window.location.href = "/search?" + toQuery({ query: query, page: 1 });
         event.preventDefault();
     };
 
     let postElements;
-    if (status == Status.Success && posts.length > 0) {
+    if (status == Status.Loading) {
+        postElements = <Spinner />;
+    } else if (status == Status.Success && posts.length > 0) {
         postElements = (
             <div className="container mx-auto">
                 {posts.map((post) =>
@@ -91,8 +98,6 @@ export default function Search() {
                 )}
             </div>
         );
-    } else if (status == Status.Loading) {
-        postElements = <Spinner />;
     } else if (!(status == Status.NotSubmitted)) {
         postElements = <p className="ms-2">No {type} match your search.</p>;
     }
@@ -107,6 +112,10 @@ export default function Search() {
                     | {Globals.Title}
                 </title>
             </Helmet>
+            <select className="form-select" onChange={changeType} value={type}>
+                <option value="ideas">Ideas</option>
+                <option value="projects">Projects</option>
+            </select>
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="row w-75 mx-auto">
                     <div className="col me-auto">
