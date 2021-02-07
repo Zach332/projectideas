@@ -2,12 +2,15 @@ package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +38,9 @@ public class SearchController {
 
     @Autowired
     private SearcherManager ideaSearcherManager;
+
+    @Autowired
+    private SearcherManager projectSearcherManager;
 
     @Autowired
     private SearcherManager tagSearcherManager;
@@ -82,6 +88,41 @@ public class SearchController {
             }
 
             ideaSearcherManager.release(indexSearcher);
+            return documents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Document> searchProjectIndex(String queryString) {
+        try {
+            projectSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = projectSearcherManager.acquire();
+
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+            PhraseQuery.Builder phraseQueryName = new PhraseQuery.Builder();
+            PhraseQuery.Builder phraseQueryDescription = new PhraseQuery.Builder();
+            phraseQueryName.setSlop(10);
+            phraseQueryDescription.setSlop(20);
+
+            String[] terms = queryString.toLowerCase().split("-| ");
+
+            for (String term : terms) {
+                phraseQueryName.add(new Term("name", term));
+                phraseQueryDescription.add(new Term("description", term));
+            }
+
+            booleanQuery.add(phraseQueryName.build(), Occur.SHOULD);
+            booleanQuery.add(phraseQueryDescription.build(), Occur.SHOULD);
+
+            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            List<Document> documents = new ArrayList<>();
+            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                documents.add(indexSearcher.doc(scoreDoc.doc));
+            }
+
+            projectSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,6 +190,27 @@ public class SearchController {
         return orderedIdeas;
     }
 
+    private List<Project> searchForProject(String queryString) {
+        List<Document> documents = searchProjectIndex(queryString);
+        List<String> ids = documents
+            .stream()
+            .map(doc -> doc.get("id"))
+            .collect(Collectors.toList());
+        List<Project> unorderedProjects = database.getProjectsInList(ids);
+
+        List<Project> orderedProjects = new ArrayList<Project>();
+        for (String id : ids) {
+            Optional<Project> projectToAdd = unorderedProjects
+                .stream()
+                .filter(idea -> idea.getId().equals(id))
+                .findFirst();
+            if (projectToAdd.isPresent()) {
+                orderedProjects.add(projectToAdd.get());
+            }
+        }
+        return orderedProjects;
+    }
+
     public PreviewIdeaPageDTO searchForIdeaByPage(
         String queryString,
         int page
@@ -164,6 +226,26 @@ public class SearchController {
             .collect(Collectors.toList());
         return new PreviewIdeaPageDTO(
             ideaPreviews,
+            page * Database.ITEMS_PER_PAGE >= allResults.size()
+        );
+    }
+
+    public PreviewProjectPageDTO searchForProjectByPage(
+        String queryString,
+        int page,
+        String userId
+    ) {
+        List<Project> allResults = searchForProject(queryString);
+        List<Project> pageResults = allResults.subList(
+            clamp((page - 1) * Database.ITEMS_PER_PAGE, allResults.size()),
+            clamp(page * Database.ITEMS_PER_PAGE, allResults.size())
+        );
+        List<PreviewProjectDTO> projectPreviews = pageResults
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project, userId))
+            .collect(Collectors.toList());
+        return new PreviewProjectPageDTO(
+            projectPreviews,
             page * Database.ITEMS_PER_PAGE >= allResults.size()
         );
     }

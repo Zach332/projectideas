@@ -11,6 +11,7 @@ import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
+import com.herokuapp.projectideas.search.SearchController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,9 @@ public class ProjectController {
 
     @Autowired
     DTOMapper mapper;
+
+    @Autowired
+    SearchController searchController;
 
     @GetMapping("/api/projects")
     public PreviewProjectPageDTO getPublicProjects(
@@ -345,5 +349,14 @@ public class ProjectController {
         User user = database.getUser(userId).get();
         user.getJoinedProjectIds().remove(projectId);
         database.updateUser(userId, user);
+    }
+
+    @GetMapping("/api/projects/search")
+    public PreviewProjectPageDTO searchIdeas(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @RequestParam("query") String query,
+        @RequestParam("page") int page
+    ) {
+        return searchController.searchForProjectByPage(query, page, userId);
     }
 }

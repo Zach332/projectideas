@@ -915,7 +915,7 @@ public class Database {
         );
     }
 
-    private List<Project> getProjectsInList(List<String> projectIds) {
+    public List<Project> getProjectsInList(List<String> projectIds) {
         return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Project.class)
