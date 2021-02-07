@@ -6,12 +6,14 @@ import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import ProjectSummary from "./../projectComponents/ProjectSummary";
 
 export default function Search() {
-    const [ideas, setIdeas] = React.useState([]);
+    const [posts, setPosts] = React.useState([]);
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [query, setQuery] = React.useState("");
     const [lastPage, setLastPage] = React.useState(true);
+    const [type] = React.useState("ideas");
     const params = toParams(window.location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
@@ -26,11 +28,18 @@ export default function Search() {
     const executeSearch = () => {
         axios
             .get(
-                "/api/ideas/search?" +
+                "/api/" +
+                    type +
+                    "/search?" +
                     toQuery({ query: params.query, page: params.page })
             )
             .then((response) => {
-                setIdeas(response.data.ideaPreviews);
+                if (type === "ideas") {
+                    setPosts(response.data.ideaPreviews);
+                }
+                if (type === "projects") {
+                    setPosts(response.data.projectPreviews);
+                }
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
@@ -39,13 +48,21 @@ export default function Search() {
     const next = () => {
         window.location.href =
             "/search?" +
-            toQuery({ query: query, page: parseInt(params.page) + 1 });
+            toQuery({
+                type: type,
+                query: query,
+                page: parseInt(params.page) + 1,
+            });
     };
 
     const previous = () => {
         window.location.href =
             "/search?" +
-            toQuery({ query: query, page: parseInt(params.page) - 1 });
+            toQuery({
+                type: type,
+                query: query,
+                page: parseInt(params.page) - 1,
+            });
     };
 
     const handleInputChange = (event) => {
@@ -57,29 +74,37 @@ export default function Search() {
         event.preventDefault();
     };
 
-    let ideaElements;
-    if (status == Status.Success && ideas.length > 0) {
-        ideaElements = (
+    let postElements;
+    if (status == Status.Success && posts.length > 0) {
+        postElements = (
             <div className="container mx-auto">
-                {ideas.map((idea) => (
-                    <div className="my-2" key={idea.id}>
-                        <IdeaSummary idea={idea} />
-                    </div>
-                ))}
+                {posts.map((post) =>
+                    type === "ideas" ? (
+                        <div className="my-2" key={post.id}>
+                            <IdeaSummary idea={post} />
+                        </div>
+                    ) : (
+                        <div className="my-2" key={post.id}>
+                            <ProjectSummary project={post} />
+                        </div>
+                    )
+                )}
             </div>
         );
     } else if (status == Status.Loading) {
-        ideaElements = <Spinner />;
+        postElements = <Spinner />;
     } else if (!(status == Status.NotSubmitted)) {
-        ideaElements = <p className="ms-2">No ideas match your search.</p>;
+        postElements = <p className="ms-2">No {type} match your search.</p>;
     }
 
     return (
         <div>
             <Helmet>
                 <title>
-                    {query === "" ? "Search" : "Search for " + query} |{" "}
-                    {Globals.Title}
+                    {query === ""
+                        ? "Search" + type
+                        : "Search " + type + "for " + query}{" "}
+                    | {Globals.Title}
                 </title>
             </Helmet>
             <form className="py-4" onSubmit={handleSubmit}>
@@ -112,7 +137,7 @@ export default function Search() {
                     </div>
                 </div>
             </form>
-            {ideaElements}
+            {postElements}
             <div className="d-flex">
                 <div className="me-auto p-2">
                     {params.page > 1 && (
@@ -126,7 +151,7 @@ export default function Search() {
                     )}
                 </div>
                 <div className="p-2">
-                    {!lastPage && ideas.length > 0 && (
+                    {!lastPage && posts.length > 0 && (
                         <button
                             type="btn btn-primary"
                             className="btn btn-primary btn-md"
