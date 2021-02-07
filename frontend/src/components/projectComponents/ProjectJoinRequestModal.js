@@ -42,7 +42,6 @@ export default function ProjectJoinRequestModal({ project, submitRequest }) {
                 <textarea
                     className="form-control"
                     value={joinRequestMessage}
-                    id="content"
                     rows="8"
                     placeholder="Enter a message to request to join"
                     onChange={handleJoinRequestChange}
