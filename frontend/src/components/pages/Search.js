@@ -20,10 +20,16 @@ export default function Search() {
     useEffect(() => {
         if (params.query) {
             setQuery(decodeURI(params.query));
+            setType(params.type);
             setStatus(Status.Loading);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (status === Status.Loading) {
             executeSearch();
         }
-    }, [type]);
+    }, [status]);
 
     const executeSearch = () => {
         axios
@@ -70,12 +76,14 @@ export default function Search() {
     };
 
     const changeType = (event) => {
-        setStatus(Status.Loading);
+        setLastPage(true);
+        setStatus(Status.NotSubmitted);
         setType(event.target.value);
     };
 
     const handleSubmit = () => {
-        window.location.href = "/search?" + toQuery({ query: query, page: 1 });
+        window.location.href =
+            "/search?" + toQuery({ type: type, query: query, page: 1 });
         event.preventDefault();
     };
 
