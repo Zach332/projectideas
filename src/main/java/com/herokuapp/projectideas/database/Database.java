@@ -387,30 +387,6 @@ public class Database {
         indexController.tryIndexIdea(idea);
     }
 
-    public int getNumIdeas() {
-        return countQuery(
-            GenericQueries.queryByType(Idea.class),
-            postContainer
-        );
-    }
-
-    public int getNumIdeasForTag(String tag) {
-        return countQuery(
-            GenericQueries.queryByType(Idea.class).arrayContains("tags", tag),
-            postContainer
-        );
-    }
-
-    public int getLastIdeaPageNum() {
-        int numIdeas = getNumIdeas();
-        return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
-    public int getLastPageNumForIdeaTag(String tag) {
-        int numIdeas = getNumIdeasForTag(tag);
-        return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
     public DocumentPage<Idea> getIdeasByPageNum(int pageNum) {
         return pageQuery(
             GenericQueries
@@ -827,22 +803,6 @@ public class Database {
         if (project.isPublicProject()) indexController.tryIndexProject(project);
     }
 
-    public int getNumProjects() {
-        return countQuery(
-            GenericQueries
-                .queryByType(Project.class)
-                .addRestrictions(
-                    new RestrictionBuilder().eq("publicProject", true)
-                ),
-            projectContainer
-        );
-    }
-
-    public int getLastProjectPageNum() {
-        int numProjects = getNumProjects();
-        return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
     public DocumentPage<Project> getPublicProjectsByPageNum(int pageNum) {
         return pageQuery(
             GenericQueries
@@ -904,20 +864,6 @@ public class Database {
             projectContainer,
             Project.class
         );
-    }
-
-    public int getNumProjectsForTag(String tag) {
-        return countQuery(
-            GenericQueries
-                .queryByType(Project.class)
-                .arrayContains("tags", tag),
-            projectContainer
-        );
-    }
-
-    public int getLastPageNumForProjectTag(String tag) {
-        int numProjects = getNumProjectsForTag(tag);
-        return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
     }
 
     public DocumentPage<Project> getPublicProjectsByTagAndPageNum(
