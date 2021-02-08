@@ -110,7 +110,7 @@ public class Database {
 
         // Get ITEMS_PER_PAGE + 1 documents instead of ITEMS_PER_PAGE
         // in order to check if this is the last page.
-        // Only return the first 10 documents.
+        // Only return the first ITEMS_PER_PAGE documents.
         List<T> documents = multipleDocumentQuery(
             query.offsetAndLimitResults(
                 (pageNum - 1) * ITEMS_PER_PAGE,
