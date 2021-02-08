@@ -76,6 +76,11 @@ export default function Search() {
     };
 
     const changeType = (event) => {
+        if (query != "") {
+            window.location.href =
+                "/search?" +
+                toQuery({ type: event.target.value, query: query, page: 1 });
+        }
         setLastPage(true);
         setStatus(Status.NotSubmitted);
         setType(event.target.value);
