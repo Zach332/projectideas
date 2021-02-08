@@ -9,14 +9,12 @@ import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
-import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,20 +44,7 @@ public class IdeaController {
 
     @GetMapping("/api/ideas")
     public PreviewIdeaPageDTO getIdeas(@RequestParam("page") int pageNum) {
-        int lastPageNum = database.getLastIdeaPageNum();
-
-        List<PreviewIdeaDTO> ideaPreviews;
-        if (pageNum <= 0 || pageNum > lastPageNum) {
-            ideaPreviews = new ArrayList<>();
-        } else {
-            ideaPreviews =
-                database
-                    .getIdeasByPageNum(pageNum)
-                    .stream()
-                    .map(idea -> mapper.previewIdeaDTO(idea))
-                    .collect(Collectors.toList());
-        }
-        return new PreviewIdeaPageDTO(ideaPreviews, pageNum == lastPageNum);
+        return mapper.previewIdeaPageDTO(database.getIdeasByPageNum(pageNum));
     }
 
     @GetMapping("/api/ideas/tags")
@@ -67,20 +52,9 @@ public class IdeaController {
         @RequestParam("page") int pageNum,
         @RequestParam("tag") String tag
     ) {
-        int lastPageNum = database.getLastPageNumForIdeaTag(tag);
-
-        List<PreviewIdeaDTO> ideaPreviews;
-        if (pageNum <= 0 || pageNum > lastPageNum) {
-            ideaPreviews = new ArrayList<>();
-        } else {
-            ideaPreviews =
-                database
-                    .getIdeasByTagAndPageNum(tag, pageNum)
-                    .stream()
-                    .map(idea -> mapper.previewIdeaDTO(idea))
-                    .collect(Collectors.toList());
-        }
-        return new PreviewIdeaPageDTO(ideaPreviews, pageNum == lastPageNum);
+        return mapper.previewIdeaPageDTO(
+            database.getIdeasByTagAndPageNum(tag, pageNum)
+        );
     }
 
     @GetMapping("/api/ideas/{ideaId}")
