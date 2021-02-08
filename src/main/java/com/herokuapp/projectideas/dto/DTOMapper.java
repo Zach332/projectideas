@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.dto;
 
+import com.herokuapp.projectideas.database.document.DocumentPage;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedMessage;
@@ -20,10 +21,12 @@ import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectJoinRequestDTO;
@@ -45,6 +48,11 @@ public abstract class DTOMapper {
     public abstract PreviewIdeaDTO previewIdeaDTO(Idea idea);
 
     public abstract ViewIdeaDTO viewIdeaDTO(Idea idea, Boolean savedByUser);
+
+    @Mapping(target = "ideaPreviews", source = "documents")
+    public abstract PreviewIdeaPageDTO previewIdeaPageDTO(
+        DocumentPage<Idea> documentPage
+    );
 
     public abstract ViewCommentDTO viewCommentDTO(Comment comment);
 
@@ -141,6 +149,11 @@ public abstract class DTOMapper {
     public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
         Project project,
         @Context String userId
+    );
+
+    @Mapping(target = "projectPreviews", source = "documents")
+    public abstract PreviewProjectPageDTO previewProjectPageDTO(
+        DocumentPage<Project> documentPage
     );
 
     @Named("userIsTeamMember")
