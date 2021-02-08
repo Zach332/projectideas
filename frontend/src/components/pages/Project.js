@@ -163,6 +163,7 @@ export default function Project() {
                     appearance: "success",
                     autoDismiss: true,
                 });
+                setStatus(Status.Success);
             })
             .catch((err) => {
                 console.log("Error leaving team: " + err);
