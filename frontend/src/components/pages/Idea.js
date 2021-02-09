@@ -24,14 +24,19 @@ export default function Idea() {
     let params = useParams();
 
     useEffect(() => {
-        axios.get("/api/ideas/" + params.id).then((response) => {
-            if (!response.data) {
+        axios
+            .get("/api/ideas/" + params.id)
+            .then((response) => {
+                if (!response.data) {
+                    setStatus(Status.NotFound);
+                } else {
+                    setStatus(Status.Loaded);
+                    setIdea(response.data);
+                }
+            })
+            .catch(() => {
                 setStatus(Status.NotFound);
-            } else {
-                setStatus(Status.Loaded);
-                setIdea(response.data);
-            }
-        });
+            });
     }, []);
 
     const deleteIdea = () => {

@@ -34,14 +34,19 @@ export default function Project() {
     let params = useParams();
 
     useEffect(() => {
-        axios.get("/api/projects/" + params.id).then((response) => {
-            if (!response.data) {
+        axios
+            .get("/api/projects/" + params.id)
+            .then((response) => {
+                if (!response.data) {
+                    setStatus(Status.NotFound);
+                } else {
+                    setProject(response.data);
+                    setStatus(Status.Loaded);
+                }
+            })
+            .catch(() => {
                 setStatus(Status.NotFound);
-            } else {
-                setProject(response.data);
-                setStatus(Status.Loaded);
-            }
-        });
+            });
     }, [rerender]);
 
     const flipLookingForMembers = () => {
