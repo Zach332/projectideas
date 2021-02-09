@@ -20,6 +20,7 @@ import GitHubLogin from "./components/logins/Login";
 import LoginLanding from "./components/logins/LoginLanding";
 import MyProjects from "./components/pages/MyProjects";
 import Projects from "./components/pages/Projects";
+import "./scss/custom.scss";
 
 function App() {
     return (
