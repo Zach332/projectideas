@@ -11,6 +11,7 @@ import com.azure.cosmos.models.PartitionKey;
 import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
 import com.github.mohitgoyal91.cosmosdbqueryutils.utilities.Constants.Order;
+import com.herokuapp.projectideas.database.document.DocumentPage;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
@@ -95,6 +96,35 @@ public class Database {
             )
             .stream()
             .collect(Collectors.toList());
+    }
+
+    private <T extends RootDocument> DocumentPage<T> pageQuery(
+        SelectQuery query,
+        CosmosContainer container,
+        int pageNum,
+        Class<T> classType
+    ) {
+        if (pageNum < 1) {
+            return new DocumentPage<>(new ArrayList<T>(), false);
+        }
+
+        // Get ITEMS_PER_PAGE + 1 documents instead of ITEMS_PER_PAGE
+        // in order to check if this is the last page.
+        // Only return the first ITEMS_PER_PAGE documents.
+        List<T> documents = multipleDocumentQuery(
+            query.offsetAndLimitResults(
+                (pageNum - 1) * ITEMS_PER_PAGE,
+                ITEMS_PER_PAGE + 1
+            ),
+            container,
+            classType
+        );
+        boolean lastPage = documents.size() < 11;
+        if (!lastPage) {
+            documents.remove(documents.size() - 1);
+        }
+
+        return new DocumentPage<>(documents, lastPage);
     }
 
     private int countQuery(SelectQuery query, CosmosContainer container) {
@@ -357,55 +387,25 @@ public class Database {
         indexController.tryIndexIdea(idea);
     }
 
-    public int getNumIdeas() {
-        return countQuery(
-            GenericQueries.queryByType(Idea.class),
-            postContainer
-        );
-    }
-
-    public int getNumIdeasForTag(String tag) {
-        return countQuery(
-            GenericQueries.queryByType(Idea.class).arrayContains("tags", tag),
-            postContainer
-        );
-    }
-
-    public int getLastIdeaPageNum() {
-        int numIdeas = getNumIdeas();
-        return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
-    public int getLastPageNumForIdeaTag(String tag) {
-        int numIdeas = getNumIdeasForTag(tag);
-        return ((numIdeas - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
-    public List<Idea> getIdeasByPageNum(int pageNum) {
-        return multipleDocumentQuery(
+    public DocumentPage<Idea> getIdeasByPageNum(int pageNum) {
+        return pageQuery(
             GenericQueries
                 .queryByType(Idea.class)
-                .orderBy("timePosted", Order.DESC)
-                .offsetAndLimitResults(
-                    (pageNum - 1) * ITEMS_PER_PAGE,
-                    ITEMS_PER_PAGE
-                ),
+                .orderBy("timePosted", Order.DESC),
             postContainer,
+            pageNum,
             Idea.class
         );
     }
 
-    public List<Idea> getIdeasByTagAndPageNum(String tag, int pageNum) {
-        return multipleDocumentQuery(
+    public DocumentPage<Idea> getIdeasByTagAndPageNum(String tag, int pageNum) {
+        return pageQuery(
             GenericQueries
                 .queryByType(Idea.class)
                 .arrayContains("tags", tag)
-                .orderBy("timePosted", Order.DESC)
-                .offsetAndLimitResults(
-                    (pageNum - 1) * ITEMS_PER_PAGE,
-                    ITEMS_PER_PAGE
-                ),
+                .orderBy("timePosted", Order.DESC),
             postContainer,
+            pageNum,
             Idea.class
         );
     }
@@ -803,35 +803,16 @@ public class Database {
         if (project.isPublicProject()) indexController.tryIndexProject(project);
     }
 
-    public int getNumProjects() {
-        return countQuery(
-            GenericQueries
-                .queryByType(Project.class)
-                .addRestrictions(
-                    new RestrictionBuilder().eq("publicProject", true)
-                ),
-            projectContainer
-        );
-    }
-
-    public int getLastProjectPageNum() {
-        int numProjects = getNumProjects();
-        return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
-    public List<Project> getPublicProjectsByPageNum(int pageNum) {
-        return multipleDocumentQuery(
+    public DocumentPage<Project> getPublicProjectsByPageNum(int pageNum) {
+        return pageQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .addRestrictions(
                     new RestrictionBuilder().eq("publicProject", true)
                 )
-                .orderBy("timeCreated", Order.DESC)
-                .offsetAndLimitResults(
-                    (pageNum - 1) * ITEMS_PER_PAGE,
-                    ITEMS_PER_PAGE
-                ),
+                .orderBy("timeCreated", Order.DESC),
             projectContainer,
+            pageNum,
             Project.class
         );
     }
@@ -885,31 +866,20 @@ public class Database {
         );
     }
 
-    public int getNumProjectsForTag(String tag) {
-        return countQuery(
-            GenericQueries
-                .queryByType(Project.class)
-                .arrayContains("tags", tag),
-            projectContainer
-        );
-    }
-
-    public int getLastPageNumForProjectTag(String tag) {
-        int numProjects = getNumProjectsForTag(tag);
-        return ((numProjects - 1) / ITEMS_PER_PAGE) + 1;
-    }
-
-    public List<Project> getProjectsByTagAndPageNum(String tag, int pageNum) {
-        return multipleDocumentQuery(
+    public DocumentPage<Project> getPublicProjectsByTagAndPageNum(
+        String tag,
+        int pageNum
+    ) {
+        return pageQuery(
             GenericQueries
                 .queryByType(Project.class)
                 .arrayContains("tags", tag)
-                .orderBy("timeCreated", Order.DESC)
-                .offsetAndLimitResults(
-                    (pageNum - 1) * ITEMS_PER_PAGE,
-                    ITEMS_PER_PAGE
-                ),
+                .addRestrictions(
+                    new RestrictionBuilder().eq("publicProject", true)
+                )
+                .orderBy("timeCreated", Order.DESC),
             projectContainer,
+            pageNum,
             Project.class
         );
     }
