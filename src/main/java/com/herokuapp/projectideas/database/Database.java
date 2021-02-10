@@ -289,9 +289,8 @@ public class Database {
     private List<String> getSavedIdeaIdsForUser(String userId) {
         return multipleValueQuery(
             GenericQueries
-                .queryByType(User.class)
-                .valueOf("savedIdeaIds")
-                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+                .queryByPartitionKey(userId, User.class)
+                .valueOf("savedIdeaIds"),
             userContainer,
             String.class
         );
@@ -300,9 +299,8 @@ public class Database {
     private List<String> getPostedIdeaIdsForUser(String userId) {
         return multipleValueQuery(
             GenericQueries
-                .queryByType(User.class)
-                .valueOf("postedIdeaIds")
-                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+                .queryByPartitionKey(userId, User.class)
+                .valueOf("postedIdeaIds"),
             userContainer,
             String.class
         );
@@ -311,9 +309,8 @@ public class Database {
     private List<String> getJoinedProjectIdsForUser(String userId) {
         return multipleValueQuery(
             GenericQueries
-                .queryByType(User.class)
-                .valueOf("joinedProjectIds")
-                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+                .queryByPartitionKey(userId, User.class)
+                .valueOf("joinedProjectIds"),
             userContainer,
             String.class
         );
