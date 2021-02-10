@@ -32,7 +32,9 @@ import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectJoinRequestDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
+import java.util.List;
 import org.mapstruct.Context;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -115,6 +117,7 @@ public abstract class DTOMapper {
         source = "project",
         qualifiedByName = "userHasRequestedToJoin"
     )
+    @Named("previewProjectDTO")
     public abstract PreviewProjectDTO previewProjectDTO(
         Project project,
         @Context String userId
@@ -151,9 +154,14 @@ public abstract class DTOMapper {
         @Context String userId
     );
 
-    @Mapping(target = "projectPreviews", source = "documents")
+    @Mapping(
+        target = "projectPreviews",
+        source = "documents",
+        qualifiedByName = "previewProjectDTOList"
+    )
     public abstract PreviewProjectPageDTO previewProjectPageDTO(
-        DocumentPage<Project> documentPage
+        DocumentPage<Project> documentPage,
+        @Context String userId
     );
 
     @Named("userIsTeamMember")
@@ -174,6 +182,15 @@ public abstract class DTOMapper {
 
     protected abstract ViewProjectJoinRequestDTO viewProjectJoinRequest(
         ProjectJoinRequest projectJoinRequest
+    );
+
+    // Document collection -> DTO collection
+
+    @IterableMapping(qualifiedByName = "previewProjectDTO")
+    @Named("previewProjectDTOList")
+    protected abstract List<PreviewProjectDTO> previewProjectDTOList(
+        List<Project> projects,
+        @Context String userId
     );
 
     // DTO updating existing document
