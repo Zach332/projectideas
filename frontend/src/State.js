@@ -12,6 +12,7 @@ export const Status = {
 
 export const userPersistenceKey = "user_persistent_storage";
 export const newIdeaPersistenceKey = "new_idea_persistent_storage";
+export const themePersistenceKey = "theme_persistent_storage";
 
 const firstUserState = {
     loggedIn: false,
@@ -26,6 +27,10 @@ const firstNewideaState = {
     tags: [],
 };
 
+const firstThemeState = {
+    mode: "light",
+};
+
 const userFromStorage = localStorage.getItem(userPersistenceKey);
 const userObject = JSON.parse(userFromStorage);
 const user =
@@ -33,8 +38,11 @@ const user =
 const newIdeaFromStorage = localStorage.getItem(newIdeaPersistenceKey);
 const newIdeaObject = JSON.parse(newIdeaFromStorage);
 const newIdea = newIdeaFromStorage === null ? firstNewideaState : newIdeaObject;
+const themeFromStorage = localStorage.getItem(themePersistenceKey);
+const themeObject = JSON.parse(themeFromStorage);
+const theme = themeObject === null ? firstThemeState : themeObject;
 
-const initialState = { user, newIdea };
+const initialState = { user, newIdea, theme };
 
 axios.defaults.headers.common["authorization"] = initialState.user.id;
 
@@ -57,6 +65,13 @@ export const logout = () => {
 
 export const post = () => {
     setGlobalState("newIdea", firstNewideaState);
+};
+
+export const setTheme = (newMode) => {
+    setGlobalState("theme", (prevTheme) => ({
+        ...prevTheme,
+        mode: newMode,
+    }));
 };
 
 export { useGlobalState };

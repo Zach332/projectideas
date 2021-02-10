@@ -1,16 +1,15 @@
 import React from "react";
+import { useGlobalState, setTheme } from "../../State";
 
-export default function Footer({ mode, setMode }) {
-    const [changes, setChanges] = React.useState(0);
+export default function Footer() {
+    const [theme] = useGlobalState("theme");
 
     const switchMode = () => {
-        if (mode === "dark") {
-            setMode("light");
+        if (theme.mode === "dark") {
+            setTheme("light");
         } else {
-            setMode("dark");
+            setTheme("dark");
         }
-        if (changes > 0) window.location.reload();
-        setChanges((changes) => changes + 1);
     };
 
     return (
@@ -21,7 +20,7 @@ export default function Footer({ mode, setMode }) {
                     type="checkbox"
                     id="lookingForMembers"
                     onClick={switchMode}
-                    value={mode === "dark"}
+                    checked={theme.mode === "dark"}
                 />
                 <label className="form-check-label" htmlFor="lookingForMembers">
                     Dark Mode
