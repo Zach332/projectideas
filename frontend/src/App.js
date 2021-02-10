@@ -21,10 +21,12 @@ import LoginLanding from "./components/logins/LoginLanding";
 import MyProjects from "./components/pages/MyProjects";
 import Projects from "./components/pages/Projects";
 import StyleDiv from "./components/general/StyleDiv";
+import Footer from "./components/layout/Footer";
 
 function App() {
+    const [mode, setMode] = React.useState("light");
     return (
-        <StyleDiv mode="light">
+        <StyleDiv mode={mode}>
             <ToastProvider>
                 <Router>
                     <div className="App">
@@ -107,6 +109,7 @@ function App() {
                                 <Route component={NotFound} />
                             </Switch>
                         </div>
+                        <Footer mode={mode} setMode={setMode} />
                     </div>
                 </Router>
             </ToastProvider>
