@@ -1,5 +1,21 @@
-$primary: #d900c7;
-$danger: #ff4136;
-$body-bg: #21262d;
+$primary: #910385;
+$danger: #a02020;
+$secondary: #537092;
+$body-bg: #181b1f;
+$headings-color: #f0f0f0;
+$text-muted: #838b94;
+$body-color: #a8b4c0;
+$input-bg: #212529;
+$input-disabled-bg: #1d2024;
+$input-color: #a8b4c0;
+
+$list-group-bg: $input-bg;
+$list-group-color: #959faa;
+$list-group-hover-bg: #2f3338;
+$list-group-action-active-bg: #24272b;
+$card-bg: $list-group-bg;
+$input-bg: $list-group-bg;
+$btn-border-width: 2px;
+$nav-tabs-link-active-color: $primary;
 
 @import "~bootstrap/scss/bootstrap";
