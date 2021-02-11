@@ -7,7 +7,7 @@ export default function StyleDiv({ children, ...props }) {
 
     useEffect(() => {
         localStorage.setItem(themePersistenceKey, JSON.stringify(theme));
-        if (changes > 1) {
+        if (changes > 0) {
             window.location.reload();
         }
         setChanges((changes) => changes + 1);
