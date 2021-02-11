@@ -22,6 +22,7 @@ import MyProjects from "./components/pages/MyProjects";
 import Projects from "./components/pages/Projects";
 import StyleDiv from "./components/general/StyleDiv";
 import Footer from "./components/layout/Footer";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 function App() {
     const [mode, setMode] = React.useState("light");
