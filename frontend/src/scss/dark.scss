@@ -10,12 +10,18 @@ $input-disabled-bg: #1d2024;
 $input-color: #a8b4c0;
 
 $list-group-bg: $input-bg;
-$list-group-color: #959faa;
+$list-group-color: $body-color;
 $list-group-hover-bg: #2f3338;
 $list-group-action-active-bg: #24272b;
 $card-bg: $list-group-bg;
 $input-bg: $list-group-bg;
 $btn-border-width: 2px;
+$btn-close-color: $headings-color;
 $nav-tabs-link-active-color: $primary;
+$modal-content-bg: $input-bg;
+$dropdown-bg: $list-group-bg;
+$dropdown-link-color: $body-color;
+$dropdown-link-hover-color: $body-color;
+$dropdown-link-hover-bg: $list-group-hover-bg;
 
 @import "~bootstrap/scss/bootstrap";
