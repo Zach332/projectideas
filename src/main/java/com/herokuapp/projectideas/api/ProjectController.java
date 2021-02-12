@@ -41,7 +41,8 @@ public class ProjectController {
         @RequestParam("page") int pageNum
     ) {
         return mapper.previewProjectPageDTO(
-            database.getPublicProjectsByPageNum(pageNum)
+            database.getPublicProjectsByPageNum(pageNum),
+            userId
         );
     }
 
@@ -52,7 +53,8 @@ public class ProjectController {
         @RequestParam("tag") String tag
     ) {
         return mapper.previewProjectPageDTO(
-            database.getPublicProjectsByTagAndPageNum(tag, pageNum)
+            database.getPublicProjectsByTagAndPageNum(tag, pageNum),
+            userId
         );
     }
 
