@@ -62,6 +62,7 @@ export default function Comments({ ideaId }) {
             .then(() => {
                 setComment("");
                 setRows(1);
+                setShowButton("hidden");
                 setRerender((rerender) => rerender + 1);
                 addToast("Your comment was added successfully.", {
                     appearance: "success",
@@ -107,7 +108,7 @@ export default function Comments({ ideaId }) {
                             <button
                                 type="submit"
                                 disabled={comment === ""}
-                                className="btn btn-primary mb-2"
+                                className="btn btn-primary mb-1"
                                 style={{ visibility: showButton }}
                             >
                                 Submit
