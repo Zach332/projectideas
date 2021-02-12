@@ -30,8 +30,10 @@ export default function Message({ message, setRerender }) {
     return (
         <motion.div
             layout
-            className="list-group-item flex-column align-items-start my-2 rounded border"
-            style={message.groupMessage && { backgroundColor: "#bdf1fc" }}
+            className={
+                "list-group-item flex-column align-items-start my-2 rounded border" +
+                (message.groupMessage ? " border border-primary" : "")
+            }
         >
             <div className="dropdown">
                 <button
