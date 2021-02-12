@@ -318,10 +318,7 @@ export default function Project() {
                 </span>
             )}
             {project.userIsTeamMember && project.joinRequests.length > 0 && (
-                <div
-                    className="mt-3 p-2"
-                    style={{ backgroundColor: "#bdf1fc" }}
-                >
+                <div className="mt-3 p-2 bg-secondary">
                     <AnimateSharedLayout>
                         <h4>Join requests</h4>
                         <motion.div layout className="container mx-auto">
