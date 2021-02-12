@@ -133,13 +133,6 @@ export default function Navbar() {
                         >
                             Projects
                         </NavLink>
-                        <NavLink
-                            className="nav-item nav-link"
-                            activeClassName="nav-item nav-link active"
-                            to="/about"
-                        >
-                            About
-                        </NavLink>
                     </ul>
                     {rightNavbar}
                 </div>
