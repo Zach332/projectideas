@@ -14,10 +14,10 @@ export default function StyleDiv({ children, ...props }) {
     }, [theme]);
 
     if (theme.mode === "light") {
-        require("../../scss/light.scss");
+        import("../../scss/light.scss");
         return <div {...props}>{children}</div>;
     } else {
-        require("../../scss/dark.scss");
+        import("../../scss/dark.scss");
         return <div {...props}>{children}</div>;
     }
 }
