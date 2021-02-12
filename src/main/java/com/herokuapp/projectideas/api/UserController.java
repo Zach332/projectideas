@@ -3,12 +3,10 @@ package com.herokuapp.projectideas.api;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.DTOMapper;
-import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
-import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
+import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
+import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -43,32 +42,34 @@ public class UserController {
     }
 
     @GetMapping("/api/users/{userId}/postedideas")
-    public List<PreviewIdeaDTO> getPostedIdeas(@PathVariable String userId) {
-        return database
-            .getPostedIdeasForUser(userId)
-            .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea))
-            .collect(Collectors.toList());
+    public PreviewIdeaPageDTO getPostedIdeas(
+        @PathVariable String userId,
+        @RequestParam("page") int pageNum
+    ) {
+        return mapper.previewIdeaPageDTO(
+            database.getPostedIdeasForUser(userId, pageNum)
+        );
     }
 
     @GetMapping("/api/users/{userId}/savedIdeas")
-    public List<PreviewIdeaDTO> getSavedIdeas(@PathVariable String userId) {
-        return database
-            .getSavedIdeasForUser(userId)
-            .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea))
-            .collect(Collectors.toList());
+    public PreviewIdeaPageDTO getSavedIdeas(
+        @PathVariable String userId,
+        @RequestParam("page") int pageNum
+    ) {
+        return mapper.previewIdeaPageDTO(
+            database.getSavedIdeasForUser(userId, pageNum)
+        );
     }
 
     @GetMapping("/api/users/{userId}/projects")
-    public List<PreviewProjectDTO> getJoinedProjects(
-        @PathVariable String userId
+    public PreviewProjectPageDTO getJoinedProjects(
+        @PathVariable String userId,
+        @RequestParam("page") int pageNum
     ) {
-        return database
-            .getJoinedProjectsForUser(userId)
-            .stream()
-            .map(project -> mapper.previewProjectDTO(project, userId))
-            .collect(Collectors.toList());
+        return mapper.previewProjectPageDTO(
+            database.getJoinedProjectsForUser(userId, pageNum),
+            userId
+        );
     }
 
     @PostMapping("/api/users")

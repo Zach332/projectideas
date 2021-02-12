@@ -68,7 +68,7 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
-    private <T extends RootDocument> Optional<T> singleDocumentQuery(
+    private <T> Optional<T> singleDocumentQuery(
         SelectQuery query,
         CosmosContainer container,
         Class<T> classType
@@ -83,7 +83,7 @@ public class Database {
             .findAny();
     }
 
-    private <T extends RootDocument> List<T> multipleDocumentQuery(
+    private <T> List<T> multipleDocumentQuery(
         SelectQuery query,
         CosmosContainer container,
         Class<T> classType
@@ -119,7 +119,7 @@ public class Database {
             container,
             classType
         );
-        boolean lastPage = documents.size() < 11;
+        boolean lastPage = documents.size() <= ITEMS_PER_PAGE;
         if (!lastPage) {
             documents.remove(documents.size() - 1);
         }
@@ -139,6 +139,7 @@ public class Database {
             .get();
     }
 
+    // TODO: Merge this with multipleDocumentQuery
     private <T> List<T> multipleValueQuery(
         SelectQuery query,
         CosmosContainer container,
@@ -152,6 +153,59 @@ public class Database {
             )
             .stream()
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a page of documents based on a list of partition keys.
+     * This method is intended to be used when a database object (for example, a user)
+     * contains an array of document partition keys (for example, an array of saved idea ids).
+     * @param <T> Type of document to request
+     * @param partitionKeys Partition keys in the array in ascending order of being added
+     * to the array (this method will handle key order)
+     * @param container Container for query to be executed on
+     * @param pageNum Page number
+     * @param classType Type of document to request
+     * @return Document page of ITEMS_PER_PAGE documents
+     */
+    private <T extends RootDocument> DocumentPage<T> getDocumentPageFromPartitionKeyList(
+        List<String> partitionKeys,
+        CosmosContainer container,
+        int pageNum,
+        Class<T> classType
+    ) {
+        // Switch partition keys to descending order of being added to the array
+        Collections.reverse(partitionKeys);
+        // Handle pagination
+        int startIndex = (pageNum - 1) * ITEMS_PER_PAGE;
+        int endIndex = startIndex + ITEMS_PER_PAGE;
+        boolean lastPage = endIndex >= partitionKeys.size() - 1;
+        if (endIndex > partitionKeys.size()) {
+            endIndex = partitionKeys.size();
+        }
+        partitionKeys = partitionKeys.subList(startIndex, endIndex);
+
+        List<T> documents = multipleDocumentQuery(
+            GenericQueries.queryByPartitionKeyList(partitionKeys, classType),
+            container,
+            classType
+        );
+
+        // SQL IN queries are not guaranteed in any order, so order the documents retrieved
+        // based on the order of the partition keys
+        ArrayList<T> orderedDocuments = new ArrayList<>();
+        for (String partitionKey : partitionKeys) {
+            Optional<T> document = documents
+                .stream()
+                .filter(doc -> doc.getPartitionKey().equals(partitionKey))
+                .findAny();
+            if (document.isPresent()) {
+                orderedDocuments.add(document.get());
+            } else {
+                // TODO: Log failure here, this should not happen without a database error at some point in time
+            }
+        }
+
+        return new DocumentPage<>(orderedDocuments, lastPage);
     }
 
     // Users
@@ -316,28 +370,37 @@ public class Database {
         );
     }
 
-    public List<Idea> getSavedIdeasForUser(String userId) {
-        ArrayList<Idea> ideas = new ArrayList<Idea>();
-        List<String> ideaIds = getSavedIdeaIdsForUser(userId);
-        // Return ideas in newest-first order
-        Collections.reverse(ideaIds);
-        for (String ideaId : ideaIds) {
-            Optional<Idea> idea = getIdea(ideaId);
-            if (idea.isPresent()) {
-                ideas.add(idea.get());
-            }
-        }
-        return ideas;
+    public DocumentPage<Idea> getSavedIdeasForUser(String userId, int pageNum) {
+        return getDocumentPageFromPartitionKeyList(
+            getSavedIdeaIdsForUser(userId),
+            postContainer,
+            pageNum,
+            Idea.class
+        );
     }
 
-    public List<Idea> getPostedIdeasForUser(String userId) {
-        List<String> ideaIds = getPostedIdeaIdsForUser(userId);
-        return getIdeasInList(ideaIds);
+    public DocumentPage<Idea> getPostedIdeasForUser(
+        String userId,
+        int pageNum
+    ) {
+        return getDocumentPageFromPartitionKeyList(
+            getPostedIdeaIdsForUser(userId),
+            postContainer,
+            pageNum,
+            Idea.class
+        );
     }
 
-    public List<Project> getJoinedProjectsForUser(String userId) {
-        List<String> projectIds = getJoinedProjectIdsForUser(userId);
-        return getProjectsInList(projectIds);
+    public DocumentPage<Project> getJoinedProjectsForUser(
+        String userId,
+        int pageNum
+    ) {
+        return getDocumentPageFromPartitionKeyList(
+            getJoinedProjectIdsForUser(userId),
+            projectContainer,
+            pageNum,
+            Project.class
+        );
     }
 
     public boolean isIdeaSavedByUser(String userId, String ideaId) {

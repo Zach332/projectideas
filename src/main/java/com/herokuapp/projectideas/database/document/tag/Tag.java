@@ -34,4 +34,8 @@ public abstract class Tag implements RootDocument {
         this.usages = 1;
         this.standard = false;
     }
+
+    public String getPartitionKey() {
+        return name;
+    }
 }

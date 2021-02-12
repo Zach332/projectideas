@@ -9,6 +9,7 @@ import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Set;
 import org.reflections.Reflections;
 
@@ -62,6 +63,17 @@ public class GenericQueries {
                 new RestrictionBuilder().eq("id", id),
                 new RestrictionBuilder()
                 .eq(getPartitionKey(classType), partitionKey)
+            );
+    }
+
+    public static <T extends RootDocument> SelectQuery queryByPartitionKeyList(
+        List<String> partitionKeys,
+        Class<T> classType
+    ) {
+        return queryByType(classType)
+            .addRestrictions(
+                new RestrictionBuilder()
+                .in(getPartitionKey(classType), partitionKeys.toArray())
             );
     }
 

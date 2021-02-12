@@ -35,4 +35,8 @@ public class User implements RootDocument {
         this.savedIdeaIds = new ArrayList<String>();
         this.joinedProjectIds = new ArrayList<String>();
     }
+
+    public String getPartitionKey() {
+        return userId;
+    }
 }
