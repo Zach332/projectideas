@@ -14,7 +14,7 @@ export default function Footer() {
     };
 
     return (
-        <div>
+        <div style={{ marginTop: "auto" }}>
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark justify-content-center mt-3">
                 <div className="form-check form-switch me-4">
                     <input

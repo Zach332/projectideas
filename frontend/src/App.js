@@ -30,7 +30,14 @@ function App() {
         <StyleDiv mode={mode}>
             <ToastProvider>
                 <Router>
-                    <div className="App">
+                    <div
+                        className="App"
+                        style={{
+                            height: "100vh",
+                            display: "flex",
+                            flexDirection: "column",
+                        }}
+                    >
                         <Navbar />
                         <div className="container mx-auto">
                             <Switch>
