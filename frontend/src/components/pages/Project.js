@@ -138,6 +138,7 @@ export default function Project() {
                 name: project.name,
                 description: project.description,
                 lookingForMembers: project.lookingForMembers,
+                publicProject: project.publicProject,
                 tags: project.tags,
                 githubLink: project.githubLink,
             })
