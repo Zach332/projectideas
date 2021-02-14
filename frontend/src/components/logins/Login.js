@@ -6,9 +6,12 @@ import XMark from "../../x.svg";
 import { toQuery } from "../utils/Routing";
 import { login, Status } from "../../State";
 import GitHubSymbol from "../../GitHub-Mark.png";
+import GitHubSymbolLight from "../../GitHub-Mark-Light.png";
 import GoogleLogo from "../../GoogleLogo.svg";
+import { useGlobalState } from "../../State";
 
 export default function Login() {
+    const [theme] = useGlobalState("theme");
     const [status, setStatus] = React.useState(Status.NotSubmitted);
 
     const search = toQuery({
@@ -110,12 +113,21 @@ export default function Login() {
                     cookiePolicy={"single_host_origin"}
                 />
             </div>
-            <img
-                src={GitHubSymbol}
-                className="mx-auto d-block m-4"
-                style={{ width: 80 }}
-                alt=""
-            />
+            {theme.mode === "light" ? (
+                <img
+                    src={GitHubSymbol}
+                    className="mx-auto d-block m-4"
+                    style={{ width: 80 }}
+                    alt=""
+                />
+            ) : (
+                <img
+                    src={GitHubSymbolLight}
+                    className="mx-auto d-block m-4"
+                    style={{ width: 80 }}
+                    alt=""
+                />
+            )}
             <div className="col-md-12 text-center">
                 <button
                     type="btn btn-primary"
