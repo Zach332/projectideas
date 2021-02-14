@@ -280,10 +280,10 @@ export default function Project() {
                     <h1>{project.name}</h1>
                 </div>
                 <div className="d-flex align-items-center">
-                    <li className="list-group-item border-0">
+                    <div>
                         <ProjectJoinRequestButton project={project} />
                         <div className="text-end">{githubLink}</div>
-                    </li>
+                    </div>
                 </div>
             </div>
             {project.tags && project.tags.length > 0 && (
