@@ -14,10 +14,12 @@ export default function StyleDiv({ children, ...props }) {
     }, [theme]);
 
     if (theme.mode === "light") {
-        import("../../scss/light.scss");
+        import("../../css/light.scss");
+        import("../../css/unhide.css");
         return <div {...props}>{children}</div>;
     } else {
-        import("../../scss/dark.scss");
+        import("../../css/dark.scss");
+        import("../../css/unhide.css");
         return <div {...props}>{children}</div>;
     }
 }
