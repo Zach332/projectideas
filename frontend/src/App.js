@@ -25,9 +25,8 @@ import Footer from "./components/layout/Footer";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 function App() {
-    const [mode, setMode] = React.useState("light");
     return (
-        <StyleDiv mode={mode}>
+        <StyleDiv>
             <ToastProvider>
                 <Router>
                     <div
@@ -117,7 +116,7 @@ function App() {
                                 <Route component={NotFound} />
                             </Switch>
                         </div>
-                        <Footer mode={mode} setMode={setMode} />
+                        <Footer />
                     </div>
                 </Router>
             </ToastProvider>
