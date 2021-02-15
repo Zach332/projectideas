@@ -108,9 +108,9 @@ export default function Message({ message, setRerender }) {
                     {formatTime(message.timeSent)}
                 </span>
             </h6>
-            <p className="mb-1 ms-2" style={{ whiteSpace: "pre" }}>
+            <div className="mb-1 ms-2" style={{ whiteSpace: "pre-wrap" }}>
                 {message.content}
-            </p>
+            </div>
             <Modal
                 id={"deleteMessage" + message.id}
                 title="Delete message"
