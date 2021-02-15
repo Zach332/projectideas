@@ -136,8 +136,8 @@ export default function Search() {
                     <option value="projects">Projects</option>
                 </select>
                 <form className="py-4 col" onSubmit={handleSubmit}>
-                    <div className="row">
-                        <div className="col">
+                    <div className="d-flex">
+                        <div className="flex-grow-1">
                             <input
                                 type="text"
                                 value={query}
@@ -147,7 +147,7 @@ export default function Search() {
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div className="col-auto my-auto">
+                        <div className="ms-2 my-auto">
                             <button
                                 className="btn btn-sm btn-secondary"
                                 type="submit"
