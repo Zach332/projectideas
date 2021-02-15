@@ -1,5 +1,5 @@
 import React from "react";
-import { formatTime } from "../../TimeFormatter";
+import { formatTime } from "../utils/TimeFormatter";
 
 export default function IdeaSummary({ idea }) {
     const removeMd = require("remove-markdown");

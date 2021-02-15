@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import SendMessageModal from "./SendMessageModal";
-import { formatTime } from "../../TimeFormatter";
+import { formatTime } from "../utils/TimeFormatter";
 import Modal from "../layout/Modal";
 import { useToasts } from "react-toast-notifications";
 

@@ -11,7 +11,7 @@ import Modal from "../layout/Modal";
 import SendMessageModal from "../messageComponents/SendMessageModal";
 import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
-import { formatTime } from "../../TimeFormatter";
+import { formatTime } from "../utils/TimeFormatter";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
