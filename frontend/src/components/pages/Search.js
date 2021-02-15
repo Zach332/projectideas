@@ -127,22 +127,23 @@ export default function Search() {
             </Helmet>
             <div className="row w-75 mx-auto">
                 <select
-                    className="form-select col-auto my-auto"
+                    className="form-select col-auto my-auto mx-auto"
                     onChange={changeType}
                     value={type}
-                    style={{ width: 150 }}
+                    style={{ width: 125 }}
                 >
                     <option value="ideas">Ideas</option>
                     <option value="projects">Projects</option>
                 </select>
                 <form className="py-4 col" onSubmit={handleSubmit}>
                     <div className="row">
-                        <div className="col me-auto">
+                        <div className="col">
                             <input
                                 type="text"
                                 value={query}
                                 className="form-control"
                                 id="title"
+                                style={{ minWidth: 125 }}
                                 onChange={handleInputChange}
                             />
                         </div>
