@@ -7,8 +7,10 @@ import { toParams, toQuery } from "../utils/Routing";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { useHistory } from "react-router-dom";
 
 export default function Tags() {
+    let history = useHistory();
     const [posts, setPosts] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
@@ -36,23 +38,25 @@ export default function Tags() {
     }, []);
 
     const next = () => {
-        window.location.href =
+        history.push(
             "/tags?" +
-            toQuery({
-                type: params.type,
-                tag: params.tag,
-                page: parseInt(params.page) + 1,
-            });
+                toQuery({
+                    type: params.type,
+                    tag: params.tag,
+                    page: parseInt(params.page) + 1,
+                })
+        );
     };
 
     const previous = () => {
-        window.location.href =
+        history.push(
             "/tags?" +
-            toQuery({
-                type: params.type,
-                tag: params.tag,
-                page: parseInt(params.page) - 1,
-            });
+                toQuery({
+                    type: params.type,
+                    tag: params.tag,
+                    page: parseInt(params.page) - 1,
+                })
+        );
     };
 
     let postElements;

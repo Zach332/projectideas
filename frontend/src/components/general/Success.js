@@ -1,19 +1,21 @@
 import React, { useEffect } from "react";
 import CheckMark from "../../check.svg";
 import { useKeyPress } from "../hooks/Keys";
+import { useHistory } from "react-router-dom";
 
 export default function Success() {
+    let history = useHistory();
     const enterPress = useKeyPress("Enter");
     const isMobile = window.innerWidth <= 768;
 
     useEffect(() => {
         if (enterPress) {
-            window.location.href = "/";
+            history.push("/");
         }
     }, [enterPress]);
 
     const onClick = () => {
-        window.location.href = "/";
+        history.push("/");
     };
 
     return (

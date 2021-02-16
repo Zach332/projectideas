@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { Status, useGlobalState } from "../../State";
 import NotFound from "./NotFound";
 import axios from "axios";
@@ -11,6 +11,7 @@ import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 
 export default function JoinProject() {
+    let history = useHistory();
     const [user] = useGlobalState("user");
     const [idea, setIdea] = React.useState([]);
     const [rerender, setRerender] = React.useState(0);
@@ -39,7 +40,7 @@ export default function JoinProject() {
     }, [rerender]);
 
     const createProject = () => {
-        window.location.href = "/create/idea/" + idea.id;
+        history.push("/create/idea/" + idea.id);
     };
 
     if (status === Status.NotFound) {

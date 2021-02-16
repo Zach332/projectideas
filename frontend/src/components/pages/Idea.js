@@ -15,8 +15,10 @@ import { formatTime } from "../utils/TimeFormatter";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { useHistory } from "react-router-dom";
 
 export default function Idea() {
+    let history = useHistory();
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
     const [idea, setIdea] = React.useState({ title: "" });
@@ -104,12 +106,11 @@ export default function Idea() {
     };
 
     const joinProject = () => {
-        window.location.href = "/join/idea/" + idea.id;
+        history.push("/join/idea/" + idea.id);
     };
 
     const searchTag = (tagName) => {
-        window.location.href =
-            "/tags?" + toQuery({ type: "idea", tag: tagName });
+        history.push("/tags?" + toQuery({ type: "idea", tag: tagName }));
     };
 
     if (status === Status.NotFound) {

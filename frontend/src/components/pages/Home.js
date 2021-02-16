@@ -6,15 +6,19 @@ import { toParams, toQuery } from "../utils/Routing";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { useHistory, useLocation } from "react-router-dom";
 
 export default function Home() {
+    let history = useHistory();
+    let location = useLocation();
     const [ideas, setIdeas] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
-    const params = toParams(window.location.search.replace(/^\?/, ""));
+    const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
     useEffect(() => {
+        setStatus(Status.Loading);
         axios
             .get("/api/ideas?" + toQuery({ page: params.page }))
             .then((response) => {
@@ -22,20 +26,18 @@ export default function Home() {
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
-    }, []);
+    }, [location]);
 
     const onCLick = () => {
-        window.location.href = "/new-idea";
+        history.push("/new-idea");
     };
 
     const next = () => {
-        window.location.href =
-            "/?" + toQuery({ page: parseInt(params.page) + 1 });
+        history.push("/?" + toQuery({ page: parseInt(params.page) + 1 }));
     };
 
     const previous = () => {
-        window.location.href =
-            "/?" + toQuery({ page: parseInt(params.page) - 1 });
+        history.push("/?" + toQuery({ page: parseInt(params.page) - 1 }));
     };
 
     let ideaElements;
