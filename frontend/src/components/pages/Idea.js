@@ -180,25 +180,27 @@ export default function Idea() {
                                         <br></br>
                                         {formatTime(idea.timePosted)}
                                     </div>
-                                    <div className="d-flex align-items-center">
-                                        {idea.savedByUser ? (
-                                            <button
-                                                type="button"
-                                                className="btn btn-danger btn-md"
-                                                onClick={unsaveIdea}
-                                            >
-                                                Unsave
-                                            </button>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                className="btn btn-primary btn-md"
-                                                onClick={saveIdea}
-                                            >
-                                                Save
-                                            </button>
-                                        )}
-                                    </div>
+                                    {user.loggedIn && (
+                                        <div className="d-flex align-items-center">
+                                            {idea.savedByUser ? (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger btn-md"
+                                                    onClick={unsaveIdea}
+                                                >
+                                                    Unsave
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-primary btn-md"
+                                                    onClick={saveIdea}
+                                                >
+                                                    Save
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </li>
                             <li className="list-group-item">
