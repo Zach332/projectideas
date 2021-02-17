@@ -274,8 +274,9 @@ public class ProjectController {
 
         if (accept) {
             project.getTeamMembers().add(new UsernameIdPair(newTeamMember));
-            newTeamMember.getJoinedProjectIds().add(projectId);
-            database.updateUser(newTeamMember.getId(), newTeamMember);
+
+            database.joinProjectForUser(newTeamMember.getUserId(), projectId);
+
             database.sendIndividualAdminMessage(
                 newTeamMember.getUserId(),
                 "Your request to join " +
@@ -316,9 +317,7 @@ public class ProjectController {
             database.updateProject(project, false, false);
         }
 
-        User user = database.getUser(userId).get();
-        user.getJoinedProjectIds().remove(projectId);
-        database.updateUser(userId, user);
+        database.leaveProjectForUser(userId, projectId);
     }
 
     @GetMapping("/api/projects/search")

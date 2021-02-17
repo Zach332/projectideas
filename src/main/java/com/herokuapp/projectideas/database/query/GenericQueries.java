@@ -8,6 +8,9 @@ import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
+import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
+import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
@@ -82,7 +85,10 @@ public class GenericQueries {
     ) {
         if (
             User.class.isAssignableFrom(classType) ||
-            Message.class.isAssignableFrom(classType)
+            Message.class.isAssignableFrom(classType) ||
+            UserPostedIdea.class.isAssignableFrom(classType) ||
+            UserSavedIdea.class.isAssignableFrom(classType) ||
+            UserJoinedProject.class.isAssignableFrom(classType)
         ) {
             return USER_CONTAINER_PARTITION_KEY;
         } else if (Post.class.isAssignableFrom(classType)) {

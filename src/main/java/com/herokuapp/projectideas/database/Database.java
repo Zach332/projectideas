@@ -27,11 +27,13 @@ import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
+import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
+import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,7 +100,7 @@ public class Database {
             .collect(Collectors.toList());
     }
 
-    private <T extends RootDocument> DocumentPage<T> pageQuery(
+    private <T> DocumentPage<T> pageQuery(
         SelectQuery query,
         CosmosContainer container,
         int pageNum,
@@ -156,36 +158,26 @@ public class Database {
     }
 
     /**
-     * Returns a page of documents based on a list of partition keys.
-     * This method is intended to be used when a database object (for example, a user)
-     * contains an array of document partition keys (for example, an array of saved idea ids).
-     * @param <T> Type of document to request
-     * @param partitionKeys Partition keys in the array in ascending order of being added
-     * to the array (this method will handle key order)
+     * Returns a page of documents based on a page of partition keys.
+     * Will return documents in the order specified in the partition key page.
+     * @param <T> Type of document desired
+     * @param partitionKeys Page of partition keys
      * @param container Container for query to be executed on
      * @param pageNum Page number
      * @param classType Type of document to request
      * @return Document page of ITEMS_PER_PAGE documents
      */
-    private <T extends RootDocument> DocumentPage<T> getDocumentPageFromPartitionKeyList(
-        List<String> partitionKeys,
+    private <T extends RootDocument> DocumentPage<T> getDocumentPageFromPartitionKeyPage(
+        DocumentPage<String> partitionKeys,
         CosmosContainer container,
         int pageNum,
         Class<T> classType
     ) {
-        // Switch partition keys to descending order of being added to the array
-        Collections.reverse(partitionKeys);
-        // Handle pagination
-        int startIndex = (pageNum - 1) * ITEMS_PER_PAGE;
-        int endIndex = startIndex + ITEMS_PER_PAGE;
-        boolean lastPage = endIndex >= partitionKeys.size() - 1;
-        if (endIndex > partitionKeys.size()) {
-            endIndex = partitionKeys.size();
-        }
-        partitionKeys = partitionKeys.subList(startIndex, endIndex);
-
         List<T> documents = multipleDocumentQuery(
-            GenericQueries.queryByPartitionKeyList(partitionKeys, classType),
+            GenericQueries.queryByPartitionKeyList(
+                partitionKeys.getDocuments(),
+                classType
+            ),
             container,
             classType
         );
@@ -193,7 +185,7 @@ public class Database {
         // SQL IN queries are not guaranteed in any order, so order the documents retrieved
         // based on the order of the partition keys
         ArrayList<T> orderedDocuments = new ArrayList<>();
-        for (String partitionKey : partitionKeys) {
+        for (String partitionKey : partitionKeys.getDocuments()) {
             Optional<T> document = documents
                 .stream()
                 .filter(doc -> doc.getPartitionKey().equals(partitionKey))
@@ -205,7 +197,7 @@ public class Database {
             }
         }
 
-        return new DocumentPage<>(orderedDocuments, lastPage);
+        return new DocumentPage<>(orderedDocuments, partitionKeys.isLastPage());
     }
 
     // Users
@@ -317,62 +309,34 @@ public class Database {
     }
 
     public void saveIdeaForUser(String ideaId, String userId) {
-        User user = getUser(userId).get();
-        if (!user.getSavedIdeaIds().contains(ideaId)) {
-            user.getSavedIdeaIds().add(ideaId);
-        }
-        userContainer.replaceItem(
-            user,
-            userId,
-            new PartitionKey(userId),
-            new CosmosItemRequestOptions()
-        );
+        UserSavedIdea savedIdea = new UserSavedIdea(userId, ideaId);
+        userContainer.createItem(savedIdea);
     }
 
     public void unsaveIdeaForUser(String ideaId, String userId) {
-        User user = getUser(userId).get();
-        user.getSavedIdeaIds().remove(ideaId);
-        userContainer.replaceItem(
-            user,
-            userId,
-            new PartitionKey(userId),
-            new CosmosItemRequestOptions()
-        );
-    }
-
-    private List<String> getSavedIdeaIdsForUser(String userId) {
-        return multipleValueQuery(
+        UserSavedIdea savedIdea = singleDocumentQuery(
             GenericQueries
-                .queryByPartitionKey(userId, User.class)
-                .valueOf("savedIdeaIds"),
+                .queryByPartitionKey(userId, UserSavedIdea.class)
+                .addRestrictions(new RestrictionBuilder().eq("ideaId", ideaId)),
             userContainer,
-            String.class
-        );
-    }
+            UserSavedIdea.class
+        )
+            .get();
 
-    private List<String> getPostedIdeaIdsForUser(String userId) {
-        return multipleValueQuery(
-            GenericQueries
-                .queryByPartitionKey(userId, User.class)
-                .valueOf("postedIdeaIds"),
-            userContainer,
-            String.class
-        );
-    }
-
-    private List<String> getJoinedProjectIdsForUser(String userId) {
-        return multipleValueQuery(
-            GenericQueries
-                .queryByPartitionKey(userId, User.class)
-                .valueOf("joinedProjectIds"),
-            userContainer,
-            String.class
-        );
+        userContainer.deleteItem(savedIdea, new CosmosItemRequestOptions());
     }
 
     public DocumentPage<Idea> getSavedIdeasForUser(String userId, int pageNum) {
-        return getDocumentPageFromPartitionKeyList(
-            getSavedIdeaIdsForUser(userId),
+        return getDocumentPageFromPartitionKeyPage(
+            pageQuery(
+                GenericQueries
+                    .queryByPartitionKey(userId, UserSavedIdea.class)
+                    .valueOf("ideaId")
+                    .orderBy("timeSaved", Order.DESC),
+                userContainer,
+                pageNum,
+                String.class
+            ),
             postContainer,
             pageNum,
             Idea.class
@@ -383,8 +347,16 @@ public class Database {
         String userId,
         int pageNum
     ) {
-        return getDocumentPageFromPartitionKeyList(
-            getPostedIdeaIdsForUser(userId),
+        return getDocumentPageFromPartitionKeyPage(
+            pageQuery(
+                GenericQueries
+                    .queryByPartitionKey(userId, UserPostedIdea.class)
+                    .valueOf("ideaId")
+                    .orderBy("timePosted", Order.DESC),
+                userContainer,
+                pageNum,
+                String.class
+            ),
             postContainer,
             pageNum,
             Idea.class
@@ -395,16 +367,56 @@ public class Database {
         String userId,
         int pageNum
     ) {
-        return getDocumentPageFromPartitionKeyList(
-            getJoinedProjectIdsForUser(userId),
+        return getDocumentPageFromPartitionKeyPage(
+            pageQuery(
+                GenericQueries
+                    .queryByPartitionKey(userId, UserJoinedProject.class)
+                    .valueOf("projectId")
+                    .orderBy("timeJoined", Order.DESC),
+                userContainer,
+                pageNum,
+                String.class
+            ),
             projectContainer,
             pageNum,
             Project.class
         );
     }
 
+    public void joinProjectForUser(String userId, String projectId) {
+        UserJoinedProject joinedProject = new UserJoinedProject(
+            userId,
+            projectId
+        );
+        userContainer.createItem(joinedProject);
+    }
+
+    public void leaveProjectForUser(String userId, String projectId) {
+        UserJoinedProject joinedProject = singleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(userId, UserJoinedProject.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("projectId", projectId)
+                ),
+            userContainer,
+            UserJoinedProject.class
+        )
+            .get();
+        userContainer.deleteItem(joinedProject, new CosmosItemRequestOptions());
+    }
+
     public boolean isIdeaSavedByUser(String userId, String ideaId) {
-        return getSavedIdeaIdsForUser(userId).contains(ideaId);
+        return (
+            countQuery(
+                GenericQueries
+                    .queryByPartitionKey(userId, UserSavedIdea.class)
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("ideaId", ideaId)
+                    ),
+                userContainer
+            ) >
+            0
+        );
     }
 
     public boolean isUserAdmin(String userId) {
@@ -441,9 +453,13 @@ public class Database {
             }
         }
         postContainer.createItem(idea);
-        User user = getUser(idea.getAuthorId()).get();
-        user.getPostedIdeaIds().add(idea.getId());
-        updateUser(idea.getAuthorId(), user);
+
+        UserPostedIdea postedIdea = new UserPostedIdea(
+            idea.getAuthorId(),
+            idea.getIdeaId()
+        );
+        userContainer.createItem(postedIdea);
+
         indexController.tryIndexIdea(idea);
     }
 
@@ -530,9 +546,15 @@ public class Database {
         indexController.tryDeleteIdea(ideaId);
 
         // Remove ideaId from author's postedIdeaIds list
-        User user = getUser(userId).get();
-        user.getPostedIdeaIds().remove(ideaId);
-        updateUser(userId, user);
+        UserPostedIdea postedIdea = singleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(userId, UserPostedIdea.class)
+                .eq("ideaId", ideaId),
+            userContainer,
+            UserPostedIdea.class
+        )
+            .get();
+        userContainer.deleteItem(postedIdea, new CosmosItemRequestOptions());
     }
 
     // Comments
@@ -589,6 +611,8 @@ public class Database {
     ) {
         User sender = getUser(senderId).get();
         User recipient = getUserByUsername(recipientUsername).get();
+        // TODO: Store count of unread received messages in each user object, use transaction
+        // to ensure the count remains accurate
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
             sender.getUsername(),
@@ -856,9 +880,12 @@ public class Database {
             }
         }
         projectContainer.createItem(project);
-        User user = getUser(projectCreatorId).get();
-        user.getJoinedProjectIds().add(project.getId());
-        updateUser(projectCreatorId, user);
+
+        UserJoinedProject joinedProject = new UserJoinedProject(
+            projectCreatorId,
+            project.getProjectId()
+        );
+        userContainer.createItem(joinedProject);
 
         if (project.isPublicProject()) indexController.tryIndexProject(project);
     }
