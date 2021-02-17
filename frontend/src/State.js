@@ -28,7 +28,7 @@ const firstNewideaState = {
 };
 
 const firstThemeState = {
-    mode: "light",
+    mode: "dark",
 };
 
 const userFromStorage = localStorage.getItem(userPersistenceKey);
