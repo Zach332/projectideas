@@ -5,6 +5,7 @@ import { toParams } from "../utils/Routing";
 import axios from "axios";
 import { login, Status } from "../../State";
 import Spinner from "../general/Spinner";
+import { Link } from "react-router-dom";
 
 export default function LoginLanding() {
     const [status, setStatus] = React.useState(Status.Loading);
@@ -51,13 +52,13 @@ export default function LoginLanding() {
                     alt="Login failed"
                 />
                 <h2>Login failed</h2>
-                <a
+                <Link
                     className="btn btn-primary mt-4 btn-lg"
-                    href="/login"
+                    to="/login"
                     role="button"
                 >
                     Try again
-                </a>
+                </Link>
             </div>
         );
     } else if (status == Status.Loading) {

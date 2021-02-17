@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function LoginWarning() {
     return (
@@ -6,9 +7,9 @@ export default function LoginWarning() {
             <h1 className="display-4">Login required</h1>
             <p className="lead">You must login to view this page.</p>
             <hr className="my-4" />
-            <a className="btn btn-primary btn-lg" href="/login" role="button">
+            <Link className="btn btn-primary btn-lg" to="/login" role="button">
                 Login here
-            </a>
+            </Link>
         </div>
     );
 }

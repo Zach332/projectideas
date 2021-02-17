@@ -1,5 +1,6 @@
 import React from "react";
 import { formatTime } from "../utils/TimeFormatter";
+import { Link } from "react-router-dom";
 
 export default function IdeaSummary({ idea }) {
     const removeMd = require("remove-markdown");
@@ -7,8 +8,8 @@ export default function IdeaSummary({ idea }) {
     const MAX_LENGTH = 320;
 
     return (
-        <a
-            href={ideaLink}
+        <Link
+            to={ideaLink}
             className="list-group-item list-group-item-action flex-column align-items-start rounded border"
         >
             <div className="d-flex justify-content-between">
@@ -27,6 +28,6 @@ export default function IdeaSummary({ idea }) {
                 {removeMd(idea.content).length > MAX_LENGTH && "..."}
             </p>
             <small className="text-muted">By {idea.authorUsername}</small>
-        </a>
+        </Link>
     );
 }

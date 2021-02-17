@@ -9,6 +9,7 @@ import GitHubSymbol from "../../GitHub-Mark.png";
 import GitHubSymbolLight from "../../GitHub-Mark-Light.png";
 import GoogleLogo from "../../GoogleLogo.svg";
 import { useGlobalState } from "../../State";
+import { Link } from "react-router-dom";
 
 export default function Login() {
     const [theme] = useGlobalState("theme");
@@ -59,13 +60,13 @@ export default function Login() {
                     alt="Login failed"
                 />
                 <h2>Login failed</h2>
-                <a
+                <Link
                     className="btn btn-primary mt-4 btn-lg"
-                    href="/login"
+                    to="/login"
                     role="button"
                 >
                     Try again
-                </a>
+                </Link>
             </div>
         );
     }

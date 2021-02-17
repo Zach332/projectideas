@@ -96,12 +96,12 @@ export default function Navbar() {
                     </svg>
                 </NavLink>
                 <li className="navbar-btn">
-                    <a
-                        href="/login"
+                    <Link
+                        to="/login"
                         className="btn btn-outline-success my-2 my-sm-0"
                     >
                         Login
-                    </a>
+                    </Link>
                 </li>
             </ul>
         );

@@ -2,6 +2,7 @@ import React from "react";
 import ChromeDinoGame from "react-chrome-dino";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { Link } from "react-router-dom";
 
 export default function NotFound() {
     const isMobile = window.innerWidth <= 768;
@@ -15,8 +16,8 @@ export default function NotFound() {
             {!isMobile && (
                 <div>
                     <p>
-                        You can go to our <a href="/">home page</a>, or enjoy
-                        the game below (space to start/jump).
+                        You can go to our <Link to="/">home page</Link>, or
+                        enjoy the game below (space to start/jump).
                     </p>
                     <ChromeDinoGame />
                 </div>

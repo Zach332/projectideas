@@ -1,6 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { Link } from "react-router-dom";
 
 export default function Privacy() {
     return (
@@ -13,9 +14,9 @@ export default function Privacy() {
                 Your privacy is important to us. It is projectideas&apos; policy
                 to respect your privacy regarding any information we may collect
                 from you across our website,{" "}
-                <a href="http://projectideas.herokuapp.com">
+                <Link to="http://projectideas.herokuapp.com">
                     http://projectideas.herokuapp.com
-                </a>
+                </Link>
                 , and other sites we own and operate.
             </p>
             <p>

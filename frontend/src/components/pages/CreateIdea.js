@@ -13,6 +13,7 @@ import IdeaCard from "../ideaComponents/IdeaCard";
 import TagPicker from "../tagComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { Link } from "react-router-dom";
 
 export default function CreateIdea() {
     const { addToast } = useToasts();
@@ -108,9 +109,9 @@ export default function CreateIdea() {
                 </form>
                 <p>
                     Basic{" "}
-                    <a href="/markdown" target="_blank">
+                    <Link to="/markdown" target="_blank">
                         Markdown
-                    </a>{" "}
+                    </Link>{" "}
                     is supported. A preview of your idea is below.
                 </p>
                 <IdeaCard title={idea.title} content={idea.content} />

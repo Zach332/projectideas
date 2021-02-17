@@ -1,19 +1,20 @@
 import React from "react";
 import ProjectJoinRequestButton from "./ProjectJoinRequestButton";
 import ProjectJoinRequestModal from "./ProjectJoinRequestModal";
+import { Link } from "react-router-dom";
 
 export default function ProjectSummary({ project, setRerender }) {
     const submitRequest = () => {
         setRerender((rerender) => rerender + 1);
     };
 
-    var ideaLink = "/project/" + project.id;
+    var projectLink = "/project/" + project.id;
     const MAX_LENGTH = 480;
 
     return (
         <div>
-            <a
-                href={ideaLink}
+            <Link
+                to={projectLink}
                 className="list-group-item list-group-item-action flex-column align-items-start rounded border"
             >
                 <div>
@@ -31,7 +32,7 @@ export default function ProjectSummary({ project, setRerender }) {
                     {project.description.substring(0, MAX_LENGTH)}
                     {project.description.length > MAX_LENGTH && "..."}
                 </p>
-            </a>
+            </Link>
             <ProjectJoinRequestModal
                 project={project}
                 submitRequest={submitRequest}
