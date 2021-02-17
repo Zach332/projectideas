@@ -696,40 +696,36 @@ public class Database {
         );
     }
 
-    public List<ReceivedMessage> getAllReceivedMessages(String recipientId) {
-        return multipleDocumentQuery(
-            GenericQueries
-                .queryByPartitionKey(recipientId, ReceivedMessage.class)
-                .orderBy("timeSent", Order.DESC),
-            userContainer,
-            ReceivedMessage.class
-        );
-    }
-
-    public List<ReceivedMessage> getAllUnreadReceivedMessages(
-        String recipientId
+    public DocumentPage<ReceivedMessage> getReceivedMessagesByPage(
+        String recipientId,
+        int pageNum
     ) {
-        return multipleDocumentQuery(
+        return pageQuery(
             GenericQueries
                 .queryByPartitionKey(recipientId, ReceivedMessage.class)
-                .addRestrictions(new RestrictionBuilder().eq("unread", true))
                 .orderBy("timeSent", Order.DESC),
             userContainer,
+            pageNum,
             ReceivedMessage.class
         );
     }
 
-    public List<SentMessage> getAllSentMessages(String senderId) {
-        return multipleDocumentQuery(
+    public DocumentPage<SentMessage> getSentMessagesByPage(
+        String senderId,
+        int pageNum
+    ) {
+        return pageQuery(
             GenericQueries
                 .queryByPartitionKey(senderId, SentMessage.class)
                 .orderBy("timeSent", Order.DESC),
             userContainer,
+            pageNum,
             SentMessage.class
         );
     }
 
     public int getNumberOfUnreadMessages(String recipientId) {
+        // TODO: Improve efficiency here
         return countQuery(
             GenericQueries
                 .queryByPartitionKey(recipientId, ReceivedMessage.class)
