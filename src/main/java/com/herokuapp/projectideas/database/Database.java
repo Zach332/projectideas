@@ -21,7 +21,6 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
-import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
@@ -437,6 +436,7 @@ public class Database {
         return multipleDocumentQuery(
             GenericQueries
                 .queryByType(Idea.class)
+                .addRestrictions(new RestrictionBuilder().eq("deleted", false))
                 .orderBy("timePosted", Order.DESC),
             postContainer,
             Idea.class
@@ -467,6 +467,7 @@ public class Database {
         return pageQuery(
             GenericQueries
                 .queryByType(Idea.class)
+                .addRestrictions(new RestrictionBuilder().eq("deleted", false))
                 .orderBy("timePosted", Order.DESC),
             postContainer,
             pageNum,
@@ -478,6 +479,7 @@ public class Database {
         return pageQuery(
             GenericQueries
                 .queryByType(Idea.class)
+                .addRestrictions(new RestrictionBuilder().eq("deleted", false))
                 .arrayContains("tags", tag)
                 .orderBy("timePosted", Order.DESC),
             postContainer,
@@ -491,6 +493,7 @@ public class Database {
             GenericQueries
                 .queryByType(Idea.class)
                 .addRestrictions(
+                    new RestrictionBuilder().eq("deleted", false),
                     new RestrictionBuilder().in("ideaId", ideaIds.toArray())
                 )
                 .orderBy("timePosted", Order.DESC),
@@ -524,37 +527,28 @@ public class Database {
         );
     }
 
-    public void deleteIdea(String ideaId, String userId) {
-        // Delete idea and all associated comments
-        PartitionKey partitionKey = new PartitionKey(ideaId);
-        List<String> ids = multipleValueQuery(
-            GenericQueries
-                .queryByPartitionKey(ideaId, Post.class)
-                .valueOf("id"),
-            postContainer,
-            String.class
-        );
-        for (String postId : ids) {
-            postContainer.deleteItem(
-                postId,
-                partitionKey,
-                new CosmosItemRequestOptions()
-            );
-        }
-
-        //Remove idea from index
-        indexController.tryDeleteIdea(ideaId);
+    public void deleteIdea(Idea idea) {
+        // Remove idea from index
+        indexController.tryDeleteIdea(idea.getIdeaId());
 
         // Remove ideaId from author's postedIdeaIds list
         UserPostedIdea postedIdea = singleDocumentQuery(
             GenericQueries
-                .queryByPartitionKey(userId, UserPostedIdea.class)
-                .eq("ideaId", ideaId),
+                .queryByPartitionKey(idea.getAuthorId(), UserPostedIdea.class)
+                .eq("ideaId", idea.getIdeaId()),
             userContainer,
             UserPostedIdea.class
         )
             .get();
         userContainer.deleteItem(postedIdea, new CosmosItemRequestOptions());
+
+        idea.delete();
+        postContainer.replaceItem(
+            idea,
+            idea.getIdeaId(),
+            new PartitionKey(idea.getIdeaId()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     // Comments
