@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class DocumentPage<T extends RootDocument> {
+public class DocumentPage<T> {
 
     private List<T> documents;
     private boolean lastPage;

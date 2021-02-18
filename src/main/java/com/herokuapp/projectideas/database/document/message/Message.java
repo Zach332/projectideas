@@ -36,4 +36,8 @@ public abstract class Message implements RootDocument {
         this.content = content;
         this.timeSent = Instant.now().getEpochSecond();
     }
+
+    public String getPartitionKey() {
+        return userId;
+    }
 }

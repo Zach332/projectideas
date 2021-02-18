@@ -56,6 +56,10 @@ public class Project implements RootDocument {
         this.tags = tags;
     }
 
+    public String getPartitionKey() {
+        return projectId;
+    }
+
     @JsonIgnore
     public boolean userIsTeamMember(String userId) {
         return teamMembers

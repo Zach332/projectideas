@@ -281,7 +281,7 @@ public class IdeaController {
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        database.deleteIdea(id, userId);
+        database.deleteIdea(ideaToDelete);
     }
 
     @DeleteMapping("/api/ideas/{ideaId}/comments/{commentId}")

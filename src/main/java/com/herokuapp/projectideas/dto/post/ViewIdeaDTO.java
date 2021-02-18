@@ -9,6 +9,7 @@ import lombok.*;
 public class ViewIdeaDTO extends BasePostDTO {
 
     private String title;
+    private boolean deleted;
     private Boolean savedByUser;
     private List<String> tags;
 }
