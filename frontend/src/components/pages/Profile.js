@@ -9,6 +9,7 @@ import LoadingDiv from "../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import MyProjects from "./MyProjects";
+import { toQuery } from "../utils/Routing";
 
 export default function Profile() {
     const { addToast } = useToasts();
@@ -23,9 +24,22 @@ export default function Profile() {
         savedIdeas: Status.Loading,
         myIdeas: Status.Loading,
     });
+    const [lastPage, setLastPage] = React.useState({
+        savedIdeas: true,
+        myIdeas: true,
+    });
+    const [page, setPage] = React.useState({
+        savedIdeas: 1,
+        myIdeas: 1,
+    });
 
     useEffect(() => {
         if (user.loggedIn) {
+            setStatus({
+                userData: Status.Loading,
+                savedIdeas: Status.Loading,
+                myIdeas: Status.Loading,
+            });
             axios.get("/api/users/" + user.id).then((response) => {
                 setUserData(response.data);
                 setStatus((status) => {
@@ -33,23 +47,41 @@ export default function Profile() {
                 });
             });
             axios
-                .get("/api/users/" + user.id + "/savedIdeas")
+                .get(
+                    "/api/users/" +
+                        user.id +
+                        "/savedIdeas?" +
+                        toQuery({ page: page.savedIdeas })
+                )
                 .then((response) => {
-                    setSavedIdeas(response.data);
+                    setSavedIdeas(response.data.ideaPreviews);
+                    setLastPage((lastPage) => ({
+                        ...lastPage,
+                        savedIdeas: response.data.lastPage,
+                    }));
                     setStatus((status) => {
                         return { ...status, savedIdeas: Status.Loaded };
                     });
                 });
             axios
-                .get("/api/users/" + user.id + "/postedideas")
+                .get(
+                    "/api/users/" +
+                        user.id +
+                        "/postedideas?" +
+                        toQuery({ page: page.myIdeas })
+                )
                 .then((response) => {
-                    setMyIdeas(response.data);
+                    setMyIdeas(response.data.ideaPreviews);
+                    setLastPage((lastPage) => ({
+                        ...lastPage,
+                        myIdeas: response.data.lastPage,
+                    }));
                     setStatus((status) => {
                         return { ...status, myIdeas: Status.Loaded };
                     });
                 });
         }
-    }, [rerender]);
+    }, [rerender, page]);
 
     const removeIdeaFromSaved = (ideaId) => {
         axios
@@ -187,6 +219,22 @@ export default function Profile() {
             appearance: "success",
             autoDismiss: true,
         });
+    };
+
+    const nextSaved = () => {
+        setPage((page) => ({ ...page, savedIdeas: page.savedIdeas + 1 }));
+    };
+
+    const previousSaved = () => {
+        setPage((page) => ({ ...page, savedIdeas: page.savedIdeas - 1 }));
+    };
+
+    const nextMyIdeas = () => {
+        setPage((page) => ({ ...page, myIdeas: page.myIdeas + 1 }));
+    };
+
+    const previousMyIdeas = () => {
+        setPage((page) => ({ ...page, myIdeas: page.myIdeas - 1 }));
     };
 
     if (!user.loggedIn) {
@@ -332,6 +380,30 @@ export default function Profile() {
                                 </div>
                             ))
                         )}
+                        <div className="d-flex">
+                            <div className="me-auto p-2">
+                                {page.savedIdeas > 1 && (
+                                    <button
+                                        type="btn btn-primary"
+                                        className="btn btn-primary btn-md"
+                                        onClick={previousSaved}
+                                    >
+                                        Previous
+                                    </button>
+                                )}
+                            </div>
+                            <div className="p-2">
+                                {!lastPage.savedIdeas && savedIdeas.length > 0 && (
+                                    <button
+                                        type="btn btn-primary"
+                                        className="btn btn-primary btn-md"
+                                        onClick={nextSaved}
+                                    >
+                                        Next
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </LoadingDiv>
                 </div>
                 <div className="tab-pane fade" id="my-ideas" role="tabpanel">
@@ -348,6 +420,30 @@ export default function Profile() {
                                 </div>
                             ))
                         )}
+                        <div className="d-flex">
+                            <div className="me-auto p-2">
+                                {page.myIdeas > 1 && (
+                                    <button
+                                        type="btn btn-primary"
+                                        className="btn btn-primary btn-md"
+                                        onClick={previousMyIdeas}
+                                    >
+                                        Previous
+                                    </button>
+                                )}
+                            </div>
+                            <div className="p-2">
+                                {!lastPage.myIdeas && myIdeas.length > 0 && (
+                                    <button
+                                        type="btn btn-primary"
+                                        className="btn btn-primary btn-md"
+                                        onClick={nextMyIdeas}
+                                    >
+                                        Next
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </LoadingDiv>
                 </div>
             </div>

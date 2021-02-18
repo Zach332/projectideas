@@ -8,8 +8,12 @@ import LoadingDiv from "./../general/LoadingDiv";
 import { Status } from "./../../State";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { useHistory, useLocation } from "react-router-dom";
+import { toParams, toQuery } from "../utils/Routing";
 
 export default function Messages() {
+    let location = useLocation();
+    let history = useHistory();
     const [messages, setMessages] = React.useState([]);
     const [user] = useGlobalState("user");
     const [rerender, setRerender] = React.useState(0);
@@ -18,21 +22,31 @@ export default function Messages() {
     const [rotateMode, setRotateMode] = React.useState(0);
     const [mode, setMode] = React.useState("Received");
 
+    const [lastPage, setLastPage] = React.useState(true);
+    const params = toParams(location.search.replace(/^\?/, ""));
+    if (!params.page) params.page = 1;
+
     useEffect(() => {
         setStatus(Status.Loading);
         if (mode === "Received") {
-            axios.get("/api/messages/received").then((response) => {
-                setMessages(response.data);
-                setStatus(Status.Loaded);
-                axios.post("/api/messages/received/markallasread");
-            });
+            axios
+                .get("/api/messages/received?" + toQuery({ page: params.page }))
+                .then((response) => {
+                    setMessages(response.data.receivedMessages);
+                    setStatus(Status.Loaded);
+                    setLastPage(response.data.lastPage);
+                    axios.post("/api/messages/received/markallasread");
+                });
         } else {
-            axios.get("/api/messages/sent").then((response) => {
-                setMessages(response.data);
-                setStatus(Status.Loaded);
-            });
+            axios
+                .get("/api/messages/sent?" + toQuery({ page: params.page }))
+                .then((response) => {
+                    setMessages(response.data.sentMessages);
+                    setStatus(Status.Loaded);
+                    setLastPage(response.data.lastPage);
+                });
         }
-    }, [rerender, mode]);
+    }, [rerender, mode, location]);
 
     const flipMode = () => {
         setRotateMode(rotateMode + 360);
@@ -41,6 +55,19 @@ export default function Messages() {
         } else {
             setMode("Received");
         }
+        history.push("/messages?" + toQuery({ page: 1 }));
+    };
+
+    const next = () => {
+        history.push(
+            "/messages?" + toQuery({ page: parseInt(params.page) + 1 })
+        );
+    };
+
+    const previous = () => {
+        history.push(
+            "/messages?" + toQuery({ page: parseInt(params.page) - 1 })
+        );
     };
 
     if (!user.loggedIn) {
@@ -84,6 +111,30 @@ export default function Messages() {
                             />
                         ))}
                     </motion.div>
+                    <div className="d-flex">
+                        <div className="me-auto p-2">
+                            {params.page > 1 && (
+                                <button
+                                    type="btn btn-primary"
+                                    className="btn btn-primary btn-md"
+                                    onClick={previous}
+                                >
+                                    Previous
+                                </button>
+                            )}
+                        </div>
+                        <div className="p-2">
+                            {!lastPage && messages.length > 0 && (
+                                <button
+                                    type="btn btn-primary"
+                                    className="btn btn-primary btn-md"
+                                    onClick={next}
+                                >
+                                    Next
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </LoadingDiv>
             </AnimateSharedLayout>
         </div>

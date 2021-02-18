@@ -8,7 +8,11 @@ import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
+import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
+import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Set;
 import org.reflections.Reflections;
 
@@ -65,12 +69,26 @@ public class GenericQueries {
             );
     }
 
+    public static <T extends RootDocument> SelectQuery queryByPartitionKeyList(
+        List<String> partitionKeys,
+        Class<T> classType
+    ) {
+        return queryByType(classType)
+            .addRestrictions(
+                new RestrictionBuilder()
+                .in(getPartitionKey(classType), partitionKeys.toArray())
+            );
+    }
+
     private static String getPartitionKey(
         Class<? extends RootDocument> classType
     ) {
         if (
             User.class.isAssignableFrom(classType) ||
-            Message.class.isAssignableFrom(classType)
+            Message.class.isAssignableFrom(classType) ||
+            UserPostedIdea.class.isAssignableFrom(classType) ||
+            UserSavedIdea.class.isAssignableFrom(classType) ||
+            UserJoinedProject.class.isAssignableFrom(classType)
         ) {
             return USER_CONTAINER_PARTITION_KEY;
         } else if (Post.class.isAssignableFrom(classType)) {

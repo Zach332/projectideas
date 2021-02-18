@@ -15,4 +15,8 @@ public abstract class Post implements RootDocument {
     protected String authorId;
     protected String authorUsername;
     protected String content;
+
+    public String getPartitionKey() {
+        return ideaId;
+    }
 }

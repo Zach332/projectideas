@@ -3,10 +3,8 @@ package com.herokuapp.projectideas.api;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.message.SendMessageDTO;
-import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
-import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.herokuapp.projectideas.dto.message.ViewReceivedMessagePageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentMessagePageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,25 +25,23 @@ public class MessageController {
     DTOMapper mapper;
 
     @GetMapping("/api/messages/received")
-    public List<ViewReceivedMessageDTO> getReceivedMessages(
-        @RequestHeader("authorization") String userId
+    public ViewReceivedMessagePageDTO getReceivedMessages(
+        @RequestHeader("authorization") String userId,
+        @RequestParam("page") int pageNum
     ) {
-        return database
-            .getAllReceivedMessages(userId)
-            .stream()
-            .map(message -> mapper.viewReceivedMessageDTO(message))
-            .collect(Collectors.toList());
+        return mapper.viewReceivedMessagePageDTO(
+            database.getReceivedMessagesByPage(userId, pageNum)
+        );
     }
 
     @GetMapping("/api/messages/sent")
-    public List<ViewSentMessageDTO> getSentMessages(
-        @RequestHeader("authorization") String userId
+    public ViewSentMessagePageDTO getSentMessages(
+        @RequestHeader("authorization") String userId,
+        @RequestParam("page") int pageNum
     ) {
-        return database
-            .getAllSentMessages(userId)
-            .stream()
-            .map(message -> mapper.viewSentMessageDTO(message))
-            .collect(Collectors.toList());
+        return mapper.viewSentMessagePageDTO(
+            database.getSentMessagesByPage(userId, pageNum)
+        );
     }
 
     @GetMapping("/api/messages/numunread")

@@ -8,24 +8,20 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class User implements RootDocument {
+public class UserSavedIdea implements RootDocument {
 
     protected String id;
     protected String type;
     protected String userId;
-    protected String username;
-    protected String email;
-    protected long timeCreated;
-    protected boolean admin;
+    protected String ideaId;
+    protected long timeSaved;
 
-    public User(String username, String email) {
+    public UserSavedIdea(String userId, String ideaId) {
         this.id = UUID.randomUUID().toString();
-        this.type = "User";
-        this.userId = this.id;
-        this.username = username;
-        this.email = email;
-        this.timeCreated = Instant.now().getEpochSecond();
-        this.admin = false;
+        this.type = "UserSavedIdea";
+        this.userId = userId;
+        this.ideaId = ideaId;
+        this.timeSaved = Instant.now().getEpochSecond();
     }
 
     public String getPartitionKey() {

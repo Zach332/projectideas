@@ -15,9 +15,11 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.dto.message.ViewReceivedGroupMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewReceivedMessagePageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentGroupMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
+import com.herokuapp.projectideas.dto.message.ViewSentMessagePageDTO;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
@@ -106,6 +108,16 @@ public abstract class DTOMapper {
         }
         return null;
     }
+
+    @Mapping(target = "receivedMessages", source = "documents")
+    public abstract ViewReceivedMessagePageDTO viewReceivedMessagePageDTO(
+        DocumentPage<ReceivedMessage> documentPage
+    );
+
+    @Mapping(target = "sentMessages", source = "documents")
+    public abstract ViewSentMessagePageDTO viewSentMessagePageDTO(
+        DocumentPage<SentMessage> documentPage
+    );
 
     @Mapping(
         target = "userIsTeamMember",
