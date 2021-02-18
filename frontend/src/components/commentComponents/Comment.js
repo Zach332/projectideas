@@ -18,9 +18,8 @@ export default function Comment({
             text.startsWith(">") ? (
                 <div
                     key={Math.floor(Math.random() * 1000000000)}
-                    className="mx-5 ps-2"
+                    className="mx-5 ps-2 bg-light"
                     style={{
-                        background: "#ededed",
                         wordBreak: "break-word",
                     }}
                 >
@@ -66,47 +65,49 @@ export default function Comment({
             layout
             className="list-group-item flex-column align-items-start my-2 rounded border"
         >
-            <div className="dropdown">
-                <button
-                    className="btn btn-sm btn-outline-secondary float-end"
-                    type="button"
-                    id="dropdownMenuButton"
-                    data-bs-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                >
-                    <svg
-                        width="1em"
-                        height="1em"
-                        viewBox="0 0 16 16"
-                        className="bi bi-three-dots-vertical"
-                        fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
+            {user.loggedIn && (
+                <div className="dropdown">
+                    <button
+                        className="btn btn-sm btn-outline-secondary float-end"
+                        type="button"
+                        id="dropdownMenuButton"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
                     >
-                        <path
-                            fillRule="evenodd"
-                            d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
-                        />
-                    </svg>
-                </button>
-                <div
-                    className="dropdown-menu"
-                    aria-labelledby="dropdownMenuButton"
-                >
-                    <a className="dropdown-item" onClick={quote}>
-                        Quote
-                    </a>
-                    {(user.username === comment.authorUsername ||
-                        user.admin) && (
-                        <a
-                            className="dropdown-item text-danger"
-                            onClick={deleteComment}
+                        <svg
+                            width="1em"
+                            height="1em"
+                            viewBox="0 0 16 16"
+                            className="bi bi-three-dots-vertical"
+                            fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg"
                         >
-                            Delete comment
+                            <path
+                                fillRule="evenodd"
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+                            />
+                        </svg>
+                    </button>
+                    <div
+                        className="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton"
+                    >
+                        <a className="dropdown-item" onClick={quote}>
+                            Quote
                         </a>
-                    )}
+                        {(user.username === comment.authorUsername ||
+                            user.admin) && (
+                            <a
+                                className="dropdown-item text-danger"
+                                onClick={deleteComment}
+                            >
+                                Delete comment
+                            </a>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
             <span className="mb-1">
                 {addBlockquoteStyling(comment.content)}
             </span>

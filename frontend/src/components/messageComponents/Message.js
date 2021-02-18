@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import SendMessageModal from "./SendMessageModal";
-import { formatTime } from "../../TimeFormatter";
+import { formatTime } from "../utils/TimeFormatter";
 import Modal from "../layout/Modal";
 import { useToasts } from "react-toast-notifications";
 
@@ -30,8 +30,10 @@ export default function Message({ message, setRerender }) {
     return (
         <motion.div
             layout
-            className="list-group-item flex-column align-items-start my-2 rounded border"
-            style={message.groupMessage && { backgroundColor: "#bdf1fc" }}
+            className={
+                "list-group-item flex-column align-items-start my-2 rounded border" +
+                (message.groupMessage ? " border border-primary" : "")
+            }
         >
             <div className="dropdown">
                 <button
@@ -106,9 +108,9 @@ export default function Message({ message, setRerender }) {
                     {formatTime(message.timeSent)}
                 </span>
             </h6>
-            <p className="mb-1 ms-2" style={{ whiteSpace: "pre" }}>
+            <div className="mb-1 ms-2" style={{ whiteSpace: "pre-wrap" }}>
                 {message.content}
-            </p>
+            </div>
             <Modal
                 id={"deleteMessage" + message.id}
                 title="Delete message"

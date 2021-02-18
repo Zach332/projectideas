@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import NameLogo from "../../namelogo.png";
 import { userPersistenceKey, useGlobalState } from "../../State";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 export default function Navbar() {
     const [user] = useGlobalState("user");
@@ -96,12 +96,12 @@ export default function Navbar() {
                     </svg>
                 </NavLink>
                 <li className="navbar-btn">
-                    <a
-                        href="/login"
+                    <Link
+                        to="/login"
                         className="btn btn-outline-success my-2 my-sm-0"
                     >
                         Login
-                    </a>
+                    </Link>
                 </li>
             </ul>
         );
@@ -110,9 +110,9 @@ export default function Navbar() {
     return (
         <div>
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark justify-content-between mb-3 px-2">
-                <a className="navbar-brand" href="/">
+                <Link className="navbar-brand" to="/">
                     <img src={NameLogo} alt="" />
-                </a>
+                </Link>
                 <button
                     className="navbar-toggler me-auto"
                     type="button"
@@ -132,13 +132,6 @@ export default function Navbar() {
                             to="/projects"
                         >
                             Projects
-                        </NavLink>
-                        <NavLink
-                            className="nav-item nav-link"
-                            activeClassName="nav-item nav-link active"
-                            to="/about"
-                        >
-                            About
                         </NavLink>
                     </ul>
                     {rightNavbar}

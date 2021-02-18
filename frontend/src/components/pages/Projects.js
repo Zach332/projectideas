@@ -6,16 +6,20 @@ import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
+import { useHistory, useLocation } from "react-router-dom";
 
 export default function Projects() {
+    let location = useLocation();
+    let history = useHistory();
     const [user] = useGlobalState("user");
     const [projects, setProjects] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
-    const params = toParams(window.location.search.replace(/^\?/, ""));
+    const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
     useEffect(() => {
+        setStatus(Status.Loading);
         axios
             .get("/api/projects?" + toQuery({ page: params.page }))
             .then((response) => {
@@ -23,20 +27,22 @@ export default function Projects() {
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
-    }, []);
+    }, [location]);
 
     const goToMyProjects = () => {
-        window.location.href = "/my-projects";
+        history.push("/my-projects");
     };
 
     const next = () => {
-        window.location.href =
-            "/projects?" + toQuery({ page: parseInt(params.page) + 1 });
+        history.push(
+            "/projects?" + toQuery({ page: parseInt(params.page) + 1 })
+        );
     };
 
     const previous = () => {
-        window.location.href =
-            "/projects?" + toQuery({ page: parseInt(params.page) - 1 });
+        history.push(
+            "/projects?" + toQuery({ page: parseInt(params.page) - 1 })
+        );
     };
 
     return (

@@ -17,8 +17,10 @@ import ProjectGitHubLinkModal from "../projectComponents/ProjectGitHubLinkModal"
 import LoadingDiv from "../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { useHistory } from "react-router-dom";
 
 export default function Project() {
+    let history = useHistory();
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
     const [rerender, setRerender] = React.useState(0);
@@ -138,6 +140,7 @@ export default function Project() {
                 name: project.name,
                 description: project.description,
                 lookingForMembers: project.lookingForMembers,
+                publicProject: project.publicProject,
                 tags: project.tags,
                 githubLink: project.githubLink,
             })
@@ -193,8 +196,7 @@ export default function Project() {
     };
 
     const searchTag = (tagName) => {
-        window.location.href =
-            "/tags?" + toQuery({ type: "project", tag: tagName });
+        history.push("/tags?" + toQuery({ type: "project", tag: tagName }));
     };
 
     var githubLink;
@@ -279,10 +281,10 @@ export default function Project() {
                     <h1>{project.name}</h1>
                 </div>
                 <div className="d-flex align-items-center">
-                    <li className="list-group-item border-0">
+                    <div>
                         <ProjectJoinRequestButton project={project} />
                         <div className="text-end">{githubLink}</div>
-                    </li>
+                    </div>
                 </div>
             </div>
             {project.tags && project.tags.length > 0 && (
@@ -318,10 +320,7 @@ export default function Project() {
                 </span>
             )}
             {project.userIsTeamMember && project.joinRequests.length > 0 && (
-                <div
-                    className="mt-3 p-2"
-                    style={{ backgroundColor: "#bdf1fc" }}
-                >
+                <div className="mt-3 p-2 bg-secondary">
                     <AnimateSharedLayout>
                         <h4>Join requests</h4>
                         <motion.div layout className="container mx-auto">

@@ -11,12 +11,14 @@ import Modal from "../layout/Modal";
 import SendMessageModal from "../messageComponents/SendMessageModal";
 import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
-import { formatTime } from "../../TimeFormatter";
+import { formatTime } from "../utils/TimeFormatter";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { useHistory } from "react-router-dom";
 
 export default function Idea() {
+    let history = useHistory();
     const { addToast } = useToasts();
     const [status, setStatus] = React.useState(Status.Loading);
     const [idea, setIdea] = React.useState({ title: "" });
@@ -104,12 +106,11 @@ export default function Idea() {
     };
 
     const joinProject = () => {
-        window.location.href = "/join/idea/" + idea.id;
+        history.push("/join/idea/" + idea.id);
     };
 
     const searchTag = (tagName) => {
-        window.location.href =
-            "/tags?" + toQuery({ type: "idea", tag: tagName });
+        history.push("/tags?" + toQuery({ type: "idea", tag: tagName }));
     };
 
     if (status === Status.NotFound) {
@@ -180,25 +181,27 @@ export default function Idea() {
                                         <br></br>
                                         {formatTime(idea.timePosted)}
                                     </div>
-                                    <div className="d-flex align-items-center">
-                                        {idea.savedByUser ? (
-                                            <button
-                                                type="button"
-                                                className="btn btn-danger btn-md"
-                                                onClick={unsaveIdea}
-                                            >
-                                                Unsave
-                                            </button>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                className="btn btn-primary btn-md"
-                                                onClick={saveIdea}
-                                            >
-                                                Save
-                                            </button>
-                                        )}
-                                    </div>
+                                    {user.loggedIn && (
+                                        <div className="d-flex align-items-center">
+                                            {idea.savedByUser ? (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger btn-md"
+                                                    onClick={unsaveIdea}
+                                                >
+                                                    Unsave
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-primary btn-md"
+                                                    onClick={saveIdea}
+                                                >
+                                                    Save
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </li>
                             <li className="list-group-item">

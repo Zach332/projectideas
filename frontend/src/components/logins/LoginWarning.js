@@ -1,14 +1,15 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function LoginWarning() {
     return (
-        <div className="p-4" style={{ background: "rgba(233, 86, 86, 0.5)" }}>
+        <div className="p-4 bg-secondary">
             <h1 className="display-4">Login required</h1>
             <p className="lead">You must login to view this page.</p>
             <hr className="my-4" />
-            <a className="btn btn-primary btn-lg" href="/login" role="button">
+            <Link className="btn btn-primary btn-lg" to="/login" role="button">
                 Login here
-            </a>
+            </Link>
         </div>
     );
 }

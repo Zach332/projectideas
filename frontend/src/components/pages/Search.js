@@ -7,14 +7,17 @@ import { toParams, toQuery } from "../utils/Routing";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
+import { useHistory, useLocation } from "react-router-dom";
 
 export default function Search() {
+    let history = useHistory();
+    let location = useLocation();
     const [posts, setPosts] = React.useState([]);
     const [status, setStatus] = React.useState(Status.NotSubmitted);
     const [query, setQuery] = React.useState("");
     const [lastPage, setLastPage] = React.useState(true);
     const [type, setType] = React.useState("ideas");
-    const params = toParams(window.location.search.replace(/^\?/, ""));
+    const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
     useEffect(() => {
@@ -23,7 +26,7 @@ export default function Search() {
             setType(params.type);
             setStatus(Status.Loading);
         }
-    }, []);
+    }, [location]);
 
     useEffect(() => {
         if (status === Status.Loading) {
@@ -52,23 +55,25 @@ export default function Search() {
     };
 
     const next = () => {
-        window.location.href =
+        history.push(
             "/search?" +
-            toQuery({
-                type: type,
-                query: query,
-                page: parseInt(params.page) + 1,
-            });
+                toQuery({
+                    type: type,
+                    query: query,
+                    page: parseInt(params.page) + 1,
+                })
+        );
     };
 
     const previous = () => {
-        window.location.href =
+        history.push(
             "/search?" +
-            toQuery({
-                type: type,
-                query: query,
-                page: parseInt(params.page) - 1,
-            });
+                toQuery({
+                    type: type,
+                    query: query,
+                    page: parseInt(params.page) - 1,
+                })
+        );
     };
 
     const handleInputChange = (event) => {
@@ -77,18 +82,20 @@ export default function Search() {
 
     const changeType = (event) => {
         if (query != "") {
-            window.location.href =
+            history.push(
                 "/search?" +
-                toQuery({ type: event.target.value, query: query, page: 1 });
+                    toQuery({ type: event.target.value, query: query, page: 1 })
+            );
         }
         setLastPage(true);
         setStatus(Status.NotSubmitted);
         setType(event.target.value);
     };
 
-    const handleSubmit = () => {
-        window.location.href =
-            "/search?" + toQuery({ type: type, query: query, page: 1 });
+    const handleSubmit = (event) => {
+        history.push(
+            "/search?" + toQuery({ type: type, query: query, page: 1 })
+        );
         event.preventDefault();
     };
 
@@ -127,26 +134,27 @@ export default function Search() {
             </Helmet>
             <div className="row w-75 mx-auto">
                 <select
-                    className="form-select col-auto my-auto"
+                    className="form-select col-auto my-auto mx-auto"
                     onChange={changeType}
                     value={type}
-                    style={{ width: 150 }}
+                    style={{ width: 125 }}
                 >
                     <option value="ideas">Ideas</option>
                     <option value="projects">Projects</option>
                 </select>
                 <form className="py-4 col" onSubmit={handleSubmit}>
-                    <div className="row">
-                        <div className="col me-auto">
+                    <div className="d-flex">
+                        <div className="flex-grow-1">
                             <input
                                 type="text"
                                 value={query}
                                 className="form-control"
                                 id="title"
+                                style={{ minWidth: 125 }}
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div className="col-auto my-auto">
+                        <div className="ms-2 my-auto">
                             <button
                                 className="btn btn-sm btn-secondary"
                                 type="submit"
