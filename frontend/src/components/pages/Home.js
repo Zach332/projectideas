@@ -58,7 +58,7 @@ export default function Home() {
     }
 
     return (
-        <LoadingDiv isLoading={status == Status.Loading}>
+        <div>
             <Helmet>
                 <title>Home | {Globals.Title}</title>
             </Helmet>
@@ -89,31 +89,33 @@ export default function Home() {
                     </button>
                 </div>
             </div>
-            {ideaElements}
-            <div className="d-flex">
-                <div className="me-auto p-2">
-                    {params.page > 1 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={previous}
-                        >
-                            Previous
-                        </button>
-                    )}
+            <LoadingDiv isLoading={status == Status.Loading}>
+                {ideaElements}
+                <div className="d-flex">
+                    <div className="me-auto p-2">
+                        {params.page > 1 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={previous}
+                            >
+                                Previous
+                            </button>
+                        )}
+                    </div>
+                    <div className="p-2">
+                        {!lastPage && ideas.length > 0 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={next}
+                            >
+                                Next
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="p-2">
-                    {!lastPage && ideas.length > 0 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={next}
-                        >
-                            Next
-                        </button>
-                    )}
-                </div>
-            </div>
-        </LoadingDiv>
+            </LoadingDiv>
+        </div>
     );
 }
