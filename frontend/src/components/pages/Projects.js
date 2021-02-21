@@ -46,7 +46,7 @@ export default function Projects() {
     };
 
     return (
-        <LoadingDiv isLoading={status == Status.Loading}>
+        <div>
             <Helmet>
                 <title>Projects | {Globals.Title}</title>
             </Helmet>
@@ -78,37 +78,39 @@ export default function Projects() {
                     </div>
                 )}
             </div>
-            <div className="container mx-auto">
-                {projects.map((project) => (
-                    <div className="my-2" key={project.id}>
-                        <ProjectSummary project={project} />
+            <LoadingDiv isLoading={status == Status.Loading}>
+                <div className="container mx-auto">
+                    {projects.map((project) => (
+                        <div className="my-2" key={project.id}>
+                            <ProjectSummary project={project} />
+                        </div>
+                    ))}
+                </div>
+                <div className="d-flex">
+                    <div className="me-auto p-2">
+                        {params.page > 1 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={previous}
+                            >
+                                Previous
+                            </button>
+                        )}
                     </div>
-                ))}
-            </div>
-            <div className="d-flex">
-                <div className="me-auto p-2">
-                    {params.page > 1 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={previous}
-                        >
-                            Previous
-                        </button>
-                    )}
+                    <div className="p-2">
+                        {!lastPage && projects.length > 0 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={next}
+                            >
+                                Next
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="p-2">
-                    {!lastPage && projects.length > 0 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={next}
-                        >
-                            Next
-                        </button>
-                    )}
-                </div>
-            </div>
-        </LoadingDiv>
+            </LoadingDiv>
+        </div>
     );
 }

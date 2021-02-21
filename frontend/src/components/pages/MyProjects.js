@@ -60,38 +60,40 @@ export default function MyProjects({ noHeading }) {
     }
 
     return (
-        <LoadingDiv isLoading={status === Status.Loading}>
+        <div>
             {!noHeading && (
                 <Helmet>
                     <title>My Projects | {Globals.Title}</title>
                 </Helmet>
             )}
             {!noHeading && <h1>My Projects</h1>}
-            {existingProjects}
-            <div className="d-flex">
-                <div className="me-auto p-2">
-                    {page > 1 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={previous}
-                        >
-                            Previous
-                        </button>
-                    )}
+            <LoadingDiv isLoading={status === Status.Loading}>
+                {existingProjects}
+                <div className="d-flex">
+                    <div className="me-auto p-2">
+                        {page > 1 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={previous}
+                            >
+                                Previous
+                            </button>
+                        )}
+                    </div>
+                    <div className="p-2">
+                        {!lastPage && projects.length > 0 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={next}
+                            >
+                                Next
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="p-2">
-                    {!lastPage && projects.length > 0 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={next}
-                        >
-                            Next
-                        </button>
-                    )}
-                </div>
-            </div>
-        </LoadingDiv>
+            </LoadingDiv>
+        </div>
     );
 }
