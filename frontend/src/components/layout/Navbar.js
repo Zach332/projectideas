@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import NameLogo from "../../namelogo.png";
+import NameLogo from "../../namelogo.svg";
 import { userPersistenceKey, useGlobalState } from "../../State";
 import { NavLink, Link } from "react-router-dom";
 
@@ -111,7 +111,7 @@ export default function Navbar() {
         <div>
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark justify-content-between mb-3 px-2">
                 <Link className="navbar-brand" to="/">
-                    <img src={NameLogo} alt="" />
+                    <img src={NameLogo} height="35" alt="projectideas" />
                 </Link>
                 <button
                     className="navbar-toggler me-auto"
