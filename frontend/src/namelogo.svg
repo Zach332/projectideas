@@ -30,12 +30,12 @@
      id="namedview26"
      showgrid="false"
      inkscape:zoom="2.1971356"
-     inkscape:cx="305.00907"
-     inkscape:cy="61.560802"
+     inkscape:cx="387.95087"
+     inkscape:cy="60.433624"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g22"
+     inkscape:current-layer="g34"
      inkscape:snap-bbox="true"
      inkscape:bbox-paths="false"
      inkscape:bbox-nodes="false"
@@ -159,7 +159,8 @@
            d="m141.75 66.9h-8.6972c-2.241 0-4.0452 1.8043-4.0452 4.0452v8.6972h8.6977c2.241 0 4.0447-1.8038 4.0447-4.0447v-3.1016zm-1.7844 1.7844v6.2616c0 1.6134-1.2986 2.9125-2.912 2.9125h-6.2616v-6.2622c0-1.6134 1.2986-2.912 2.912-2.912h2.5508z"
            fill="#800080"
            stroke-width=".077846"
-           id="path18" />
+           id="path18"
+           style="fill:#910385;fill-opacity:1" />
         <path
            d="m115.21 80.659v8.6971c0 2.241 1.8043 4.0452 4.0452 4.0452h8.6972v-8.6977c0-2.241-1.8038-4.0447-4.0447-4.0447h-3.1016zm1.7844 1.7844h6.2616c1.6134 0 2.9125 1.2986 2.9125 2.912v6.2616h-6.2622c-1.6134 0-2.912-1.2986-2.912-2.912v-2.5508z"
            fill="#008000"
