@@ -16,7 +16,7 @@ export default function Navbar() {
         axios.get("/api/messages/numunread").then((response) => {
             setUnreadMessages(response.data);
         });
-    });
+    }, []);
 
     let rightNavbar;
     if (user.loggedIn) {

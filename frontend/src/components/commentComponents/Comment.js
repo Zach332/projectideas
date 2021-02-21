@@ -29,7 +29,8 @@ export default function Comment({
                 <div
                     key={Math.floor(Math.random() * 1000000000)}
                     style={{
-                        wordBreak: "break-all",
+                        wordBreak: "break-word",
+                        hyphens: "auto",
                     }}
                 >
                     {text}
