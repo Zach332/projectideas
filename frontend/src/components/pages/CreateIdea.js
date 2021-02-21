@@ -92,7 +92,6 @@ export default function CreateIdea() {
                         <textarea
                             value={idea.content}
                             className="form-control"
-                            id="content"
                             rows="10"
                             onChange={handleInputChange}
                         ></textarea>

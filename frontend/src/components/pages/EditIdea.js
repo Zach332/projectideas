@@ -69,7 +69,6 @@ export default function EditIdea({ originalIdea, setStatus }) {
                     <textarea
                         value={idea.content}
                         className="form-control"
-                        id="content"
                         rows="10"
                         onChange={handleInputChange}
                     ></textarea>

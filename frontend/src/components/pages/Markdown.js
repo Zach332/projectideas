@@ -68,7 +68,6 @@ export default function Markdown() {
                         <form>
                             <textarea
                                 className="form-control"
-                                id="content"
                                 rows="20"
                                 onChange={handleInputChange}
                             ></textarea>

@@ -29,7 +29,6 @@ export default function SendMessageModal({
                 <textarea
                     className="form-control"
                     value={messageToSend}
-                    id="content"
                     rows="8"
                     placeholder="Your message"
                     onChange={handleMessageChange}
