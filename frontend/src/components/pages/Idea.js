@@ -175,8 +175,14 @@ export default function Idea() {
                     <div className="col-md-3 col-sm-auto">
                         <ul className="card list-group list-group-flush">
                             <li className="list-group-item">
-                                <div className="d-flex">
-                                    <div className="me-auto">
+                                <div className="d-flex flex-wrap">
+                                    <div
+                                        className="me-auto"
+                                        style={{
+                                            wordBreak: "break-word",
+                                            minWidth: 75,
+                                        }}
+                                    >
                                         By {idea.authorUsername}
                                         <br></br>
                                         {formatTime(idea.timePosted)}
