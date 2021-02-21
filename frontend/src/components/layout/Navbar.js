@@ -3,8 +3,10 @@ import axios from "axios";
 import NameLogo from "../../namelogo.png";
 import { userPersistenceKey, useGlobalState } from "../../State";
 import { NavLink, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export default function Navbar() {
+    let location = useLocation();
     const [user] = useGlobalState("user");
     const [unreadMessages, setUnreadMessages] = React.useState(0);
 
@@ -16,7 +18,7 @@ export default function Navbar() {
         axios.get("/api/messages/numunread").then((response) => {
             setUnreadMessages(response.data);
         });
-    }, []);
+    }, [location]);
 
     let rightNavbar;
     if (user.loggedIn) {
