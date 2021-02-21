@@ -80,7 +80,7 @@ export default function Comments({ ideaId }) {
 
     return (
         <AnimateSharedLayout>
-            <div className="w-75 mt-5">
+            <div className={"mt-5" + (window.innerWidth <= 768 ? "" : " w-75")}>
                 <form className="mb-3" onSubmit={handleSubmit}>
                     <div className="form-row align-items-top">
                         <div className="col w-100">
