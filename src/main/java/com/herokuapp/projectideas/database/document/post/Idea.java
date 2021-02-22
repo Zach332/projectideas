@@ -13,6 +13,7 @@ public class Idea extends Post {
 
     protected String title;
     protected List<String> tags;
+    protected int upvoteCount;
     protected boolean deleted;
 
     public Idea(
@@ -34,6 +35,7 @@ public class Idea extends Post {
         this.title = title;
         this.content = content;
         this.tags = tags;
+        this.upvoteCount = 0;
     }
 
     /**
