@@ -140,22 +140,6 @@ public class Database {
             .get();
     }
 
-    // TODO: Merge this with multipleDocumentQuery
-    private <T> List<T> multipleValueQuery(
-        SelectQuery query,
-        CosmosContainer container,
-        Class<T> classType
-    ) {
-        return container
-            .queryItems(
-                query.createQuery(),
-                new CosmosQueryRequestOptions(),
-                classType
-            )
-            .stream()
-            .collect(Collectors.toList());
-    }
-
     /**
      * Returns a page of documents based on a page of partition keys.
      * Will return documents in the order specified in the partition key page.
@@ -251,7 +235,7 @@ public class Database {
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
             // Handle posts container
-            List<PartitionKey> ideaPartitionKeys = multipleValueQuery(
+            List<PartitionKey> ideaPartitionKeys = multipleDocumentQuery(
                 GenericQueries
                     .queryByType(Idea.class)
                     .valueOf("ideaId")
@@ -749,7 +733,7 @@ public class Database {
     }
 
     public void markAllReceivedMessagesAsRead(String recipientId) {
-        multipleValueQuery(
+        multipleDocumentQuery(
             GenericQueries
                 .queryByType(ReceivedMessage.class)
                 .valueOf("id")
