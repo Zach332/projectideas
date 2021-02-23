@@ -322,14 +322,14 @@ export default function Profile() {
                                 Primary email from GitHub/Google
                             </label>
                         </form>
-                        <button
-                            type="button"
-                            onClick={onCLick}
-                            className="btn btn-danger btn-md"
-                        >
-                            Log Out
-                        </button>
                     </LoadingDiv>
+                    <button
+                        type="button"
+                        onClick={onCLick}
+                        className="btn btn-danger btn-md"
+                    >
+                        Log Out
+                    </button>
                 </div>
                 <div className="tab-pane fade" id="projects" role="tabpanel">
                     <h5 className="mt-4">My projects</h5>
