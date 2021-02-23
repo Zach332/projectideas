@@ -6,9 +6,11 @@ import com.herokuapp.projectideas.database.document.user.User;
 import java.io.IOException;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class AuthenticationController {
@@ -80,7 +82,9 @@ public class AuthenticationController {
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 System.out.println("Unexpected code " + response);
-                return null;
+                throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                );
             }
             String responseString = response.body().string();
             ObjectMapper mapper = new ObjectMapper();
@@ -112,7 +116,9 @@ public class AuthenticationController {
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 System.out.println("Unexpected code " + response);
-                return null;
+                throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                );
             }
             HttpUrl url = HttpUrl.parse(
                 "https://randomaddress.com/search?" + response.body().string()
@@ -132,7 +138,7 @@ public class AuthenticationController {
             );
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -145,7 +151,9 @@ public class AuthenticationController {
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 System.out.println("Unexpected code " + response);
-                return null;
+                throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                );
             }
             return response.body().string();
         }
