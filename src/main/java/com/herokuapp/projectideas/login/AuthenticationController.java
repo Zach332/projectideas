@@ -29,14 +29,14 @@ public class AuthenticationController {
         }
     }
 
-    static class Email {
+    static class GoogleToken {
 
-        String email;
+        String token;
 
-        public Email() {}
+        public GoogleToken() {}
 
-        public void setEmail(String email) {
-            this.email = email;
+        public void setToken(String token) {
+            this.token = token;
         }
     }
 
@@ -50,6 +50,14 @@ public class AuthenticationController {
         public GithubEmail() {}
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class GoogleEmail {
+
+        public String email;
+
+        public GoogleEmail() {}
+    }
+
     static class UserDTO {
 
         public String id;
@@ -61,9 +69,30 @@ public class AuthenticationController {
         public UserDTO() {}
     }
 
-    @PostMapping("/api/login/email")
-    public UserDTO emailAuthentication(@RequestBody Email email) {
-        return convertUserToDTO(loginController.getUserByEmail(email.email));
+    @PostMapping("/api/login/google")
+    public UserDTO googleAuthentication(@RequestBody GoogleToken googleToken)
+        throws IOException {
+        Request request = new Request.Builder()
+            .url("https://www.googleapis.com/oauth2/v1/userinfo")
+            .header("Authorization", "Bearer " + googleToken.token)
+            .build();
+
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                System.out.println("Unexpected code " + response);
+                return null;
+            }
+            String responseString = response.body().string();
+            ObjectMapper mapper = new ObjectMapper();
+            GoogleEmail email = mapper.readValue(
+                responseString,
+                GoogleEmail.class
+            );
+
+            return convertUserToDTO(
+                loginController.getUserByEmail(email.email)
+            );
+        }
     }
 
     @PostMapping("/api/login/github")

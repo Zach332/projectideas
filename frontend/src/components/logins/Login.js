@@ -28,8 +28,8 @@ export default function Login() {
 
     const responseGoogle = (response) => {
         axios
-            .post("/api/login/email", {
-                email: response.profileObj.email,
+            .post("/api/login/google", {
+                token: response.accessToken,
             })
             .then((response) => {
                 login(
