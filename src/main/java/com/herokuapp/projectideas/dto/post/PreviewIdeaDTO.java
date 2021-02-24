@@ -8,4 +8,5 @@ import lombok.*;
 public class PreviewIdeaDTO extends BasePostDTO {
 
     private String title;
+    private int upvoteCount;
 }

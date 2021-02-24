@@ -21,6 +21,7 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
+import com.herokuapp.projectideas.database.document.post.IdeaUpvote;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
@@ -428,6 +429,7 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
+        // Create or update idea tags
         for (String tag : idea.getTags()) {
             Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
@@ -436,15 +438,61 @@ public class Database {
                 createTag(new IdeaTag(tag));
             }
         }
+
+        // Save idea to database
         postContainer.createItem(idea);
 
+        // Add initial author upvote
+        upvoteIdea(idea.getIdeaId(), idea.getAuthorId());
+
+        // Add UserPostedIdea to user container
         UserPostedIdea postedIdea = new UserPostedIdea(
             idea.getAuthorId(),
             idea.getIdeaId()
         );
         userContainer.createItem(postedIdea);
 
+        // Update idea index
         indexController.tryIndexIdea(idea);
+    }
+
+    public void upvoteIdea(String ideaId, String userId) {
+        IdeaUpvote upvote = new IdeaUpvote(ideaId, userId);
+        postContainer.createItem(upvote);
+
+        Idea idea = postContainer
+            .readItem(ideaId, new PartitionKey(ideaId), Idea.class)
+            .getItem();
+        idea.addUpvote();
+        postContainer.replaceItem(
+            idea,
+            idea.getId(),
+            new PartitionKey(idea.getIdeaId()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    public void unupvoteIdea(String ideaId, String userId) {
+        IdeaUpvote upvote = singleDocumentQuery(
+            GenericQueries
+                .queryByPartitionKey(ideaId, IdeaUpvote.class)
+                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+            postContainer,
+            IdeaUpvote.class
+        )
+            .get();
+        postContainer.deleteItem(upvote, new CosmosItemRequestOptions());
+
+        Idea idea = postContainer
+            .readItem(ideaId, new PartitionKey(ideaId), Idea.class)
+            .getItem();
+        idea.removeUpvote();
+        postContainer.replaceItem(
+            idea,
+            idea.getId(),
+            new PartitionKey(idea.getIdeaId()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     public DocumentPage<Idea> getIdeasByPageNum(int pageNum) {

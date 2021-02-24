@@ -4,6 +4,7 @@ import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.Message;
+import com.herokuapp.projectideas.database.document.post.IdeaUpvote;
 import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
@@ -91,7 +92,10 @@ public class GenericQueries {
             UserJoinedProject.class.isAssignableFrom(classType)
         ) {
             return USER_CONTAINER_PARTITION_KEY;
-        } else if (Post.class.isAssignableFrom(classType)) {
+        } else if (
+            Post.class.isAssignableFrom(classType) ||
+            IdeaUpvote.class.isAssignableFrom(classType)
+        ) {
             return POST_CONTAINER_PARTITION_KEY;
         } else if (Tag.class.isAssignableFrom(classType)) {
             return TAG_CONTAINER_PARTITION_KEY;
