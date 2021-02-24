@@ -2,6 +2,20 @@ import React from "react";
 import IdeaSummary from "./IdeaSummary";
 
 export default function IdeaSummaryUpvotes({ idea }) {
+    const [userHasUpvoted, setUserHasUpvoted] = React.useState(
+        idea.userHasUpvoted
+    );
+    const [upvotes, setUpvotes] = React.useState(375);
+
+    const toggleUpvote = () => {
+        if (userHasUpvoted) {
+            setUpvotes((prev) => prev - 1);
+        } else {
+            setUpvotes((prev) => prev + 1);
+        }
+        setUserHasUpvoted((prev) => !prev);
+    };
+
     const filledUpvote = (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -31,9 +45,10 @@ export default function IdeaSummaryUpvotes({ idea }) {
             <div
                 className="d-flex flex-column align-items-center"
                 style={{ width: 50 }}
+                onClick={toggleUpvote}
             >
-                <div>{idea.userHasUpvoted ? unfilledUpvote : filledUpvote}</div>
-                <div>{"375"}</div>
+                <div>{userHasUpvoted ? filledUpvote : unfilledUpvote}</div>
+                <div>{upvotes}</div>
             </div>
             <IdeaSummary idea={idea}></IdeaSummary>
         </div>
