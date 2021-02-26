@@ -14,7 +14,6 @@ import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
@@ -246,11 +245,5 @@ public class SearchController {
             .stream()
             .map(doc -> doc.get("name"))
             .collect(Collectors.toList());
-    }
-
-    private int clamp(int value, int maximum) {
-        if (value < 0) return 0;
-        if (value > maximum) return maximum;
-        return value;
     }
 }
