@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
+import Upvotes from "./../postComponents/Upvotes";
 
 function useWidth(elementRef) {
     const [width, setWidth] = useState(null);
@@ -41,8 +42,9 @@ export default function IdeaCard(props) {
 
     return (
         <div className="card">
-            <div className="card-header">
-                <h1>{props.title}</h1>
+            <div className="card-header d-flex">
+                <h1 className="me-auto">{props.title}</h1>
+                <Upvotes idea={props}></Upvotes>
             </div>
             <div className="card-body" ref={ref}>
                 <ReactMarkdown renderers={renderers}>
