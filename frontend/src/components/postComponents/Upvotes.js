@@ -4,7 +4,11 @@ export default function Upvotes({ post }) {
     const [userHasUpvoted, setUserHasUpvoted] = React.useState(
         post.userHasUpvoted
     );
-    const [upvotes, setUpvotes] = React.useState(375);
+    const [upvotes, setUpvotes] = React.useState(post.upvoteCount);
+
+    React.useEffect(() => {
+        setUpvotes(post.upvoteCount);
+    }, [post.upvoteCount]);
 
     const toggleUpvote = () => {
         if (userHasUpvoted) {

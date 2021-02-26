@@ -170,7 +170,7 @@ export default function Idea() {
             <div className="container-fluid">
                 <div className="row justify-content-center">
                     <div className="col-lg-8 col-md-8 col-sm-auto mb-2">
-                        <IdeaCard title={idea.title} content={idea.content} />
+                        <IdeaCard idea={idea} />
                     </div>
                     <div className="col-md-3 col-sm-auto">
                         <ul className="card list-group list-group-flush">

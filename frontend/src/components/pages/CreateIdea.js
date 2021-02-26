@@ -114,7 +114,7 @@ export default function CreateIdea() {
                     </Link>{" "}
                     is supported. A preview of your idea is below.
                 </p>
-                <IdeaCard title={idea.title} content={idea.content} />
+                <IdeaCard idea={idea} />
             </div>
         );
     } else if (status === Status.Success) {
