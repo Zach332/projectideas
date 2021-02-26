@@ -1,8 +1,8 @@
 import React from "react";
 
-export default function Upvotes({ idea }) {
+export default function Upvotes({ post }) {
     const [userHasUpvoted, setUserHasUpvoted] = React.useState(
-        idea.userHasUpvoted
+        post.userHasUpvoted
     );
     const [upvotes, setUpvotes] = React.useState(375);
 

@@ -5,7 +5,7 @@ import IdeaSummary from "./IdeaSummary";
 export default function IdeaSummaryUpvotes({ idea }) {
     return (
         <div className="d-flex align-items-center">
-            <Upvotes idea={idea} />
+            <Upvotes post={idea} />
             <IdeaSummary idea={idea} />
         </div>
     );

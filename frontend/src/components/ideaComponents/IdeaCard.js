@@ -44,7 +44,7 @@ export default function IdeaCard(props) {
         <div className="card">
             <div className="card-header d-flex">
                 <h1 className="me-auto">{props.title}</h1>
-                <Upvotes idea={props}></Upvotes>
+                <Upvotes post={props}></Upvotes>
             </div>
             <div className="card-body" ref={ref}>
                 <ReactMarkdown renderers={renderers}>
