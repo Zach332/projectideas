@@ -82,6 +82,22 @@ public class ProjectController {
         }
     }
 
+    @PostMapping("/api/projects/{projectId}/upvote")
+    public void upvoteProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId
+    ) {
+        database.upvoteProject(projectId, userId);
+    }
+
+    @PostMapping("/api/projects/{projectId}/unupvote")
+    public void unupvoteProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId
+    ) {
+        database.unupvoteProject(projectId, userId);
+    }
+
     @PutMapping("/api/projects/{projectId}")
     public void updateProject(
         @RequestHeader("authorization") String userId,

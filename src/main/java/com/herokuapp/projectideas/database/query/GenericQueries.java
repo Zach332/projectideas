@@ -4,7 +4,6 @@ import com.github.mohitgoyal91.cosmosdbqueryutils.RestrictionBuilder;
 import com.github.mohitgoyal91.cosmosdbqueryutils.SelectQuery;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.message.Message;
-import com.herokuapp.projectideas.database.document.post.IdeaUpvote;
 import com.herokuapp.projectideas.database.document.post.Post;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
@@ -12,6 +11,8 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
 import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
 import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
+import com.herokuapp.projectideas.database.document.vote.IdeaUpvote;
+import com.herokuapp.projectideas.database.document.vote.ProjectUpvote;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
@@ -99,7 +100,10 @@ public class GenericQueries {
             return POST_CONTAINER_PARTITION_KEY;
         } else if (Tag.class.isAssignableFrom(classType)) {
             return TAG_CONTAINER_PARTITION_KEY;
-        } else if (Project.class.isAssignableFrom(classType)) {
+        } else if (
+            Project.class.isAssignableFrom(classType) ||
+            ProjectUpvote.class.isAssignableFrom(classType)
+        ) {
             return PROJECT_CONTAINER_PARTITION_KEY;
         }
         throw new IllegalArgumentException(

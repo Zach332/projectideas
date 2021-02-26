@@ -4,6 +4,7 @@ import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.implementation.ConflictException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
@@ -21,7 +22,6 @@ import com.herokuapp.projectideas.database.document.message.SentIndividualMessag
 import com.herokuapp.projectideas.database.document.message.SentMessage;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
-import com.herokuapp.projectideas.database.document.post.IdeaUpvote;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
@@ -31,6 +31,10 @@ import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
 import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
 import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.document.vote.IdeaUpvote;
+import com.herokuapp.projectideas.database.document.vote.ProjectUpvote;
+import com.herokuapp.projectideas.database.document.vote.Upvote;
+import com.herokuapp.projectideas.database.document.vote.Votable;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
@@ -182,6 +186,67 @@ public class Database {
         }
 
         return new DocumentPage<>(orderedDocuments, partitionKeys.isLastPage());
+    }
+
+    private <T extends Upvote<S>, S extends Votable> void upvoteDocument(
+        Upvote<S> upvote,
+        CosmosContainer container,
+        Class<S> documentType
+    ) {
+        /**
+         * Only upvote if the user has not already upvoted the document
+         */
+        try {
+            container.createItem(upvote);
+        } catch (ConflictException e) {
+            return;
+        }
+
+        S document = container
+            .readItem(
+                upvote.getPartitionKey(),
+                new PartitionKey(upvote.getPartitionKey()),
+                documentType
+            )
+            .getItem();
+
+        document.addUpvote();
+        container.replaceItem(
+            document,
+            upvote.getPartitionKey(),
+            new PartitionKey(upvote.getPartitionKey()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    private <T extends Upvote<S>, S extends Votable> void unupvoteDocument(
+        String partitionKey,
+        String userId,
+        CosmosContainer container,
+        Class<T> upvoteType,
+        Class<S> documentType
+    ) {
+        T upvote = container
+            .readItem(userId, new PartitionKey(partitionKey), upvoteType)
+            .getItem();
+
+        container.deleteItem(upvote, new CosmosItemRequestOptions());
+
+        S document = container
+            .readItem(
+                upvote.getPartitionKey(),
+                new PartitionKey(upvote.getPartitionKey()),
+                documentType
+            )
+            .getItem();
+
+        document.removeUpvote();
+        container.replaceItem(
+            document,
+            upvote.getPartitionKey(),
+            new PartitionKey(upvote.getPartitionKey()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     // Users
@@ -458,40 +523,16 @@ public class Database {
 
     public void upvoteIdea(String ideaId, String userId) {
         IdeaUpvote upvote = new IdeaUpvote(ideaId, userId);
-        postContainer.createItem(upvote);
-
-        Idea idea = postContainer
-            .readItem(ideaId, new PartitionKey(ideaId), Idea.class)
-            .getItem();
-        idea.addUpvote();
-        postContainer.replaceItem(
-            idea,
-            idea.getId(),
-            new PartitionKey(idea.getIdeaId()),
-            new CosmosItemRequestOptions()
-        );
+        upvoteDocument(upvote, postContainer, Idea.class);
     }
 
     public void unupvoteIdea(String ideaId, String userId) {
-        IdeaUpvote upvote = singleDocumentQuery(
-            GenericQueries
-                .queryByPartitionKey(ideaId, IdeaUpvote.class)
-                .addRestrictions(new RestrictionBuilder().eq("userId", userId)),
+        unupvoteDocument(
+            ideaId,
+            userId,
             postContainer,
-            IdeaUpvote.class
-        )
-            .get();
-        postContainer.deleteItem(upvote, new CosmosItemRequestOptions());
-
-        Idea idea = postContainer
-            .readItem(ideaId, new PartitionKey(ideaId), Idea.class)
-            .getItem();
-        idea.removeUpvote();
-        postContainer.replaceItem(
-            idea,
-            idea.getId(),
-            new PartitionKey(idea.getIdeaId()),
-            new CosmosItemRequestOptions()
+            IdeaUpvote.class,
+            Idea.class
         );
     }
 
@@ -903,6 +944,8 @@ public class Database {
         }
         projectContainer.createItem(project);
 
+        upvoteProject(project.getId(), projectCreatorId);
+
         UserJoinedProject joinedProject = new UserJoinedProject(
             projectCreatorId,
             project.getProjectId()
@@ -910,6 +953,21 @@ public class Database {
         userContainer.createItem(joinedProject);
 
         if (project.isPublicProject()) indexController.tryIndexProject(project);
+    }
+
+    public void upvoteProject(String projectId, String userId) {
+        ProjectUpvote upvote = new ProjectUpvote(projectId, userId);
+        upvoteDocument(upvote, projectContainer, Project.class);
+    }
+
+    public void unupvoteProject(String projectId, String userId) {
+        unupvoteDocument(
+            projectId,
+            userId,
+            projectContainer,
+            ProjectUpvote.class,
+            Project.class
+        );
     }
 
     public DocumentPage<Project> getPublicProjectsByPageNum(int pageNum) {
