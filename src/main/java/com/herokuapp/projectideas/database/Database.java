@@ -183,6 +183,19 @@ public class Database {
         return new DocumentPage<>(orderedDocuments, partitionKeys.isLastPage());
     }
 
+    public <T extends RootDocument> DocumentPage<T> getPostPageFromIds(
+        DocumentPage<String> ids,
+        int pageNum,
+        Class<T> classType
+    ) {
+        return getDocumentPageFromPartitionKeyPage(
+            ids,
+            postContainer,
+            pageNum,
+            classType
+        );
+    }
+
     // Users
 
     public void createUser(User user) {
