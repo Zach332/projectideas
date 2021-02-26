@@ -142,6 +142,16 @@ public class IndexController {
         projectIndexWriter.commit();
     }
 
+    public void tryUpdateIdea(Idea newIdea) {
+        tryDeleteIdea(newIdea.getId());
+        tryIndexIdea(newIdea);
+    }
+
+    public void tryUpdateProject(Project newPoject) {
+        tryDeleteProject(newPoject.getId());
+        tryIndexProject(newPoject);
+    }
+
     public void tryIndexIdea(Idea idea) {
         try {
             indexIdea(idea);

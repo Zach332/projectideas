@@ -8,7 +8,7 @@ import axios from "axios";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
-import TagPicker from "../tagComponents/TagPicker";
+import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 

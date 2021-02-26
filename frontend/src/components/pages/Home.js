@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import IdeaSummary from "../ideaComponents/IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
 import { toParams, toQuery } from "../utils/Routing";
@@ -7,6 +6,7 @@ import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import { useHistory, useLocation } from "react-router-dom";
+import IdeaSummaryUpvotes from "../ideaComponents/IdeaSummaryUpvotes";
 
 export default function Home() {
     let history = useHistory();
@@ -46,7 +46,7 @@ export default function Home() {
             <div className="container mx-auto">
                 {ideas.map((idea) => (
                     <div className="my-2" key={idea.id}>
-                        <IdeaSummary idea={idea} />
+                        <IdeaSummaryUpvotes idea={idea} />
                     </div>
                 ))}
             </div>

@@ -584,6 +584,7 @@ public class Database {
     }
 
     public void updateIdea(Idea idea) {
+        indexController.tryUpdateIdea(idea);
         for (String tag : idea.getTags()) {
             Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
@@ -1070,8 +1071,13 @@ public class Database {
         boolean toPublic,
         boolean toPrivate
     ) {
-        if (toPublic) indexController.tryIndexProject(project);
-        if (toPrivate) indexController.tryDeleteProject(project.getId());
+        if (toPublic) {
+            indexController.tryIndexProject(project);
+        } else if (toPrivate) {
+            indexController.tryDeleteProject(project.getId());
+        } else {
+            indexController.tryUpdateProject(project);
+        }
         for (String tag : project.getTags()) {
             Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {

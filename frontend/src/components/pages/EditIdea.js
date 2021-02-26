@@ -4,7 +4,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../ideaComponents/IdeaCard";
-import TagPicker from "../tagComponents/TagPicker";
+import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import { Link } from "react-router-dom";
