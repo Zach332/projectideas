@@ -1,6 +1,7 @@
 import React from "react";
+import axios from "axios";
 
-export default function Upvotes({ post }) {
+export default function Upvotes({ post, postType }) {
     const [userHasUpvoted, setUserHasUpvoted] = React.useState(
         post.userHasUpvoted
     );
@@ -13,8 +14,10 @@ export default function Upvotes({ post }) {
     const toggleUpvote = () => {
         if (userHasUpvoted) {
             setUpvotes((prev) => prev - 1);
+            axios.post("/api/" + postType + "s/" + post.id + "/unupvote");
         } else {
             setUpvotes((prev) => prev + 1);
+            axios.post("/api/" + postType + "s/" + post.id + "/upvote");
         }
         setUserHasUpvoted((prev) => !prev);
     };
