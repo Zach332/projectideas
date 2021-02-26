@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.post;
 
+import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +10,12 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Idea extends Post {
+public class Idea extends Post implements Votable {
 
     protected String title;
     protected List<String> tags;
     protected boolean deleted;
+    protected int upvoteCount;
 
     public Idea(
         String authorId,
@@ -34,6 +36,8 @@ public class Idea extends Post {
         this.title = title;
         this.content = content;
         this.tags = tags;
+        this.deleted = false;
+        this.upvoteCount = 0;
     }
 
     /**
@@ -45,5 +49,13 @@ public class Idea extends Post {
         authorUsername = null;
         content = "This idea has been deleted by its author.";
         tags = new ArrayList<>();
+    }
+
+    public void addUpvote() {
+        upvoteCount += 1;
+    }
+
+    public void removeUpvote() {
+        upvoteCount -= 1;
     }
 }

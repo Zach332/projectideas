@@ -6,9 +6,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ViewIdeaDTO extends BasePostDTO {
+public class ViewIdeaDTO extends PreviewIdeaDTO {
 
-    private String title;
     private boolean deleted;
     private Boolean savedByUser;
     private List<String> tags;

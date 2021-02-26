@@ -261,6 +261,22 @@ public class IdeaController {
         database.unsaveIdeaForUser(ideaId, userId);
     }
 
+    @PostMapping("/api/ideas/{ideaId}/upvote")
+    public void upvoteIdea(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId
+    ) {
+        database.upvoteIdea(ideaId, userId);
+    }
+
+    @PostMapping("/api/ideas/{ideaId}/unupvote")
+    public void unupvoteIdea(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId
+    ) {
+        database.unupvoteIdea(ideaId, userId);
+    }
+
     @DeleteMapping("/api/ideas/{id}")
     public void deleteIdea(
         @RequestHeader("authorization") String userId,

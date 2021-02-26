@@ -11,6 +11,8 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
 import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
 import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
+import com.herokuapp.projectideas.database.document.vote.IdeaUpvote;
+import com.herokuapp.projectideas.database.document.vote.ProjectUpvote;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
@@ -91,11 +93,17 @@ public class GenericQueries {
             UserJoinedProject.class.isAssignableFrom(classType)
         ) {
             return USER_CONTAINER_PARTITION_KEY;
-        } else if (Post.class.isAssignableFrom(classType)) {
+        } else if (
+            Post.class.isAssignableFrom(classType) ||
+            IdeaUpvote.class.isAssignableFrom(classType)
+        ) {
             return POST_CONTAINER_PARTITION_KEY;
         } else if (Tag.class.isAssignableFrom(classType)) {
             return TAG_CONTAINER_PARTITION_KEY;
-        } else if (Project.class.isAssignableFrom(classType)) {
+        } else if (
+            Project.class.isAssignableFrom(classType) ||
+            ProjectUpvote.class.isAssignableFrom(classType)
+        ) {
             return PROJECT_CONTAINER_PARTITION_KEY;
         }
         throw new IllegalArgumentException(
