@@ -5,8 +5,8 @@ import { toParams, toQuery } from "../utils/Routing";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
-import ProjectSummary from "./../projectComponents/ProjectSummary";
 import { useHistory, useLocation } from "react-router-dom";
+import ProjectSummaryUpvotes from "./../projectComponents/ProjectSummaryUpvotes";
 
 export default function Projects() {
     let location = useLocation();
@@ -82,7 +82,7 @@ export default function Projects() {
                 <div className="container mx-auto">
                     {projects.map((project) => (
                         <div className="my-2" key={project.id}>
-                            <ProjectSummary project={project} />
+                            <ProjectSummaryUpvotes project={project} />
                         </div>
                     ))}
                 </div>

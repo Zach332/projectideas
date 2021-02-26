@@ -14,7 +14,7 @@ export default function IdeaSummary({ idea }) {
         >
             <div className="d-flex justify-content-between">
                 <h5 className="mb-1">{idea.title}</h5>
-                <small className="text-muted">
+                <small className="text-muetd">
                     {formatTime(idea.timePosted)}
                 </small>
             </div>

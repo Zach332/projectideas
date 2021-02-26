@@ -12,16 +12,14 @@ export default function ProjectSummary({ project, setRerender }) {
     const MAX_LENGTH = 480;
 
     return (
-        <div>
+        <div className="w-100">
             <Link
                 to={projectLink}
                 className="list-group-item list-group-item-action flex-column align-items-start rounded border"
             >
-                <div>
-                    <ProjectJoinRequestButton project={project} />
-                </div>
                 <div className="d-flex justify-content-between">
                     <h5 className="mb-1">{project.name}</h5>
+                    <ProjectJoinRequestButton project={project} />
                 </div>
                 <p
                     className="mb-1"
