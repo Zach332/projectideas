@@ -111,6 +111,16 @@ public class ProjectController {
             );
         }
 
+        if (project.getName().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Project name " +
+                project.getName() +
+                " is too long. " +
+                "Project names cannot be longer than 175 characters."
+            );
+        }
+
         Project existingProject = database
             .getProject(projectId)
             .orElseThrow(
