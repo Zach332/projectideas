@@ -47,7 +47,9 @@ public class UserController {
         @RequestParam("page") int pageNum
     ) {
         return mapper.previewIdeaPageDTO(
-            database.getPostedIdeasForUser(userId, pageNum)
+            database.getPostedIdeasForUser(userId, pageNum),
+            userId,
+            database
         );
     }
 
@@ -57,7 +59,9 @@ public class UserController {
         @RequestParam("page") int pageNum
     ) {
         return mapper.previewIdeaPageDTO(
-            database.getSavedIdeasForUser(userId, pageNum)
+            database.getSavedIdeasForUser(userId, pageNum),
+            userId,
+            database
         );
     }
 
@@ -68,7 +72,8 @@ public class UserController {
     ) {
         return mapper.previewProjectPageDTO(
             database.getJoinedProjectsForUser(userId, pageNum),
-            userId
+            userId,
+            database
         );
     }
 

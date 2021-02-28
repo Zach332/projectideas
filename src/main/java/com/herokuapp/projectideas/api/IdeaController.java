@@ -43,24 +43,34 @@ public class IdeaController {
     SearchController searchController;
 
     @GetMapping("/api/ideas")
-    public PreviewIdeaPageDTO getIdeas(@RequestParam("page") int pageNum) {
-        return mapper.previewIdeaPageDTO(database.getIdeasByPageNum(pageNum));
+    public PreviewIdeaPageDTO getIdeas(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @RequestParam("page") int pageNum
+    ) {
+        return mapper.previewIdeaPageDTO(
+            database.getIdeasByPageNum(pageNum),
+            userId,
+            database
+        );
     }
 
     @GetMapping("/api/ideas/tags")
     public PreviewIdeaPageDTO getIdeasByTag(
+        @RequestHeader(value = "authorization", required = false) String userId,
         @RequestParam("page") int pageNum,
         @RequestParam("tag") String tag
     ) {
         return mapper.previewIdeaPageDTO(
-            database.getIdeasByTagAndPageNum(tag, pageNum)
+            database.getIdeasByTagAndPageNum(tag, pageNum),
+            userId,
+            database
         );
     }
 
     @GetMapping("/api/ideas/{ideaId}")
     public ViewIdeaDTO getIdea(
-        @PathVariable String ideaId,
-        @RequestHeader(value = "authorization", required = false) String userId
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @PathVariable String ideaId
     ) {
         Idea idea = database
             .getIdea(ideaId)
@@ -77,7 +87,7 @@ public class IdeaController {
         } else {
             ideaSavedByUser = null;
         }
-        return mapper.viewIdeaDTO(idea, ideaSavedByUser);
+        return mapper.viewIdeaDTO(idea, ideaSavedByUser, userId, database);
     }
 
     @GetMapping("/api/ideas/{ideaId}/comments")
@@ -102,13 +112,19 @@ public class IdeaController {
             return database
                 .getPublicProjectsLookingForMemberBasedOnIdea(ideaId)
                 .stream()
-                .map(project -> mapper.previewProjectDTO(project, userId))
+                .map(
+                    project ->
+                        mapper.previewProjectDTO(project, userId, database)
+                )
                 .collect(Collectors.toList());
         } else {
             return database
                 .getProjectsBasedOnIdea(ideaId)
                 .stream()
-                .map(project -> mapper.previewProjectDTO(project, userId))
+                .map(
+                    project ->
+                        mapper.previewProjectDTO(project, userId, database)
+                )
                 .collect(Collectors.toList());
         }
     }
@@ -138,10 +154,11 @@ public class IdeaController {
 
     @GetMapping("/api/ideas/search")
     public PreviewIdeaPageDTO searchIdeas(
+        @RequestHeader(value = "authorization", required = false) String userId,
         @RequestParam("query") String query,
         @RequestParam("page") int page
     ) {
-        return searchController.searchForIdeaByPage(query, page);
+        return searchController.searchForIdeaByPage(query, userId, page);
     }
 
     @PostMapping("/api/ideas/{ideaId}/comments")

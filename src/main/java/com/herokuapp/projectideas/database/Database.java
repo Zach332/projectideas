@@ -5,6 +5,7 @@ import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
 import com.azure.cosmos.implementation.ConflictException;
+import com.azure.cosmos.implementation.NotFoundException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
@@ -260,6 +261,25 @@ public class Database {
             new PartitionKey(upvote.getPartitionKey()),
             new CosmosItemRequestOptions()
         );
+    }
+
+    private <T extends Upvote<S>, S extends Votable> boolean userHasUpvotedDocument(
+        String partitionKey,
+        String userId,
+        CosmosContainer container,
+        Class<T> upvoteType
+    ) {
+        try {
+            container.readItem(
+                partitionKey,
+                new PartitionKey(partitionKey),
+                upvoteType
+            );
+        } catch (NotFoundException e) {
+            return false;
+        }
+
+        return true;
     }
 
     // Users
@@ -546,6 +566,15 @@ public class Database {
             postContainer,
             IdeaUpvote.class,
             Idea.class
+        );
+    }
+
+    public boolean userHasUpvotedIdea(String ideaId, String userId) {
+        return userHasUpvotedDocument(
+            ideaId,
+            userId,
+            postContainer,
+            IdeaUpvote.class
         );
     }
 
@@ -981,6 +1010,15 @@ public class Database {
             projectContainer,
             ProjectUpvote.class,
             Project.class
+        );
+    }
+
+    public boolean userHasUpvotedProject(String projectId, String userId) {
+        return userHasUpvotedDocument(
+            projectId,
+            userId,
+            postContainer,
+            ProjectUpvote.class
         );
     }
 

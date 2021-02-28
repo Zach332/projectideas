@@ -189,6 +189,7 @@ public class SearchController {
 
     public PreviewIdeaPageDTO searchForIdeaByPage(
         String queryString,
+        String userId,
         int page
     ) {
         List<String> idResults = searchForIdea(queryString);
@@ -202,7 +203,7 @@ public class SearchController {
         List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
             .getDocuments()
             .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea))
+            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
             .collect(Collectors.toList());
         return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
     }
@@ -223,7 +224,7 @@ public class SearchController {
         List<PreviewProjectDTO> projectPreviews = projectResultsPage
             .getDocuments()
             .stream()
-            .map(project -> mapper.previewProjectDTO(project, userId))
+            .map(project -> mapper.previewProjectDTO(project, userId, database))
             .collect(Collectors.toList());
         return new PreviewProjectPageDTO(projectPreviews, isLastPage);
     }

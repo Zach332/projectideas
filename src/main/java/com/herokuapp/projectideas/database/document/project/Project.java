@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.database.document.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.database.document.vote.Votable;
@@ -104,5 +105,9 @@ public class Project implements RootDocument, Votable {
 
     public void removeUpvote() {
         upvoteCount -= 1;
+    }
+
+    public boolean userHasUpvoted(String userId, Database database) {
+        return database.userHasUpvotedProject(projectId, userId);
     }
 }
