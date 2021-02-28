@@ -23,7 +23,7 @@ function useWidth(elementRef) {
     return [width];
 }
 
-export default function IdeaCard(props) {
+export default function IdeaCard({ idea }) {
     const ref = useRef(null);
     const [width] = useWidth(ref);
 
@@ -43,12 +43,12 @@ export default function IdeaCard(props) {
     return (
         <div className="card">
             <div className="card-header d-flex">
-                <h1 className="me-auto">{props.title}</h1>
-                <Upvotes post={props}></Upvotes>
+                <h1 className="me-auto">{idea.title}</h1>
+                <Upvotes post={idea} postType="idea"></Upvotes>
             </div>
             <div className="card-body" ref={ref}>
                 <ReactMarkdown renderers={renderers}>
-                    {props.content}
+                    {idea.content}
                 </ReactMarkdown>
             </div>
         </div>

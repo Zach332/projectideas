@@ -111,7 +111,7 @@ public class UserController {
                     HttpStatus.CONFLICT,
                     "Username " +
                     user.getUsername() +
-                    "is too long or too short. " +
+                    " is too long or too short. " +
                     "Usernames must be between 3 and 30 characters (inclusive)."
                 );
             }

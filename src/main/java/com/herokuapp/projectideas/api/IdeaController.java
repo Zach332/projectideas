@@ -134,6 +134,15 @@ public class IdeaController {
         @RequestHeader("authorization") String userId,
         @RequestBody PostIdeaDTO idea
     ) {
+        if (idea.getTitle().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Idea title " +
+                idea.getTitle() +
+                " is too long. " +
+                "Idea titles cannot be longer than 175 characters."
+            );
+        }
         // TODO: Move this call into the createIdea function
         // As is, creating an idea requires calling the findUser function twice
         User user = database
@@ -197,6 +206,16 @@ public class IdeaController {
             );
         }
 
+        if (project.getName().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Project name " +
+                project.getName() +
+                " is too long. " +
+                "Project names cannot be longer than 175 characters."
+            );
+        }
+
         database.createProject(
             new Project(
                 project.getName(),
@@ -217,6 +236,16 @@ public class IdeaController {
         @PathVariable String id,
         @RequestBody PostIdeaDTO idea
     ) {
+        if (idea.getTitle().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Idea title " +
+                idea.getTitle() +
+                " is too long. " +
+                "Idea titles cannot be longer than 175 characters."
+            );
+        }
+
         Idea existingIdea = database
             .getIdea(id)
             .orElseThrow(
