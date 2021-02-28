@@ -52,13 +52,13 @@ export default function Upvotes({ post, postType }) {
     }
 
     return (
-        <div
-            className="d-flex flex-column align-items-center"
-            style={{ width: 50 }}
+        <button
+            className="btn d-flex flex-column align-items-center"
+            style={{ width: 50, boxShadow: "none" }}
             onClick={toggleUpvote}
         >
             <div>{userHasUpvoted ? filledUpvote : unfilledUpvote}</div>
             <div>{upvotes}</div>
-        </div>
+        </button>
     );
 }
