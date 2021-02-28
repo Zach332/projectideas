@@ -64,6 +64,7 @@ export default function EditIdea({ originalIdea, setStatus }) {
                         onChange={handleInputChange}
                     />
                 </div>
+                {idea.title.length > 175 && <div>Your title is too long.</div>}
                 <div className="form-group mt-2 mb-3">
                     <label htmlFor="content">Details</label>
                     <textarea
@@ -76,7 +77,11 @@ export default function EditIdea({ originalIdea, setStatus }) {
                 </div>
                 <TagPicker post={idea} setPost={setIdea} postType="idea" />
                 <br></br>
-                <button type="submit" className="btn btn-primary">
+                <button
+                    type="submit"
+                    disabled={idea.title === "" || idea.title.length > 175}
+                    className="btn btn-primary"
+                >
                     Update Idea
                 </button>
             </form>
