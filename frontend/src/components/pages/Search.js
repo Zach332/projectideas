@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
-import IdeaSummary from "../ideaComponents/IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
-import ProjectSummary from "./../projectComponents/ProjectSummary";
 import { useHistory, useLocation } from "react-router-dom";
+import IdeaSummaryUpvotes from "./../ideaComponents/IdeaSummaryUpvotes";
+import ProjectSummaryUpvotes from "./../projectComponents/ProjectSummaryUpvotes";
 
 export default function Search() {
     let history = useHistory();
@@ -108,11 +108,11 @@ export default function Search() {
                 {posts.map((post) =>
                     type === "ideas" ? (
                         <div className="my-2" key={post.id}>
-                            <IdeaSummary idea={post} />
+                            <IdeaSummaryUpvotes idea={post} />
                         </div>
                     ) : (
                         <div className="my-2" key={post.id}>
-                            <ProjectSummary project={post} />
+                            <ProjectSummaryUpvotes project={post} />
                         </div>
                     )
                 )}
