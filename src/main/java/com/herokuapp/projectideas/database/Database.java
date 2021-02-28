@@ -271,7 +271,7 @@ public class Database {
     ) {
         try {
             container.readItem(
-                partitionKey,
+                userId,
                 new PartitionKey(partitionKey),
                 upvoteType
             );
@@ -1017,7 +1017,7 @@ public class Database {
         return userHasUpvotedDocument(
             projectId,
             userId,
-            postContainer,
+            projectContainer,
             ProjectUpvote.class
         );
     }
