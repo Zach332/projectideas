@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.dto;
 
+import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.DocumentPage;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
 import com.herokuapp.projectideas.database.document.message.ReceivedIndividualMessage;
@@ -49,14 +50,45 @@ public abstract class DTOMapper {
 
     public abstract ViewUserDTO viewUserDTO(User user);
 
-    public abstract PreviewIdeaDTO previewIdeaDTO(Idea idea);
+    @Mapping(
+        target = "userHasUpvoted",
+        source = "idea",
+        qualifiedByName = "userHasUpvotedIdea"
+    )
+    public abstract PreviewIdeaDTO previewIdeaDTO(
+        Idea idea,
+        @Context String userId,
+        @Context Database database
+    );
 
-    public abstract ViewIdeaDTO viewIdeaDTO(Idea idea, Boolean savedByUser);
+    @Mapping(
+        target = "userHasUpvoted",
+        source = "idea",
+        qualifiedByName = "userHasUpvotedIdea"
+    )
+    // TODO: Handle savedByUser the same way as userHasUpvoted
+    public abstract ViewIdeaDTO viewIdeaDTO(
+        Idea idea,
+        Boolean savedByUser,
+        @Context String userId,
+        @Context Database database
+    );
 
     @Mapping(target = "ideaPreviews", source = "documents")
     public abstract PreviewIdeaPageDTO previewIdeaPageDTO(
-        DocumentPage<Idea> documentPage
+        DocumentPage<Idea> documentPage,
+        @Context String userId,
+        @Context Database database
     );
+
+    @Named("userHasUpvotedIdea")
+    protected boolean userHasUpvotedIdea(
+        Idea idea,
+        @Context String userId,
+        @Context Database database
+    ) {
+        return idea.userHasUpvoted(userId, database);
+    }
 
     public abstract ViewCommentDTO viewCommentDTO(Comment comment);
 
@@ -129,10 +161,16 @@ public abstract class DTOMapper {
         source = "project",
         qualifiedByName = "userHasRequestedToJoin"
     )
+    @Mapping(
+        target = "userHasUpvoted",
+        source = "project",
+        qualifiedByName = "userHasUpvotedProject"
+    )
     @Named("previewProjectDTO")
     public abstract PreviewProjectDTO previewProjectDTO(
         Project project,
-        @Context String userId
+        @Context String userId,
+        @Context Database database
     );
 
     @Mapping(
@@ -144,10 +182,16 @@ public abstract class DTOMapper {
         target = "userHasRequestedToJoin",
         source = "project",
         qualifiedByName = "userHasRequestedToJoin"
+    )
+    @Mapping(
+        target = "userHasUpvoted",
+        source = "project",
+        qualifiedByName = "userHasUpvotedProject"
     )
     public abstract ViewProjectDTO viewProjectDTO(
         Project project,
-        @Context String userId
+        @Context String userId,
+        @Context Database database
     );
 
     @Mapping(
@@ -159,11 +203,17 @@ public abstract class DTOMapper {
         target = "userHasRequestedToJoin",
         source = "project",
         qualifiedByName = "userHasRequestedToJoin"
+    )
+    @Mapping(
+        target = "userHasUpvoted",
+        source = "project",
+        qualifiedByName = "userHasUpvotedProject"
     )
     @Mapping(target = "joinRequests", source = "usersRequestingToJoin")
     public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
         Project project,
-        @Context String userId
+        @Context String userId,
+        @Context Database database
     );
 
     @Mapping(
@@ -173,7 +223,8 @@ public abstract class DTOMapper {
     )
     public abstract PreviewProjectPageDTO previewProjectPageDTO(
         DocumentPage<Project> documentPage,
-        @Context String userId
+        @Context String userId,
+        @Context Database database
     );
 
     @Named("userIsTeamMember")
@@ -192,6 +243,15 @@ public abstract class DTOMapper {
         return project.userHasRequestedToJoin(userId);
     }
 
+    @Named("userHasUpvotedProject")
+    protected boolean userHasUpvotedProject(
+        Project project,
+        @Context String userId,
+        @Context Database database
+    ) {
+        return project.userHasUpvoted(userId, database);
+    }
+
     protected abstract ViewProjectJoinRequestDTO viewProjectJoinRequest(
         ProjectJoinRequest projectJoinRequest
     );
@@ -202,7 +262,8 @@ public abstract class DTOMapper {
     @Named("previewProjectDTOList")
     protected abstract List<PreviewProjectDTO> previewProjectDTOList(
         List<Project> projects,
-        @Context String userId
+        @Context String userId,
+        @Context Database database
     );
 
     // DTO updating existing document

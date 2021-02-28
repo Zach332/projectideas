@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.post;
 
+import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -57,5 +58,9 @@ public class Idea extends Post implements Votable {
 
     public void removeUpvote() {
         upvoteCount -= 1;
+    }
+
+    public boolean userHasUpvoted(String userId, Database database) {
+        return database.userHasUpvotedIdea(ideaId, userId);
     }
 }

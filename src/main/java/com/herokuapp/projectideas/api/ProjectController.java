@@ -42,7 +42,8 @@ public class ProjectController {
     ) {
         return mapper.previewProjectPageDTO(
             database.getPublicProjectsByPageNum(pageNum),
-            userId
+            userId,
+            database
         );
     }
 
@@ -54,7 +55,8 @@ public class ProjectController {
     ) {
         return mapper.previewProjectPageDTO(
             database.getPublicProjectsByTagAndPageNum(tag, pageNum),
-            userId
+            userId,
+            database
         );
     }
 
@@ -74,11 +76,11 @@ public class ProjectController {
             );
 
         if (project.userIsTeamMember(userId)) {
-            return mapper.viewProjectAsTeamMemberDTO(project, userId);
+            return mapper.viewProjectAsTeamMemberDTO(project, userId, database);
         } else if (project.userHasRequestedToJoin(userId)) {
-            return mapper.viewProjectDTO(project, userId);
+            return mapper.viewProjectDTO(project, userId, database);
         } else {
-            return mapper.viewProjectDTO(project, userId);
+            return mapper.viewProjectDTO(project, userId, database);
         }
     }
 
