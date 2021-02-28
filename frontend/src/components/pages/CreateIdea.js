@@ -10,7 +10,7 @@ import {
 } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../ideaComponents/IdeaCard";
-import TagPicker from "../tagComponents/TagPicker";
+import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import { Link } from "react-router-dom";
@@ -87,6 +87,9 @@ export default function CreateIdea() {
                             onChange={handleInputChange}
                         />
                     </div>
+                    {idea.title.length > 175 && (
+                        <div>Your title is too long.</div>
+                    )}
                     <div className="form-group mt-2 mb-3">
                         <label htmlFor="content">Details</label>
                         <textarea
@@ -100,7 +103,7 @@ export default function CreateIdea() {
                     <br></br>
                     <button
                         type="submit"
-                        disabled={idea.title === ""}
+                        disabled={idea.title === "" || idea.title.length > 175}
                         className="btn btn-primary mt-4"
                     >
                         Post Idea
@@ -113,7 +116,7 @@ export default function CreateIdea() {
                     </Link>{" "}
                     is supported. A preview of your idea is below.
                 </p>
-                <IdeaCard title={idea.title} content={idea.content} />
+                <IdeaCard idea={idea} />
             </div>
         );
     } else if (status === Status.Success) {

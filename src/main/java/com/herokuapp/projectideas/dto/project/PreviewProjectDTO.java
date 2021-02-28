@@ -13,4 +13,6 @@ public class PreviewProjectDTO {
     private boolean lookingForMembers;
     private boolean userIsTeamMember;
     private boolean userHasRequestedToJoin;
+    private int upvoteCount;
+    private boolean userHasUpvoted;
 }

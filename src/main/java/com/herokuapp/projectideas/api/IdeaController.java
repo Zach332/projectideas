@@ -43,24 +43,34 @@ public class IdeaController {
     SearchController searchController;
 
     @GetMapping("/api/ideas")
-    public PreviewIdeaPageDTO getIdeas(@RequestParam("page") int pageNum) {
-        return mapper.previewIdeaPageDTO(database.getIdeasByPageNum(pageNum));
+    public PreviewIdeaPageDTO getIdeas(
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @RequestParam("page") int pageNum
+    ) {
+        return mapper.previewIdeaPageDTO(
+            database.getIdeasByPageNum(pageNum),
+            userId,
+            database
+        );
     }
 
     @GetMapping("/api/ideas/tags")
     public PreviewIdeaPageDTO getIdeasByTag(
+        @RequestHeader(value = "authorization", required = false) String userId,
         @RequestParam("page") int pageNum,
         @RequestParam("tag") String tag
     ) {
         return mapper.previewIdeaPageDTO(
-            database.getIdeasByTagAndPageNum(tag, pageNum)
+            database.getIdeasByTagAndPageNum(tag, pageNum),
+            userId,
+            database
         );
     }
 
     @GetMapping("/api/ideas/{ideaId}")
     public ViewIdeaDTO getIdea(
-        @PathVariable String ideaId,
-        @RequestHeader(value = "authorization", required = false) String userId
+        @RequestHeader(value = "authorization", required = false) String userId,
+        @PathVariable String ideaId
     ) {
         Idea idea = database
             .getIdea(ideaId)
@@ -77,7 +87,7 @@ public class IdeaController {
         } else {
             ideaSavedByUser = null;
         }
-        return mapper.viewIdeaDTO(idea, ideaSavedByUser);
+        return mapper.viewIdeaDTO(idea, ideaSavedByUser, userId, database);
     }
 
     @GetMapping("/api/ideas/{ideaId}/comments")
@@ -102,13 +112,19 @@ public class IdeaController {
             return database
                 .getPublicProjectsLookingForMemberBasedOnIdea(ideaId)
                 .stream()
-                .map(project -> mapper.previewProjectDTO(project, userId))
+                .map(
+                    project ->
+                        mapper.previewProjectDTO(project, userId, database)
+                )
                 .collect(Collectors.toList());
         } else {
             return database
                 .getProjectsBasedOnIdea(ideaId)
                 .stream()
-                .map(project -> mapper.previewProjectDTO(project, userId))
+                .map(
+                    project ->
+                        mapper.previewProjectDTO(project, userId, database)
+                )
                 .collect(Collectors.toList());
         }
     }
@@ -118,6 +134,15 @@ public class IdeaController {
         @RequestHeader("authorization") String userId,
         @RequestBody PostIdeaDTO idea
     ) {
+        if (idea.getTitle().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Idea title " +
+                idea.getTitle() +
+                " is too long. " +
+                "Idea titles cannot be longer than 175 characters."
+            );
+        }
         // TODO: Move this call into the createIdea function
         // As is, creating an idea requires calling the findUser function twice
         User user = database
@@ -138,10 +163,11 @@ public class IdeaController {
 
     @GetMapping("/api/ideas/search")
     public PreviewIdeaPageDTO searchIdeas(
+        @RequestHeader(value = "authorization", required = false) String userId,
         @RequestParam("query") String query,
         @RequestParam("page") int page
     ) {
-        return searchController.searchForIdeaByPage(query, page);
+        return searchController.searchForIdeaByPage(query, userId, page);
     }
 
     @PostMapping("/api/ideas/{ideaId}/comments")
@@ -180,6 +206,16 @@ public class IdeaController {
             );
         }
 
+        if (project.getName().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Project name " +
+                project.getName() +
+                " is too long. " +
+                "Project names cannot be longer than 175 characters."
+            );
+        }
+
         database.createProject(
             new Project(
                 project.getName(),
@@ -200,6 +236,16 @@ public class IdeaController {
         @PathVariable String id,
         @RequestBody PostIdeaDTO idea
     ) {
+        if (idea.getTitle().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Idea title " +
+                idea.getTitle() +
+                " is too long. " +
+                "Idea titles cannot be longer than 175 characters."
+            );
+        }
+
         Idea existingIdea = database
             .getIdea(id)
             .orElseThrow(
@@ -259,6 +305,22 @@ public class IdeaController {
         @PathVariable String ideaId
     ) {
         database.unsaveIdeaForUser(ideaId, userId);
+    }
+
+    @PostMapping("/api/ideas/{ideaId}/upvote")
+    public void upvoteIdea(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId
+    ) {
+        database.upvoteIdea(ideaId, userId);
+    }
+
+    @PostMapping("/api/ideas/{ideaId}/unupvote")
+    public void unupvoteIdea(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String ideaId
+    ) {
+        database.unupvoteIdea(ideaId, userId);
     }
 
     @DeleteMapping("/api/ideas/{id}")

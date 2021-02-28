@@ -1,8 +1,10 @@
 package com.herokuapp.projectideas.database.document.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Project implements RootDocument {
+public class Project implements RootDocument, Votable {
 
     protected String id;
     protected String type;
@@ -31,6 +33,7 @@ public class Project implements RootDocument {
     protected boolean lookingForMembers;
     protected List<ProjectJoinRequest> usersRequestingToJoin;
     protected List<String> tags;
+    protected int upvoteCount;
 
     public Project(
         String name,
@@ -54,6 +57,7 @@ public class Project implements RootDocument {
         this.lookingForMembers = lookingForMembers;
         this.usersRequestingToJoin = new ArrayList<>();
         this.tags = tags;
+        this.upvoteCount = 0;
     }
 
     public String getPartitionKey() {
@@ -93,5 +97,17 @@ public class Project implements RootDocument {
             .stream()
             .map(projectJoinRequest -> projectJoinRequest.getUsername())
             .collect(Collectors.toList());
+    }
+
+    public void addUpvote() {
+        upvoteCount += 1;
+    }
+
+    public void removeUpvote() {
+        upvoteCount -= 1;
+    }
+
+    public boolean userHasUpvoted(String userId, Database database) {
+        return database.userHasUpvotedProject(projectId, userId);
     }
 }

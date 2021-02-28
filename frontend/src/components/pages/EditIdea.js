@@ -4,7 +4,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import IdeaCard from "../ideaComponents/IdeaCard";
-import TagPicker from "../tagComponents/TagPicker";
+import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import { Link } from "react-router-dom";
@@ -64,6 +64,7 @@ export default function EditIdea({ originalIdea, setStatus }) {
                         onChange={handleInputChange}
                     />
                 </div>
+                {idea.title.length > 175 && <div>Your title is too long.</div>}
                 <div className="form-group mt-2 mb-3">
                     <label htmlFor="content">Details</label>
                     <textarea
@@ -75,7 +76,11 @@ export default function EditIdea({ originalIdea, setStatus }) {
                 </div>
                 <TagPicker post={idea} setPost={setIdea} postType="idea" />
                 <br></br>
-                <button type="submit" className="btn btn-primary">
+                <button
+                    type="submit"
+                    disabled={idea.title === "" || idea.title.length > 175}
+                    className="btn btn-primary"
+                >
                     Update Idea
                 </button>
             </form>
@@ -86,7 +91,7 @@ export default function EditIdea({ originalIdea, setStatus }) {
                 </Link>{" "}
                 is supported. A preview of your idea is below.
             </p>
-            <IdeaCard title={idea.title} content={idea.content} />
+            <IdeaCard idea={idea} />
         </div>
     );
 }

@@ -18,6 +18,7 @@ import LoadingDiv from "../general/LoadingDiv";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
+import Upvotes from "./../postComponents/Upvotes";
 
 export default function Project() {
     let history = useHistory();
@@ -33,6 +34,7 @@ export default function Project() {
         id: "",
         joinRequests: "",
     });
+    const [newGithubLink, setNewGithubLink] = React.useState("");
     let params = useParams();
 
     useEffect(() => {
@@ -128,10 +130,7 @@ export default function Project() {
     };
 
     const editGitHubLink = (newLink) => {
-        setProject({
-            ...project,
-            githubLink: newLink,
-        });
+        setNewGithubLink(newLink);
     };
 
     const submitLink = () => {
@@ -142,9 +141,13 @@ export default function Project() {
                 lookingForMembers: project.lookingForMembers,
                 publicProject: project.publicProject,
                 tags: project.tags,
-                githubLink: project.githubLink,
+                githubLink: newGithubLink,
             })
             .then(() => {
+                setProject({
+                    ...project,
+                    githubLink: newGithubLink,
+                });
                 addToast("Your idea was updated successfully.", {
                     appearance: "success",
                     autoDismiss: true,
@@ -276,9 +279,10 @@ export default function Project() {
                     {project.name} | {Globals.Title}
                 </title>
             </Helmet>
-            <div className="d-flex">
-                <div className="me-auto">
-                    <h1>{project.name}</h1>
+            <div className="d-flex align-items-center">
+                <h1>{project.name}</h1>
+                <div className="me-auto ms-3">
+                    <Upvotes post={project} postType="project" />
                 </div>
                 <div className="d-flex align-items-center">
                     <div>
@@ -406,7 +410,7 @@ export default function Project() {
             />
             <ProjectGitHubLinkModal
                 id="gitHubLink"
-                gitHubLink={project.githubLink}
+                gitHubLink={newGithubLink}
                 setGitHubLink={editGitHubLink}
                 submitLink={submitLink}
             />

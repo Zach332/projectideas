@@ -42,7 +42,8 @@ public class ProjectController {
     ) {
         return mapper.previewProjectPageDTO(
             database.getPublicProjectsByPageNum(pageNum),
-            userId
+            userId,
+            database
         );
     }
 
@@ -54,7 +55,8 @@ public class ProjectController {
     ) {
         return mapper.previewProjectPageDTO(
             database.getPublicProjectsByTagAndPageNum(tag, pageNum),
-            userId
+            userId,
+            database
         );
     }
 
@@ -74,12 +76,28 @@ public class ProjectController {
             );
 
         if (project.userIsTeamMember(userId)) {
-            return mapper.viewProjectAsTeamMemberDTO(project, userId);
+            return mapper.viewProjectAsTeamMemberDTO(project, userId, database);
         } else if (project.userHasRequestedToJoin(userId)) {
-            return mapper.viewProjectDTO(project, userId);
+            return mapper.viewProjectDTO(project, userId, database);
         } else {
-            return mapper.viewProjectDTO(project, userId);
+            return mapper.viewProjectDTO(project, userId, database);
         }
+    }
+
+    @PostMapping("/api/projects/{projectId}/upvote")
+    public void upvoteProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId
+    ) {
+        database.upvoteProject(projectId, userId);
+    }
+
+    @PostMapping("/api/projects/{projectId}/unupvote")
+    public void unupvoteProject(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId
+    ) {
+        database.unupvoteProject(projectId, userId);
     }
 
     @PutMapping("/api/projects/{projectId}")
@@ -92,6 +110,16 @@ public class ProjectController {
             throw new ResponseStatusException(
                 HttpStatus.CONFLICT,
                 "A project cannot be looking for members while private."
+            );
+        }
+
+        if (project.getName().length() > 175) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Project name " +
+                project.getName() +
+                " is too long. " +
+                "Project names cannot be longer than 175 characters."
             );
         }
 

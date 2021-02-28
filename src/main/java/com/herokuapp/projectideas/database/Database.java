@@ -4,6 +4,8 @@ import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.implementation.ConflictException;
+import com.azure.cosmos.implementation.NotFoundException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.CosmosStoredProcedureRequestOptions;
@@ -30,6 +32,10 @@ import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
 import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
 import com.herokuapp.projectideas.database.document.user.UserSavedIdea;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.document.vote.IdeaUpvote;
+import com.herokuapp.projectideas.database.document.vote.ProjectUpvote;
+import com.herokuapp.projectideas.database.document.vote.Upvote;
+import com.herokuapp.projectideas.database.document.vote.Votable;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
 import java.util.ArrayList;
@@ -140,22 +146,6 @@ public class Database {
             .get();
     }
 
-    // TODO: Merge this with multipleDocumentQuery
-    private <T> List<T> multipleValueQuery(
-        SelectQuery query,
-        CosmosContainer container,
-        Class<T> classType
-    ) {
-        return container
-            .queryItems(
-                query.createQuery(),
-                new CosmosQueryRequestOptions(),
-                classType
-            )
-            .stream()
-            .collect(Collectors.toList());
-    }
-
     /**
      * Returns a page of documents based on a page of partition keys.
      * Will return documents in the order specified in the partition key page.
@@ -197,6 +187,99 @@ public class Database {
         }
 
         return new DocumentPage<>(orderedDocuments, partitionKeys.isLastPage());
+    }
+
+    public <T extends RootDocument> DocumentPage<T> getPostPageFromIds(
+        DocumentPage<String> ids,
+        int pageNum,
+        Class<T> classType
+    ) {
+        return getDocumentPageFromPartitionKeyPage(
+            ids,
+            postContainer,
+            pageNum,
+            classType
+        );
+    }
+
+    private <T extends Upvote<S>, S extends Votable> void upvoteDocument(
+        Upvote<S> upvote,
+        CosmosContainer container,
+        Class<S> documentType
+    ) {
+        /**
+         * Only upvote if the user has not already upvoted the document
+         */
+        try {
+            container.createItem(upvote);
+        } catch (ConflictException e) {
+            return;
+        }
+
+        S document = container
+            .readItem(
+                upvote.getPartitionKey(),
+                new PartitionKey(upvote.getPartitionKey()),
+                documentType
+            )
+            .getItem();
+
+        document.addUpvote();
+        container.replaceItem(
+            document,
+            upvote.getPartitionKey(),
+            new PartitionKey(upvote.getPartitionKey()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    private <T extends Upvote<S>, S extends Votable> void unupvoteDocument(
+        String partitionKey,
+        String userId,
+        CosmosContainer container,
+        Class<T> upvoteType,
+        Class<S> documentType
+    ) {
+        T upvote = container
+            .readItem(userId, new PartitionKey(partitionKey), upvoteType)
+            .getItem();
+
+        container.deleteItem(upvote, new CosmosItemRequestOptions());
+
+        S document = container
+            .readItem(
+                upvote.getPartitionKey(),
+                new PartitionKey(upvote.getPartitionKey()),
+                documentType
+            )
+            .getItem();
+
+        document.removeUpvote();
+        container.replaceItem(
+            document,
+            upvote.getPartitionKey(),
+            new PartitionKey(upvote.getPartitionKey()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    private <T extends Upvote<S>, S extends Votable> boolean userHasUpvotedDocument(
+        String partitionKey,
+        String userId,
+        CosmosContainer container,
+        Class<T> upvoteType
+    ) {
+        try {
+            container.readItem(
+                userId,
+                new PartitionKey(partitionKey),
+                upvoteType
+            );
+        } catch (NotFoundException e) {
+            return false;
+        }
+
+        return true;
     }
 
     // Users
@@ -251,7 +334,7 @@ public class Database {
             CosmosStoredProcedureRequestOptions options = new CosmosStoredProcedureRequestOptions();
 
             // Handle posts container
-            List<PartitionKey> ideaPartitionKeys = multipleValueQuery(
+            List<PartitionKey> ideaPartitionKeys = multipleDocumentQuery(
                 GenericQueries
                     .queryByType(Idea.class)
                     .valueOf("ideaId")
@@ -444,6 +527,7 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
+        // Create or update idea tags
         for (String tag : idea.getTags()) {
             Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
@@ -452,15 +536,46 @@ public class Database {
                 createTag(new IdeaTag(tag));
             }
         }
+
+        // Save idea to database
         postContainer.createItem(idea);
 
+        // Add initial author upvote
+        upvoteIdea(idea.getIdeaId(), idea.getAuthorId());
+
+        // Add UserPostedIdea to user container
         UserPostedIdea postedIdea = new UserPostedIdea(
             idea.getAuthorId(),
             idea.getIdeaId()
         );
         userContainer.createItem(postedIdea);
 
+        // Update idea index
         indexController.tryIndexIdea(idea);
+    }
+
+    public void upvoteIdea(String ideaId, String userId) {
+        IdeaUpvote upvote = new IdeaUpvote(ideaId, userId);
+        upvoteDocument(upvote, postContainer, Idea.class);
+    }
+
+    public void unupvoteIdea(String ideaId, String userId) {
+        unupvoteDocument(
+            ideaId,
+            userId,
+            postContainer,
+            IdeaUpvote.class,
+            Idea.class
+        );
+    }
+
+    public boolean userHasUpvotedIdea(String ideaId, String userId) {
+        return userHasUpvotedDocument(
+            ideaId,
+            userId,
+            postContainer,
+            IdeaUpvote.class
+        );
     }
 
     public DocumentPage<Idea> getIdeasByPageNum(int pageNum) {
@@ -511,6 +626,7 @@ public class Database {
     }
 
     public void updateIdea(Idea idea) {
+        indexController.tryUpdateIdea(idea);
         for (String tag : idea.getTags()) {
             Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             if (existingTag.isPresent()) {
@@ -749,7 +865,7 @@ public class Database {
     }
 
     public void markAllReceivedMessagesAsRead(String recipientId) {
-        multipleValueQuery(
+        multipleDocumentQuery(
             GenericQueries
                 .queryByType(ReceivedMessage.class)
                 .valueOf("id")
@@ -871,6 +987,8 @@ public class Database {
         }
         projectContainer.createItem(project);
 
+        upvoteProject(project.getId(), projectCreatorId);
+
         UserJoinedProject joinedProject = new UserJoinedProject(
             projectCreatorId,
             project.getProjectId()
@@ -878,6 +996,30 @@ public class Database {
         userContainer.createItem(joinedProject);
 
         if (project.isPublicProject()) indexController.tryIndexProject(project);
+    }
+
+    public void upvoteProject(String projectId, String userId) {
+        ProjectUpvote upvote = new ProjectUpvote(projectId, userId);
+        upvoteDocument(upvote, projectContainer, Project.class);
+    }
+
+    public void unupvoteProject(String projectId, String userId) {
+        unupvoteDocument(
+            projectId,
+            userId,
+            projectContainer,
+            ProjectUpvote.class,
+            Project.class
+        );
+    }
+
+    public boolean userHasUpvotedProject(String projectId, String userId) {
+        return userHasUpvotedDocument(
+            projectId,
+            userId,
+            projectContainer,
+            ProjectUpvote.class
+        );
     }
 
     public DocumentPage<Project> getPublicProjectsByPageNum(int pageNum) {
@@ -980,8 +1122,13 @@ public class Database {
         boolean toPublic,
         boolean toPrivate
     ) {
-        if (toPublic) indexController.tryIndexProject(project);
-        if (toPrivate) indexController.tryDeleteProject(project.getId());
+        if (toPublic) {
+            indexController.tryIndexProject(project);
+        } else if (toPrivate) {
+            indexController.tryDeleteProject(project.getId());
+        } else {
+            indexController.tryUpdateProject(project);
+        }
         for (String tag : project.getTags()) {
             Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {

@@ -8,7 +8,7 @@ import axios from "axios";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
-import TagPicker from "../tagComponents/TagPicker";
+import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
 
@@ -123,6 +123,9 @@ export default function CreateProject() {
                         onChange={handleInputChange}
                     />
                 </div>
+                {project.name.length > 175 && (
+                    <div>Your project name is too long.</div>
+                )}
                 <div className="form-group mt-2 mb-3">
                     <label htmlFor="description">
                         Description - if you are looking for new members, add
@@ -178,7 +181,7 @@ export default function CreateProject() {
                 <br></br>
                 <button
                     type="submit"
-                    disabled={project.name === ""}
+                    disabled={project.name === "" || project.name.length > 175}
                     className="btn btn-primary mt-4"
                 >
                     Create project

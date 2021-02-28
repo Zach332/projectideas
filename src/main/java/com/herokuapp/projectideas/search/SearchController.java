@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.search;
 
 import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.document.DocumentPage;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
@@ -13,7 +14,6 @@ import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
@@ -169,65 +169,43 @@ public class SearchController {
         }
     }
 
-    private List<Idea> searchForIdea(String queryString) {
+    private List<String> searchForIdea(String queryString) {
         List<Document> documents = searchIdeaIndex(queryString);
         List<String> ids = documents
             .stream()
             .map(doc -> doc.get("id"))
             .collect(Collectors.toList());
-        List<Idea> unorderedIdeas = database.getIdeasInList(ids);
-
-        List<Idea> orderedIdeas = new ArrayList<Idea>();
-        for (String id : ids) {
-            Optional<Idea> ideaToAdd = unorderedIdeas
-                .stream()
-                .filter(idea -> idea.getId().equals(id))
-                .findFirst();
-            if (ideaToAdd.isPresent()) {
-                orderedIdeas.add(ideaToAdd.get());
-            }
-        }
-        return orderedIdeas;
+        return ids;
     }
 
-    private List<Project> searchForProject(String queryString) {
+    private List<String> searchForProject(String queryString) {
         List<Document> documents = searchProjectIndex(queryString);
         List<String> ids = documents
             .stream()
             .map(doc -> doc.get("id"))
             .collect(Collectors.toList());
-        List<Project> unorderedProjects = database.getProjectsInList(ids);
-
-        List<Project> orderedProjects = new ArrayList<Project>();
-        for (String id : ids) {
-            Optional<Project> projectToAdd = unorderedProjects
-                .stream()
-                .filter(idea -> idea.getId().equals(id))
-                .findFirst();
-            if (projectToAdd.isPresent()) {
-                orderedProjects.add(projectToAdd.get());
-            }
-        }
-        return orderedProjects;
+        return ids;
     }
 
     public PreviewIdeaPageDTO searchForIdeaByPage(
         String queryString,
+        String userId,
         int page
     ) {
-        List<Idea> allResults = searchForIdea(queryString);
-        List<Idea> pageResults = allResults.subList(
-            clamp((page - 1) * Database.ITEMS_PER_PAGE, allResults.size()),
-            clamp(page * Database.ITEMS_PER_PAGE, allResults.size())
+        List<String> idResults = searchForIdea(queryString);
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Idea> ideaResultsPage = database.getPostPageFromIds(
+            new DocumentPage<>(idResults, isLastPage),
+            page,
+            Idea.class
         );
-        List<PreviewIdeaDTO> ideaPreviews = pageResults
+
+        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
+            .getDocuments()
             .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea))
+            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
             .collect(Collectors.toList());
-        return new PreviewIdeaPageDTO(
-            ideaPreviews,
-            page * Database.ITEMS_PER_PAGE >= allResults.size()
-        );
+        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
     }
 
     public PreviewProjectPageDTO searchForProjectByPage(
@@ -235,19 +213,20 @@ public class SearchController {
         int page,
         String userId
     ) {
-        List<Project> allResults = searchForProject(queryString);
-        List<Project> pageResults = allResults.subList(
-            clamp((page - 1) * Database.ITEMS_PER_PAGE, allResults.size()),
-            clamp(page * Database.ITEMS_PER_PAGE, allResults.size())
+        List<String> idResults = searchForProject(queryString);
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Project> projectResultsPage = database.getPostPageFromIds(
+            new DocumentPage<>(idResults, isLastPage),
+            page,
+            Project.class
         );
-        List<PreviewProjectDTO> projectPreviews = pageResults
+
+        List<PreviewProjectDTO> projectPreviews = projectResultsPage
+            .getDocuments()
             .stream()
-            .map(project -> mapper.previewProjectDTO(project, userId))
+            .map(project -> mapper.previewProjectDTO(project, userId, database))
             .collect(Collectors.toList());
-        return new PreviewProjectPageDTO(
-            projectPreviews,
-            page * Database.ITEMS_PER_PAGE >= allResults.size()
-        );
+        return new PreviewProjectPageDTO(projectPreviews, isLastPage);
     }
 
     public List<String> searchForIdeaTags(String queryString) {
@@ -267,11 +246,5 @@ public class SearchController {
             .stream()
             .map(doc -> doc.get("name"))
             .collect(Collectors.toList());
-    }
-
-    private int clamp(int value, int maximum) {
-        if (value < 0) return 0;
-        if (value > maximum) return maximum;
-        return value;
     }
 }
