@@ -34,6 +34,7 @@ export default function Project() {
         id: "",
         joinRequests: "",
     });
+    const [newGithubLink, setNewGithubLink] = React.useState("");
     let params = useParams();
 
     useEffect(() => {
@@ -129,10 +130,7 @@ export default function Project() {
     };
 
     const editGitHubLink = (newLink) => {
-        setProject({
-            ...project,
-            githubLink: newLink,
-        });
+        setNewGithubLink(newLink);
     };
 
     const submitLink = () => {
@@ -143,9 +141,13 @@ export default function Project() {
                 lookingForMembers: project.lookingForMembers,
                 publicProject: project.publicProject,
                 tags: project.tags,
-                githubLink: project.githubLink,
+                githubLink: newGithubLink,
             })
             .then(() => {
+                setProject({
+                    ...project,
+                    githubLink: newGithubLink,
+                });
                 addToast("Your idea was updated successfully.", {
                     appearance: "success",
                     autoDismiss: true,
@@ -408,7 +410,7 @@ export default function Project() {
             />
             <ProjectGitHubLinkModal
                 id="gitHubLink"
-                gitHubLink={project.githubLink}
+                gitHubLink={newGithubLink}
                 setGitHubLink={editGitHubLink}
                 submitLink={submitLink}
             />
