@@ -9,7 +9,8 @@ export default function Upvotes({ post, postType }) {
 
     React.useEffect(() => {
         setUpvotes(post.upvoteCount);
-    }, [post.upvoteCount]);
+        setUserHasUpvoted(post.userHasUpvoted);
+    }, [post]);
 
     const toggleUpvote = () => {
         if (userHasUpvoted) {
