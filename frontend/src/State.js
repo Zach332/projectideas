@@ -16,8 +16,8 @@ export const themePersistenceKey = "theme_persistent_storage";
 
 const firstUserState = {
     loggedIn: false,
-    id: "",
-    username: "",
+    id: null,
+    username: null,
     admin: false,
 };
 
