@@ -75,6 +75,23 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
+    private <T> Optional<T> readDocument(
+        String id,
+        String partitionKey,
+        CosmosContainer container,
+        Class<T> documentType
+    ) {
+        try {
+            return Optional.of(
+                container
+                    .readItem(id, new PartitionKey(partitionKey), documentType)
+                    .getItem()
+            );
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
     private <T> Optional<T> singleDocumentQuery(
         SelectQuery query,
         CosmosContainer container,
@@ -289,11 +306,7 @@ public class Database {
     }
 
     public Optional<User> getUser(String userId) {
-        return singleDocumentQuery(
-            GenericQueries.queryByPartitionKey(userId, User.class),
-            userContainer,
-            User.class
-        );
+        return readDocument(userId, userId, userContainer, User.class);
     }
 
     public Optional<User> getUserByEmail(String email) {
@@ -618,11 +631,7 @@ public class Database {
     }
 
     public Optional<Idea> getIdea(String id) {
-        return singleDocumentQuery(
-            GenericQueries.queryByPartitionKey(id, Idea.class),
-            postContainer,
-            Idea.class
-        );
+        return readDocument(id, id, postContainer, Idea.class);
     }
 
     public void updateIdea(Idea idea) {
@@ -801,12 +810,9 @@ public class Database {
         String recipientId,
         String messageId
     ) {
-        return singleDocumentQuery(
-            GenericQueries.queryByIdAndPartitionKey(
-                messageId,
-                recipientId,
-                ReceivedMessage.class
-            ),
+        return readDocument(
+            messageId,
+            recipientId,
             userContainer,
             ReceivedMessage.class
         );
@@ -949,6 +955,7 @@ public class Database {
     }
 
     public <T extends Tag> Optional<T> getTag(String name, Class<T> classType) {
+        // TODO: Change tag id field to be the same as name
         return singleDocumentQuery(
             GenericQueries.queryByPartitionKey(name, classType),
             tagContainer,
@@ -1050,8 +1057,9 @@ public class Database {
     }
 
     public Optional<Project> getProject(String projectId) {
-        return singleDocumentQuery(
-            GenericQueries.queryByPartitionKey(projectId, Project.class),
+        return readDocument(
+            projectId,
+            projectId,
             projectContainer,
             Project.class
         );
