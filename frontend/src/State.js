@@ -61,6 +61,7 @@ export const login = (username, id, admin) => {
 
 export const logout = () => {
     setGlobalState("user", firstUserState);
+    axios.defaults.headers.common["authorization"] = null;
 };
 
 export const post = () => {

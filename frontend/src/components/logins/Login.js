@@ -1,10 +1,6 @@
 import React from "react";
 import GoogleLogin from "react-google-login";
-import axios from "axios";
-import Success from "../general/Success";
-import XMark from "../../x.svg";
 import { toQuery } from "../utils/Routing";
-import { login, Status } from "../../State";
 import GitHubSymbol from "../../GitHub-Mark.png";
 import GitHubSymbolLight from "../../GitHub-Mark-Light.png";
 import GoogleLogo from "../../GoogleLogo.svg";
@@ -12,7 +8,6 @@ import { useGlobalState } from "../../State";
 
 export default function Login() {
     const [theme] = useGlobalState("theme");
-    const [status, setStatus] = React.useState(Status.NotSubmitted);
 
     const search = toQuery({
         client_id: process.env.REACT_APP_GITHUB_CLIENT_ID,
@@ -25,50 +20,6 @@ export default function Login() {
             "https://github.com/login/oauth/authorize?" + search;
     };
 
-    const responseGoogle = (response) => {
-        axios
-            .post("/api/login/google", {
-                token: response.accessToken,
-            })
-            .then((response) => {
-                login(
-                    response.data.username,
-                    response.data.id,
-                    response.data.admin
-                );
-                setStatus(Status.Success);
-            })
-            .catch((err) => {
-                onFailure(err);
-            });
-    };
-
-    const onFailure = (error) => {
-        console.log("Failure to retrieve code from login data: " + error);
-        setStatus(Status.Failure);
-    };
-
-    if (status == Status.Success) {
-        return <Success />;
-    } else if (status == Status.Failure) {
-        return (
-            <div className="text-center">
-                <img
-                    src={XMark}
-                    className="mx-auto w-25 d-block py-4"
-                    alt="Login failed"
-                />
-                <h2>Login failed</h2>
-                <button
-                    className="btn btn-primary mt-4 btn-lg"
-                    onClick={() => setStatus(Status.NotSubmitted)}
-                >
-                    Try again
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div className="container">
             <img
@@ -80,6 +31,8 @@ export default function Login() {
             <div className="text-center pb-5">
                 <GoogleLogin
                     clientId="449086482050-t6e9tflhou1r9b905s42pvjtbvac23hl.apps.googleusercontent.com"
+                    uxMode="redirect"
+                    redirectUri={window.location.href + "/oauth2/code/google"}
                     render={(renderProps) => (
                         <button
                             type="btn btn-primary"
@@ -107,8 +60,6 @@ export default function Login() {
                             </svg>
                         </button>
                     )}
-                    onSuccess={responseGoogle}
-                    onFailure={responseGoogle}
                     cookiePolicy={"single_host_origin"}
                 />
             </div>
