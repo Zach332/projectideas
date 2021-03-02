@@ -96,6 +96,7 @@ export default function CreateIdea() {
                             value={idea.content}
                             className="form-control"
                             rows="10"
+                            id="content"
                             onChange={handleInputChange}
                         ></textarea>
                     </div>
