@@ -225,6 +225,13 @@ public class Database {
         Class<S> documentType
     ) {
         /**
+         * Only upvote if the user exists
+         */
+        if (getUser(upvote.getId()).isEmpty()) {
+            return;
+        }
+
+        /**
          * Only upvote if the user has not already upvoted the document
          */
         try {
