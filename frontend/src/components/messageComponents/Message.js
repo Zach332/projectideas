@@ -5,6 +5,7 @@ import SendMessageModal from "./SendMessageModal";
 import { formatTime } from "../utils/TimeFormatter";
 import Modal from "../layout/Modal";
 import { useToasts } from "react-toast-notifications";
+import { Link } from "react-router-dom";
 
 export default function Message({ message, setRerender }) {
     const { addToast } = useToasts();
@@ -26,6 +27,35 @@ export default function Message({ message, setRerender }) {
                 });
             });
     };
+
+    let recipientHeader;
+    if (message.senderUsername != null) {
+        if (message.groupMessage) {
+            recipientHeader = (
+                <div>
+                    From {message.senderUsername} to team:{" "}
+                    <Link to={"/project/" + message.recipientProjectId}>
+                        {message.recipientProjectName}
+                    </Link>
+                </div>
+            );
+        } else {
+            recipientHeader = <div>From {message.senderUsername}</div>;
+        }
+    } else {
+        if (message.groupMessage) {
+            recipientHeader = (
+                <div>
+                    To team:{" "}
+                    <Link to={"/project/" + message.recipientProjectId}>
+                        {message.recipientProjectName}
+                    </Link>
+                </div>
+            );
+        } else {
+            recipientHeader = <div>To {message.recipientUsername}</div>;
+        }
+    }
 
     return (
         <motion.div
@@ -93,16 +123,7 @@ export default function Message({ message, setRerender }) {
                         New
                     </span>
                 )}
-                {message.senderUsername != null
-                    ? "From " +
-                      message.senderUsername +
-                      (message.groupMessage
-                          ? " to team: " + message.recipientProjectName
-                          : "")
-                    : "To " +
-                      (message.groupMessage
-                          ? "team: " + message.recipientProjectName
-                          : message.recipientUsername)}
+                {recipientHeader}
                 <span className="text-muted">
                     {" "}
                     {formatTime(message.timeSent)}
