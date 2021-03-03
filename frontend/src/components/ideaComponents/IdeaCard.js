@@ -42,7 +42,7 @@ export default function IdeaCard({ idea }) {
 
     return (
         <div className="card">
-            <div className="card-header d-flex">
+            <div className="card-header d-flex flex-wrap">
                 <h1 className="me-auto">{idea.title}</h1>
                 <Upvotes post={idea} postType="idea"></Upvotes>
             </div>
