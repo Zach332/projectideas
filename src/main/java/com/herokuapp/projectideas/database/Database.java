@@ -206,16 +206,27 @@ public class Database {
         return new DocumentPage<>(orderedDocuments, partitionKeys.isLastPage());
     }
 
-    public <T extends RootDocument> DocumentPage<T> getPostPageFromIds(
+    public DocumentPage<Idea> getIdeaPageFromIds(
         DocumentPage<String> ids,
-        int pageNum,
-        Class<T> classType
+        int pageNum
     ) {
         return getDocumentPageFromPartitionKeyPage(
             ids,
             postContainer,
             pageNum,
-            classType
+            Idea.class
+        );
+    }
+
+    public DocumentPage<Project> getProjectPageFromIds(
+        DocumentPage<String> ids,
+        int pageNum
+    ) {
+        return getDocumentPageFromPartitionKeyPage(
+            ids,
+            projectContainer,
+            pageNum,
+            Project.class
         );
     }
 
