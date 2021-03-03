@@ -17,7 +17,7 @@ import Tags from "./components/pages/Tags";
 import JoinProject from "./components/pages/JoinProject";
 import CreateProject from "./components/pages/CreateProject";
 import GitHubLogin from "./components/logins/Login";
-import LoginLanding from "./components/logins/LoginLanding";
+import LoginLanding from "./components/logins/LoginLandingGithub";
 import MyProjects from "./components/pages/MyProjects";
 import Projects from "./components/pages/Projects";
 import StyleDiv from "./components/general/StyleDiv";
