@@ -5,6 +5,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { useToasts } from "react-toast-notifications";
 import LoginWarning from "./../logins/LoginWarning";
 import { useGlobalState } from "../../State";
+import { Prompt } from "react-router-dom";
 
 export default function SendMessageModal({
     recipient,
@@ -67,6 +68,10 @@ export default function SendMessageModal({
 
     return (
         <div>
+            <Prompt
+                when={messageToSend != ""}
+                message="You have unsaved changes; are you sure you want to leave?"
+            />
             <Modal
                 id={id}
                 title={"Send message to " + recipient}

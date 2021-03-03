@@ -6,6 +6,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
+import { Prompt } from "react-router-dom";
 
 export default function EditProject({ originalProject, setStatus }) {
     const [edited, setEdited] = React.useState(false);
@@ -68,6 +69,10 @@ export default function EditProject({ originalProject, setStatus }) {
             <Helmet>
                 <title>Edit Project | {Globals.Title}</title>
             </Helmet>
+            <Prompt
+                when={edited}
+                message="You have unsaved changes; are you sure you want to leave?"
+            />
             <h1>Update project</h1>
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="form-group">

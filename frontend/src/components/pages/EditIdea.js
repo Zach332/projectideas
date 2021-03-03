@@ -7,7 +7,7 @@ import IdeaCard from "../ideaComponents/IdeaCard";
 import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet";
 import { Globals } from "../../GlobalData";
-import { Link } from "react-router-dom";
+import { Link, Prompt } from "react-router-dom";
 
 export default function EditIdea({ originalIdea, setStatus }) {
     const { addToast } = useToasts();
@@ -53,6 +53,10 @@ export default function EditIdea({ originalIdea, setStatus }) {
             <Helmet>
                 <title>Edit Idea | {Globals.Title}</title>
             </Helmet>
+            <Prompt
+                when={edited}
+                message="You have unsaved changes; are you sure you want to leave?"
+            />
             <form className="py-4" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="title">Title</label>
