@@ -194,10 +194,9 @@ public class SearchController {
     ) {
         List<String> idResults = searchForIdea(queryString);
         boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Idea> ideaResultsPage = database.getPostPageFromIds(
+        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
             new DocumentPage<>(idResults, isLastPage),
-            page,
-            Idea.class
+            page
         );
 
         List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
@@ -215,10 +214,9 @@ public class SearchController {
     ) {
         List<String> idResults = searchForProject(queryString);
         boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Project> projectResultsPage = database.getPostPageFromIds(
+        DocumentPage<Project> projectResultsPage = database.getProjectPageFromIds(
             new DocumentPage<>(idResults, isLastPage),
-            page,
-            Project.class
+            page
         );
 
         List<PreviewProjectDTO> projectPreviews = projectResultsPage
