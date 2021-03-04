@@ -465,7 +465,7 @@ public class Database {
                 GenericQueries
                     .queryByPartitionKey(userId, UserPostedIdea.class)
                     .valueOf("ideaId")
-                    .orderBy("timePosted", Order.DESC),
+                    .orderBy("timeCreated", Order.DESC),
                 userContainer,
                 pageNum,
                 String.class
@@ -551,7 +551,7 @@ public class Database {
             GenericQueries
                 .queryByType(Idea.class)
                 .addRestrictions(new RestrictionBuilder().eq("deleted", false))
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             Idea.class
         );
@@ -614,7 +614,7 @@ public class Database {
             GenericQueries
                 .queryByType(Idea.class)
                 .addRestrictions(new RestrictionBuilder().eq("deleted", false))
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             pageNum,
             Idea.class
@@ -627,7 +627,7 @@ public class Database {
                 .queryByType(Idea.class)
                 .addRestrictions(new RestrictionBuilder().eq("deleted", false))
                 .arrayContains("tags", tag)
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             pageNum,
             Idea.class
@@ -642,7 +642,7 @@ public class Database {
                     new RestrictionBuilder().eq("deleted", false),
                     new RestrictionBuilder().in("ideaId", ideaIds.toArray())
                 )
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             Idea.class
         );
@@ -704,7 +704,7 @@ public class Database {
         return multipleDocumentQuery(
             GenericQueries
                 .queryByPartitionKey(ideaId, Comment.class)
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             Comment.class
         );

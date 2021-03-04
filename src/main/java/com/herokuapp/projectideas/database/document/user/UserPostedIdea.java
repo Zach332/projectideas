@@ -14,14 +14,14 @@ public class UserPostedIdea implements RootDocument {
     protected String type;
     protected String userId;
     protected String ideaId;
-    protected long timePosted;
+    protected long timeCreated;
 
     public UserPostedIdea(String userId, String ideaId) {
         this.id = UUID.randomUUID().toString();
         this.type = "UserPostedIdea";
         this.userId = userId;
         this.ideaId = ideaId;
-        this.timePosted = Instant.now().getEpochSecond();
+        this.timeCreated = Instant.now().getEpochSecond();
     }
 
     public String getPartitionKey() {
