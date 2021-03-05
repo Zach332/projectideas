@@ -235,7 +235,7 @@ public class SearchController {
         List<String> idResults = searchForIdea(queryString);
         boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
         DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
-            new DocumentPage<>(idResults, isLastPage),
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
             page
         );
 
@@ -255,7 +255,7 @@ public class SearchController {
         List<String> idResults = searchForProject(queryString);
         boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
         DocumentPage<Project> projectResultsPage = database.getProjectPageFromIds(
-            new DocumentPage<>(idResults, isLastPage),
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
             page
         );
 
@@ -271,7 +271,7 @@ public class SearchController {
         List<String> idResults = getIdeasByHotness();
         boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
         DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
-            new DocumentPage<>(idResults, isLastPage),
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
             page
         );
 
@@ -300,5 +300,18 @@ public class SearchController {
             .stream()
             .map(doc -> doc.get("name"))
             .collect(Collectors.toList());
+    }
+
+    private List<String> clampIdListToPage(List<String> ids, int page) {
+        return ids.subList(
+            clamp((page - 1) * Database.ITEMS_PER_PAGE, ids.size()),
+            clamp(page * Database.ITEMS_PER_PAGE, ids.size())
+        );
+    }
+
+    private int clamp(int value, int maximum) {
+        if (value < 0) return 0;
+        if (value > maximum) return maximum;
+        return value;
     }
 }
