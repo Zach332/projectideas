@@ -4,7 +4,9 @@ import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.Tag;
+import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.io.IOException;
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -12,8 +14,10 @@ import lombok.NoArgsConstructor;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FeatureField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.util.NumericUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,6 +70,24 @@ public class IndexController {
                 new TextField("content", idea.getContent(), Field.Store.YES)
             );
             doc.add(new TextField("id", idea.getId(), Field.Store.YES));
+            doc.add(
+                new SortedNumericDocValuesField(
+                    "recency",
+                    NumericUtils.floatToSortableInt(getRecencyScore(idea))
+                )
+            );
+            doc.add(
+                new SortedNumericDocValuesField(
+                    "upvotes",
+                    NumericUtils.floatToSortableInt(getUpvoteScore(idea))
+                )
+            );
+            doc.add(
+                new SortedNumericDocValuesField(
+                    "hotness",
+                    NumericUtils.floatToSortableInt(getHotnessScore(idea))
+                )
+            );
             docs.add(doc);
         }
         ideaIndexWriter.addDocuments(docs);
@@ -85,6 +107,24 @@ public class IndexController {
                 )
             );
             doc.add(new TextField("id", project.getId(), Field.Store.YES));
+            doc.add(
+                new SortedNumericDocValuesField(
+                    "recency",
+                    NumericUtils.floatToSortableInt(getRecencyScore(project))
+                )
+            );
+            doc.add(
+                new SortedNumericDocValuesField(
+                    "upvotes",
+                    NumericUtils.floatToSortableInt(getUpvoteScore(project))
+                )
+            );
+            doc.add(
+                new SortedNumericDocValuesField(
+                    "hotness",
+                    NumericUtils.floatToSortableInt(getHotnessScore(project))
+                )
+            );
             docs.add(doc);
         }
         projectIndexWriter.addDocuments(docs);
@@ -111,6 +151,24 @@ public class IndexController {
         doc.add(new TextField("title", idea.getTitle(), Field.Store.YES));
         doc.add(new TextField("content", idea.getContent(), Field.Store.YES));
         doc.add(new TextField("id", idea.getId(), Field.Store.YES));
+        doc.add(
+            new SortedNumericDocValuesField(
+                "recency",
+                NumericUtils.floatToSortableInt(getRecencyScore(idea))
+            )
+        );
+        doc.add(
+            new SortedNumericDocValuesField(
+                "upvotes",
+                NumericUtils.floatToSortableInt(getUpvoteScore(idea))
+            )
+        );
+        doc.add(
+            new SortedNumericDocValuesField(
+                "hotness",
+                NumericUtils.floatToSortableInt(getHotnessScore(idea))
+            )
+        );
         ideaIndexWriter.addDocument(doc);
         ideaIndexWriter.commit();
     }
@@ -126,8 +184,40 @@ public class IndexController {
             )
         );
         doc.add(new TextField("id", project.getId(), Field.Store.YES));
+        doc.add(
+            new SortedNumericDocValuesField(
+                "recency",
+                NumericUtils.floatToSortableInt(getRecencyScore(project))
+            )
+        );
+        doc.add(
+            new SortedNumericDocValuesField(
+                "upvotes",
+                NumericUtils.floatToSortableInt(getUpvoteScore(project))
+            )
+        );
+        doc.add(
+            new SortedNumericDocValuesField(
+                "hotness",
+                NumericUtils.floatToSortableInt(getHotnessScore(project))
+            )
+        );
         projectIndexWriter.addDocument(doc);
         projectIndexWriter.commit();
+    }
+
+    private float getUpvoteScore(Votable votable) {
+        return (float) Math.log10(votable.getUpvoteCount());
+    }
+
+    private float getRecencyScore(Votable votable) {
+        return votable.getTimeCreated() - 1134028003;
+    }
+
+    private float getHotnessScore(Votable votable) {
+        float upvoteScore = getUpvoteScore(votable);
+        float recencyScore = getRecencyScore(votable);
+        return upvoteScore + (recencyScore / 45000);
     }
 
     public void deleteIdea(String ideaId) throws IOException {

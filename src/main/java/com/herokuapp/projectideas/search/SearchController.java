@@ -23,10 +23,14 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortedNumericSortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +86,33 @@ public class SearchController {
             booleanQuery.add(phraseQueryContent.build(), Occur.SHOULD);
 
             TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            List<Document> documents = new ArrayList<>();
+            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                documents.add(indexSearcher.doc(scoreDoc.doc));
+            }
+
+            ideaSearcherManager.release(indexSearcher);
+            return documents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Document> searchIdeaIndexByScore(String scoreType) {
+        try {
+            ideaSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = ideaSearcherManager.acquire();
+
+            Sort sort = new Sort(
+                new SortedNumericSortField(scoreType, SortField.Type.LONG, true)
+            );
+            TopDocs topDocs = indexSearcher.search(
+                new MatchAllDocsQuery(),
+                100000,
+                sort
+            );
+
             List<Document> documents = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
@@ -178,6 +209,15 @@ public class SearchController {
         return ids;
     }
 
+    private List<String> getIdeasByHotness() {
+        List<Document> documents = searchIdeaIndexByScore("hotness");
+        List<String> ids = documents
+            .stream()
+            .map(doc -> doc.get("id"))
+            .collect(Collectors.toList());
+        return ids;
+    }
+
     private List<String> searchForProject(String queryString) {
         List<Document> documents = searchProjectIndex(queryString);
         List<String> ids = documents
@@ -225,6 +265,22 @@ public class SearchController {
             .map(project -> mapper.previewProjectDTO(project, userId, database))
             .collect(Collectors.toList());
         return new PreviewProjectPageDTO(projectPreviews, isLastPage);
+    }
+
+    public PreviewIdeaPageDTO getIdeaPageByHotness(int page, String userId) {
+        List<String> idResults = getIdeasByHotness();
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
+            new DocumentPage<>(idResults, isLastPage),
+            page
+        );
+
+        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
+            .getDocuments()
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
+            .collect(Collectors.toList());
+        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
     }
 
     public List<String> searchForIdeaTags(String queryString) {
