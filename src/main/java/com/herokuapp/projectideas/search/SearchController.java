@@ -102,7 +102,7 @@ public class SearchController {
         }
     }
 
-    private List<Document> searchIdeaIndexByScore(String scoreType) {
+    private List<Document> getIdeaIndexSortedBy(String scoreType) {
         try {
             ideaSearcherManager.maybeRefresh();
             IndexSearcher indexSearcher = ideaSearcherManager.acquire();
@@ -167,6 +167,33 @@ public class SearchController {
         }
     }
 
+    private List<Document> getProjectIndexSortedBy(String scoreType) {
+        try {
+            projectSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = projectSearcherManager.acquire();
+
+            Sort sort = new Sort(
+                new SortedNumericSortField(scoreType, SortField.Type.LONG, true)
+            );
+            TopDocs topDocs = indexSearcher.search(
+                new MatchAllDocsQuery(),
+                100000,
+                sort
+            );
+
+            List<Document> documents = new ArrayList<>();
+            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                documents.add(indexSearcher.doc(scoreDoc.doc));
+            }
+
+            projectSearcherManager.release(indexSearcher);
+            return documents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private <T extends Tag> List<Document> searchTagIndex(
         String queryString,
         Class<T> classType
@@ -215,13 +242,46 @@ public class SearchController {
         return ids;
     }
 
-    private List<String> getIdeasByHotness() {
-        List<Document> documents = searchIdeaIndexByScore("hotness");
+    private List<String> getIdeasSortedBy(String scoreType) {
+        List<Document> documents = getIdeaIndexSortedBy(scoreType);
         List<String> ids = documents
             .stream()
             .map(doc -> doc.get("id"))
             .collect(Collectors.toList());
         return ids;
+    }
+
+    private List<String> getIdeasByRecency() {
+        return getIdeasSortedBy("recency");
+    }
+
+    private List<String> getIdeasByUpvotes() {
+        return getIdeasSortedBy("upvotes");
+    }
+
+    private List<String> getIdeasByHotness() {
+        return getIdeasSortedBy("hotness");
+    }
+
+    private List<String> getProjectsSortedBy(String scoreType) {
+        List<Document> documents = getProjectIndexSortedBy(scoreType);
+        List<String> ids = documents
+            .stream()
+            .map(doc -> doc.get("id"))
+            .collect(Collectors.toList());
+        return ids;
+    }
+
+    private List<String> getProjectsByRecency() {
+        return getProjectsSortedBy("recency");
+    }
+
+    private List<String> getProjectsByUpvotes() {
+        return getProjectsSortedBy("upvotes");
+    }
+
+    private List<String> getProjectsByHotness() {
+        return getProjectsSortedBy("hotness");
     }
 
     private List<String> searchForProject(String queryString) {
@@ -239,18 +299,7 @@ public class SearchController {
         int page
     ) {
         List<String> idResults = searchForIdea(queryString);
-        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
-            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
-            page
-        );
-
-        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
-            .getDocuments()
-            .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
-            .collect(Collectors.toList());
-        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
+        return getIdeaPage(idResults, page, userId);
     }
 
     public PreviewProjectPageDTO searchForProjectByPage(
@@ -259,34 +308,46 @@ public class SearchController {
         String userId
     ) {
         List<String> idResults = searchForProject(queryString);
-        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Project> projectResultsPage = database.getProjectPageFromIds(
-            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
-            page
-        );
+        return getProjectPage(idResults, page, userId);
+    }
 
-        List<PreviewProjectDTO> projectPreviews = projectResultsPage
-            .getDocuments()
-            .stream()
-            .map(project -> mapper.previewProjectDTO(project, userId, database))
-            .collect(Collectors.toList());
-        return new PreviewProjectPageDTO(projectPreviews, isLastPage);
+    public PreviewIdeaPageDTO getIdeaPageByRecency(int page, String userId) {
+        List<String> idResults = getIdeasByRecency();
+        return getIdeaPage(idResults, page, userId);
+    }
+
+    public PreviewIdeaPageDTO getIdeaPageByUpvotes(int page, String userId) {
+        List<String> idResults = getIdeasByUpvotes();
+        return getIdeaPage(idResults, page, userId);
     }
 
     public PreviewIdeaPageDTO getIdeaPageByHotness(int page, String userId) {
         List<String> idResults = getIdeasByHotness();
-        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
-            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
-            page
-        );
+        return getIdeaPage(idResults, page, userId);
+    }
 
-        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
-            .getDocuments()
-            .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
-            .collect(Collectors.toList());
-        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
+    public PreviewProjectPageDTO getProjectPageByRecency(
+        int page,
+        String userId
+    ) {
+        List<String> idResults = getProjectsByRecency();
+        return getProjectPage(idResults, page, userId);
+    }
+
+    public PreviewProjectPageDTO getProjectPageByUpvotes(
+        int page,
+        String userId
+    ) {
+        List<String> idResults = getProjectsByUpvotes();
+        return getProjectPage(idResults, page, userId);
+    }
+
+    public PreviewProjectPageDTO getProjectPageByHotness(
+        int page,
+        String userId
+    ) {
+        List<String> idResults = getProjectsByHotness();
+        return getProjectPage(idResults, page, userId);
     }
 
     public List<String> searchForIdeaTags(String queryString) {
@@ -306,6 +367,44 @@ public class SearchController {
             .stream()
             .map(doc -> doc.get("name"))
             .collect(Collectors.toList());
+    }
+
+    private PreviewIdeaPageDTO getIdeaPage(
+        List<String> idResults,
+        int page,
+        String userId
+    ) {
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
+            page
+        );
+
+        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
+            .getDocuments()
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
+            .collect(Collectors.toList());
+        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
+    }
+
+    private PreviewProjectPageDTO getProjectPage(
+        List<String> idResults,
+        int page,
+        String userId
+    ) {
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Project> projectResultsPage = database.getProjectPageFromIds(
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
+            page
+        );
+
+        List<PreviewProjectDTO> projectPreviews = projectResultsPage
+            .getDocuments()
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project, userId, database))
+            .collect(Collectors.toList());
+        return new PreviewProjectPageDTO(projectPreviews, isLastPage);
     }
 
     private List<String> clampIdListToPage(List<String> ids, int page) {
