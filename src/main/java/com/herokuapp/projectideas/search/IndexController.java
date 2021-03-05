@@ -64,30 +64,7 @@ public class IndexController {
     private void indexIdeas(List<Idea> ideaList) throws IOException {
         List<Document> docs = new ArrayList<Document>();
         for (Idea idea : ideaList) {
-            Document doc = new Document();
-            doc.add(new TextField("title", idea.getTitle(), Field.Store.YES));
-            doc.add(
-                new TextField("content", idea.getContent(), Field.Store.YES)
-            );
-            doc.add(new TextField("id", idea.getId(), Field.Store.YES));
-            doc.add(
-                new SortedNumericDocValuesField(
-                    "recency",
-                    NumericUtils.floatToSortableInt(getRecencyScore(idea))
-                )
-            );
-            doc.add(
-                new SortedNumericDocValuesField(
-                    "upvotes",
-                    NumericUtils.floatToSortableInt(getUpvoteScore(idea))
-                )
-            );
-            doc.add(
-                new SortedNumericDocValuesField(
-                    "hotness",
-                    NumericUtils.floatToSortableInt(getHotnessScore(idea))
-                )
-            );
+            Document doc = getIdeaDoc(idea);
             docs.add(doc);
         }
         ideaIndexWriter.addDocuments(docs);
@@ -97,34 +74,7 @@ public class IndexController {
     private void indexProjects(List<Project> projectList) throws IOException {
         List<Document> docs = new ArrayList<Document>();
         for (Project project : projectList) {
-            Document doc = new Document();
-            doc.add(new TextField("name", project.getName(), Field.Store.YES));
-            doc.add(
-                new TextField(
-                    "description",
-                    project.getDescription(),
-                    Field.Store.YES
-                )
-            );
-            doc.add(new TextField("id", project.getId(), Field.Store.YES));
-            doc.add(
-                new SortedNumericDocValuesField(
-                    "recency",
-                    NumericUtils.floatToSortableInt(getRecencyScore(project))
-                )
-            );
-            doc.add(
-                new SortedNumericDocValuesField(
-                    "upvotes",
-                    NumericUtils.floatToSortableInt(getUpvoteScore(project))
-                )
-            );
-            doc.add(
-                new SortedNumericDocValuesField(
-                    "hotness",
-                    NumericUtils.floatToSortableInt(getHotnessScore(project))
-                )
-            );
+            Document doc = getProjectDoc(project);
             docs.add(doc);
         }
         projectIndexWriter.addDocuments(docs);
@@ -134,12 +84,7 @@ public class IndexController {
     private void indexTags(List<Tag> tagList) throws IOException {
         List<Document> docs = new ArrayList<Document>();
         for (Tag tag : tagList) {
-            Document doc = new Document();
-            doc.add(new TextField("name", tag.getName(), Field.Store.YES));
-            doc.add(new FeatureField("features", "usages", tag.getUsages()));
-            doc.add(
-                new TextField("type", tag.getType().toString(), Field.Store.YES)
-            );
+            Document doc = getTagDoc(tag);
             docs.add(doc);
         }
         tagIndexWriter.addDocuments(docs);
@@ -147,6 +92,18 @@ public class IndexController {
     }
 
     public void indexIdea(Idea idea) throws IOException {
+        Document doc = getIdeaDoc(idea);
+        ideaIndexWriter.addDocument(doc);
+        ideaIndexWriter.commit();
+    }
+
+    public void indexProject(Project project) throws IOException {
+        Document doc = getProjectDoc(project);
+        projectIndexWriter.addDocument(doc);
+        projectIndexWriter.commit();
+    }
+
+    private Document getIdeaDoc(Idea idea) {
         Document doc = new Document();
         doc.add(new TextField("title", idea.getTitle(), Field.Store.YES));
         doc.add(new TextField("content", idea.getContent(), Field.Store.YES));
@@ -169,11 +126,10 @@ public class IndexController {
                 NumericUtils.floatToSortableInt(getHotnessScore(idea))
             )
         );
-        ideaIndexWriter.addDocument(doc);
-        ideaIndexWriter.commit();
+        return doc;
     }
 
-    public void indexProject(Project project) throws IOException {
+    private Document getProjectDoc(Project project) {
         Document doc = new Document();
         doc.add(new TextField("name", project.getName(), Field.Store.YES));
         doc.add(
@@ -202,8 +158,17 @@ public class IndexController {
                 NumericUtils.floatToSortableInt(getHotnessScore(project))
             )
         );
-        projectIndexWriter.addDocument(doc);
-        projectIndexWriter.commit();
+        return doc;
+    }
+
+    private Document getTagDoc(Tag tag) {
+        Document doc = new Document();
+        doc.add(new TextField("name", tag.getName(), Field.Store.YES));
+        doc.add(new FeatureField("features", "usages", tag.getUsages()));
+        doc.add(
+            new TextField("type", tag.getType().toString(), Field.Store.YES)
+        );
+        return doc;
     }
 
     private float getUpvoteScore(Votable votable) {
