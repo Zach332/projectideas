@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.post;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import lombok.*;
 
@@ -15,6 +16,9 @@ public abstract class Post implements RootDocument {
     protected String authorId;
     protected String authorUsername;
     protected String content;
+
+    @JsonProperty("_etag")
+    protected String etag;
 
     public String getPartitionKey() {
         return ideaId;

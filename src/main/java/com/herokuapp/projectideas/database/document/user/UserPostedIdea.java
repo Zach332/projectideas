@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.database.document.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import java.time.Instant;
 import java.util.UUID;
@@ -15,6 +16,9 @@ public class UserPostedIdea implements RootDocument {
     protected String userId;
     protected String ideaId;
     protected long timePosted;
+
+    @JsonProperty("_etag")
+    protected String etag;
 
     public UserPostedIdea(String userId, String ideaId) {
         this.id = UUID.randomUUID().toString();

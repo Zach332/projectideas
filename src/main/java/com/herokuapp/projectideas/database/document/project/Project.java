@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.database.document.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
@@ -34,6 +35,9 @@ public class Project implements RootDocument, Votable {
     protected List<ProjectJoinRequest> usersRequestingToJoin;
     protected List<String> tags;
     protected int upvoteCount;
+
+    @JsonProperty("_etag")
+    protected String etag;
 
     public Project(
         String name,
