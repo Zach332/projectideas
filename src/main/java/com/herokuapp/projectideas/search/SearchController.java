@@ -85,7 +85,10 @@ public class SearchController {
             booleanQuery.add(phraseQueryTitle.build(), Occur.SHOULD);
             booleanQuery.add(phraseQueryContent.build(), Occur.SHOULD);
 
-            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            TopDocs topDocs = indexSearcher.search(
+                booleanQuery.build(),
+                Database.ITEMS_PER_PAGE * 10
+            );
             List<Document> documents = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
@@ -147,7 +150,10 @@ public class SearchController {
             booleanQuery.add(phraseQueryName.build(), Occur.SHOULD);
             booleanQuery.add(phraseQueryDescription.build(), Occur.SHOULD);
 
-            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            TopDocs topDocs = indexSearcher.search(
+                booleanQuery.build(),
+                Database.ITEMS_PER_PAGE * 10
+            );
             List<Document> documents = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
