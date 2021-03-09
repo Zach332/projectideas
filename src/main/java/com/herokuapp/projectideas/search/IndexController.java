@@ -172,7 +172,7 @@ public class IndexController {
     }
 
     private float getUpvoteScore(Votable votable) {
-        return (float) Math.log10(votable.getUpvoteCount());
+        return (float) Math.log10(votable.getUpvoteCount() + 1);
     }
 
     private float getRecencyScore(Votable votable) {
