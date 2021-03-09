@@ -571,6 +571,9 @@ public class Database {
         // Save idea to database
         postContainer.createItem(idea);
 
+        // Update idea index
+        indexController.tryIndexIdea(idea);
+
         // Add initial author upvote
         upvoteIdea(idea.getIdeaId(), idea.getAuthorId());
 
@@ -580,9 +583,6 @@ public class Database {
             idea.getIdeaId()
         );
         userContainer.createItem(postedIdea);
-
-        // Update idea index
-        indexController.tryIndexIdea(idea);
     }
 
     public void upvoteIdea(String ideaId, String userId) {
@@ -1012,6 +1012,8 @@ public class Database {
         }
         projectContainer.createItem(project);
 
+        if (project.isPublicProject()) indexController.tryIndexProject(project);
+
         upvoteProject(project.getId(), projectCreatorId);
 
         UserJoinedProject joinedProject = new UserJoinedProject(
@@ -1019,8 +1021,6 @@ public class Database {
             project.getProjectId()
         );
         userContainer.createItem(joinedProject);
-
-        if (project.isPublicProject()) indexController.tryIndexProject(project);
     }
 
     public void upvoteProject(String projectId, String userId) {
