@@ -16,19 +16,20 @@ export default function Projects() {
     const [projects, setProjects] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
+    const [sort, setSort] = React.useState("hotness");
     const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
     useEffect(() => {
         setStatus(Status.Loading);
         axios
-            .get("/api/projects?" + toQuery({ page: params.page }))
+            .get("/api/projects?" + toQuery({ page: params.page, sort: sort }))
             .then((response) => {
                 setProjects(response.data.projectPreviews);
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
-    }, [location, rerender]);
+    }, [location, rerender, sort]);
 
     const goToMyProjects = () => {
         history.push("/my-projects");
@@ -52,9 +53,19 @@ export default function Projects() {
                 <title>Projects | {Globals.Title}</title>
             </Helmet>
             <div className="d-flex align-items-center">
-                <div className="me-auto p-2">
+                <div className="p-2 me-3">
                     <h1>Projects</h1>
                 </div>
+                <select
+                    className="form-select w-auto me-auto"
+                    onChange={(event) => setSort(event.target.value)}
+                    value={sort}
+                    style={{ height: 40 }}
+                >
+                    <option value="hotness">Hot</option>
+                    <option value="upvotes">Top</option>
+                    <option value="recency">New</option>
+                </select>
                 {user.loggedIn && (
                     <div className="p-2">
                         <button
