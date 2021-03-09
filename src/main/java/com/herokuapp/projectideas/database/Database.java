@@ -260,6 +260,13 @@ public class Database {
             .getItem();
 
         document.addUpvote();
+
+        if (document instanceof Idea) {
+            indexController.tryUpdateIdea((Idea) document);
+        } else if (document instanceof Project) {
+            indexController.tryUpdateProject((Project) document);
+        }
+
         container.replaceItem(
             document,
             upvote.getPartitionKey(),
