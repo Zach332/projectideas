@@ -251,18 +251,6 @@ public class SearchController {
         return ids;
     }
 
-    private List<String> getIdeasByRecency() {
-        return getIdeasSortedBy("recency");
-    }
-
-    private List<String> getIdeasByUpvotes() {
-        return getIdeasSortedBy("upvotes");
-    }
-
-    private List<String> getIdeasByHotness() {
-        return getIdeasSortedBy("hotness");
-    }
-
     private List<String> getProjectsSortedBy(String scoreType) {
         List<Document> documents = getProjectIndexSortedBy(scoreType);
         List<String> ids = documents
@@ -270,18 +258,6 @@ public class SearchController {
             .map(doc -> doc.get("id"))
             .collect(Collectors.toList());
         return ids;
-    }
-
-    private List<String> getProjectsByRecency() {
-        return getProjectsSortedBy("recency");
-    }
-
-    private List<String> getProjectsByUpvotes() {
-        return getProjectsSortedBy("upvotes");
-    }
-
-    private List<String> getProjectsByHotness() {
-        return getProjectsSortedBy("hotness");
     }
 
     private List<String> searchForProject(String queryString) {
@@ -312,17 +288,17 @@ public class SearchController {
     }
 
     public PreviewIdeaPageDTO getIdeaPageByRecency(int page, String userId) {
-        List<String> idResults = getIdeasByRecency();
+        List<String> idResults = getIdeasSortedBy("recency");
         return getIdeaPage(idResults, page, userId);
     }
 
     public PreviewIdeaPageDTO getIdeaPageByUpvotes(int page, String userId) {
-        List<String> idResults = getIdeasByUpvotes();
+        List<String> idResults = getIdeasSortedBy("upvotes");
         return getIdeaPage(idResults, page, userId);
     }
 
     public PreviewIdeaPageDTO getIdeaPageByHotness(int page, String userId) {
-        List<String> idResults = getIdeasByHotness();
+        List<String> idResults = getIdeasSortedBy("hotness");
         return getIdeaPage(idResults, page, userId);
     }
 
@@ -330,7 +306,7 @@ public class SearchController {
         int page,
         String userId
     ) {
-        List<String> idResults = getProjectsByRecency();
+        List<String> idResults = getProjectsSortedBy("recency");
         return getProjectPage(idResults, page, userId);
     }
 
@@ -338,7 +314,7 @@ public class SearchController {
         int page,
         String userId
     ) {
-        List<String> idResults = getProjectsByUpvotes();
+        List<String> idResults = getProjectsSortedBy("upvotes");
         return getProjectPage(idResults, page, userId);
     }
 
@@ -346,7 +322,7 @@ public class SearchController {
         int page,
         String userId
     ) {
-        List<String> idResults = getProjectsByHotness();
+        List<String> idResults = getProjectsSortedBy("hotness");
         return getProjectPage(idResults, page, userId);
     }
 
