@@ -21,6 +21,7 @@ public class Project implements RootDocument, Votable {
     protected String type;
     protected String projectId;
     protected long timeCreated;
+    protected long timeLastEdited;
     /**
      * Id of the idea associated with this project
      */
@@ -47,7 +48,9 @@ public class Project implements RootDocument, Votable {
         this.id = UUID.randomUUID().toString();
         this.type = "Project";
         this.projectId = this.id;
-        this.timeCreated = Instant.now().getEpochSecond();
+        long now = Instant.now().getEpochSecond();
+        this.timeCreated = now;
+        this.timeLastEdited = now;
         this.ideaId = ideaId;
         this.name = name;
         this.description = description;
