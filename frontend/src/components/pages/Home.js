@@ -14,19 +14,20 @@ export default function Home() {
     const [ideas, setIdeas] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
+    const [sort, setSort] = React.useState("hotness");
     const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 
     useEffect(() => {
         setStatus(Status.Loading);
         axios
-            .get("/api/ideas?" + toQuery({ page: params.page }))
+            .get("/api/ideas?" + toQuery({ page: params.page, sort: sort }))
             .then((response) => {
                 setIdeas(response.data.ideaPreviews);
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
-    }, [location]);
+    }, [location, sort]);
 
     const onCLick = () => {
         history.push("/new-idea");
@@ -62,10 +63,20 @@ export default function Home() {
             <Helmet>
                 <title>Home | {Globals.Title}</title>
             </Helmet>
-            <div className="d-flex">
-                <div className="me-auto p-2">
+            <div className="d-flex align-items-center">
+                <div className="p-2 me-3">
                     <h1>Home</h1>
                 </div>
+                <select
+                    className="form-select w-auto me-auto"
+                    onChange={(event) => setSort(event.target.value)}
+                    value={sort}
+                    style={{ height: 40 }}
+                >
+                    <option value="hotness">Hot</option>
+                    <option value="upvotes">Top</option>
+                    <option value="recency">New</option>
+                </select>
                 <div className="p-2">
                     <button
                         type="btn btn-primary"
@@ -89,6 +100,7 @@ export default function Home() {
                     </button>
                 </div>
             </div>
+
             <LoadingDiv isLoading={status == Status.Loading}>
                 {ideaElements}
                 <div className="d-flex">

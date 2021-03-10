@@ -38,13 +38,17 @@ public class ProjectController {
     @GetMapping("/api/projects")
     public PreviewProjectPageDTO getPublicProjects(
         @RequestHeader(value = "authorization", required = false) String userId,
-        @RequestParam("page") int pageNum
+        @RequestParam("page") int pageNum,
+        @RequestParam(value = "sort", required = false) String sort
     ) {
-        return mapper.previewProjectPageDTO(
-            database.getPublicProjectsByPageNum(pageNum),
-            userId,
-            database
-        );
+        if (sort == null || sort.equals("hotness")) {
+            return searchController.getProjectPageByHotness(pageNum, userId);
+        }
+        if (sort.equals("recency")) {
+            return searchController.getProjectPageByRecency(pageNum, userId);
+        }
+        // remaining sort option is upvotes
+        return searchController.getProjectPageByUpvotes(pageNum, userId);
     }
 
     @GetMapping("/api/projects/tags")

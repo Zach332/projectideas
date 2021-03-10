@@ -7,21 +7,21 @@ import { login, Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { Link } from "react-router-dom";
 
-export default function LoginLanding() {
+export default function LoginLandingGoogle() {
     const [status, setStatus] = React.useState(Status.Loading);
 
     useEffect(() => {
-        const params = toParams(window.location.search.replace(/^\?/, ""));
+        const params = toParams(window.location.hash.replace(/^#/, ""));
         onSuccess(params);
     }, []);
 
     const onSuccess = (data) => {
-        if (!data.code) {
-            onFailure(new Error("'code' not found"));
+        if (!data.access_token) {
+            onFailure(new Error("Access token not found"));
         }
         axios
-            .post("/api/login/github", {
-                code: data.code,
+            .post("/api/login/google", {
+                token: data.access_token,
             })
             .then((response) => {
                 login(

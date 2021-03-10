@@ -185,7 +185,7 @@ export default function Idea() {
                                     >
                                         By {idea.authorUsername}
                                         <br></br>
-                                        {formatTime(idea.timePosted)}
+                                        {formatTime(idea.timeCreated)}
                                     </div>
                                     {user.loggedIn && (
                                         <div className="d-flex align-items-center">

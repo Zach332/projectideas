@@ -3,6 +3,7 @@ import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import Modal from "../layout/Modal";
+import { Prompt } from "react-router-dom";
 
 export default function ProjectJoinRequestModal({ project, submitRequest }) {
     const { addToast } = useToasts();
@@ -52,6 +53,10 @@ export default function ProjectJoinRequestModal({ project, submitRequest }) {
 
     return (
         <div>
+            <Prompt
+                when={joinRequestMessage != ""}
+                message="You have unsaved changes; are you sure you want to leave?"
+            />
             <Modal
                 id={"sendJoinRequest" + project.id}
                 title={"Send join request to " + project.name}

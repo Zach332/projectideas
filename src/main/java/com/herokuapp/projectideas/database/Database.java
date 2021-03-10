@@ -260,6 +260,13 @@ public class Database {
             .getItem();
 
         document.addUpvote();
+
+        if (document instanceof Idea) {
+            indexController.tryUpdateIdea((Idea) document);
+        } else if (document instanceof Project) {
+            indexController.tryUpdateProject((Project) document);
+        }
+
         container.replaceItem(
             document,
             upvote.getPartitionKey(),
@@ -290,6 +297,13 @@ public class Database {
             .getItem();
 
         document.removeUpvote();
+
+        if (document instanceof Idea) {
+            indexController.tryUpdateIdea((Idea) document);
+        } else if (document instanceof Project) {
+            indexController.tryUpdateProject((Project) document);
+        }
+
         container.replaceItem(
             document,
             upvote.getPartitionKey(),
@@ -465,7 +479,7 @@ public class Database {
                 GenericQueries
                     .queryByPartitionKey(userId, UserPostedIdea.class)
                     .valueOf("ideaId")
-                    .orderBy("timePosted", Order.DESC),
+                    .orderBy("timeCreated", Order.DESC),
                 userContainer,
                 pageNum,
                 String.class
@@ -551,7 +565,7 @@ public class Database {
             GenericQueries
                 .queryByType(Idea.class)
                 .addRestrictions(new RestrictionBuilder().eq("deleted", false))
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             Idea.class
         );
@@ -571,6 +585,9 @@ public class Database {
         // Save idea to database
         postContainer.createItem(idea);
 
+        // Update idea index
+        indexController.tryIndexIdea(idea);
+
         // Add initial author upvote
         upvoteIdea(idea.getIdeaId(), idea.getAuthorId());
 
@@ -580,9 +597,6 @@ public class Database {
             idea.getIdeaId()
         );
         userContainer.createItem(postedIdea);
-
-        // Update idea index
-        indexController.tryIndexIdea(idea);
     }
 
     public void upvoteIdea(String ideaId, String userId) {
@@ -614,7 +628,7 @@ public class Database {
             GenericQueries
                 .queryByType(Idea.class)
                 .addRestrictions(new RestrictionBuilder().eq("deleted", false))
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             pageNum,
             Idea.class
@@ -627,7 +641,7 @@ public class Database {
                 .queryByType(Idea.class)
                 .addRestrictions(new RestrictionBuilder().eq("deleted", false))
                 .arrayContains("tags", tag)
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             pageNum,
             Idea.class
@@ -642,7 +656,7 @@ public class Database {
                     new RestrictionBuilder().eq("deleted", false),
                     new RestrictionBuilder().in("ideaId", ideaIds.toArray())
                 )
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             Idea.class
         );
@@ -704,7 +718,7 @@ public class Database {
         return multipleDocumentQuery(
             GenericQueries
                 .queryByPartitionKey(ideaId, Comment.class)
-                .orderBy("timePosted", Order.DESC),
+                .orderBy("timeCreated", Order.DESC),
             postContainer,
             Comment.class
         );
@@ -1012,6 +1026,8 @@ public class Database {
         }
         projectContainer.createItem(project);
 
+        if (project.isPublicProject()) indexController.tryIndexProject(project);
+
         upvoteProject(project.getId(), projectCreatorId);
 
         UserJoinedProject joinedProject = new UserJoinedProject(
@@ -1019,8 +1035,6 @@ public class Database {
             project.getProjectId()
         );
         userContainer.createItem(joinedProject);
-
-        if (project.isPublicProject()) indexController.tryIndexProject(project);
     }
 
     public void upvoteProject(String projectId, String userId) {

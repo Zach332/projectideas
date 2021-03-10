@@ -45,13 +45,17 @@ public class IdeaController {
     @GetMapping("/api/ideas")
     public PreviewIdeaPageDTO getIdeas(
         @RequestHeader(value = "authorization", required = false) String userId,
-        @RequestParam("page") int pageNum
+        @RequestParam("page") int pageNum,
+        @RequestParam(value = "sort", required = false) String sort
     ) {
-        return mapper.previewIdeaPageDTO(
-            database.getIdeasByPageNum(pageNum),
-            userId,
-            database
-        );
+        if (sort == null || sort.equals("hotness")) {
+            return searchController.getIdeaPageByHotness(pageNum, userId);
+        }
+        if (sort.equals("recency")) {
+            return searchController.getIdeaPageByRecency(pageNum, userId);
+        }
+        // remaining sort option is upvotes
+        return searchController.getIdeaPageByUpvotes(pageNum, userId);
     }
 
     @GetMapping("/api/ideas/tags")

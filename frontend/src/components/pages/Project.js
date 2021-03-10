@@ -279,9 +279,9 @@ export default function Project() {
                     {project.name} | {Globals.Title}
                 </title>
             </Helmet>
-            <div className="d-flex align-items-center">
-                <h1>{project.name}</h1>
-                <div className="me-auto ms-3">
+            <div className="d-flex flex-wrap align-items-center">
+                <h1 className="me-3">{project.name}</h1>
+                <div className="me-auto">
                     <Upvotes post={project} postType="project" />
                 </div>
                 <div className="d-flex align-items-center">

@@ -15,7 +15,7 @@ public class UserPostedIdea implements RootDocument {
     protected String type;
     protected String userId;
     protected String ideaId;
-    protected long timePosted;
+    protected long timeCreated;
 
     @JsonProperty("_etag")
     protected String etag;
@@ -25,7 +25,7 @@ public class UserPostedIdea implements RootDocument {
         this.type = "UserPostedIdea";
         this.userId = userId;
         this.ideaId = ideaId;
-        this.timePosted = Instant.now().getEpochSecond();
+        this.timeCreated = Instant.now().getEpochSecond();
     }
 
     public String getPartitionKey() {

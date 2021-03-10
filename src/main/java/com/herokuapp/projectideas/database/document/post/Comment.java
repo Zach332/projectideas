@@ -17,7 +17,7 @@ public class Comment extends Post {
         this.type = "Comment";
         this.ideaId = ideaId;
         long now = Instant.now().getEpochSecond();
-        this.timePosted = now;
+        this.timeCreated = now;
         this.timeLastEdited = now;
         this.authorId = authorId;
         this.authorUsername = authorUsername;

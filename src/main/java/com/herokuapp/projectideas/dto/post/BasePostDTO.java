@@ -7,7 +7,7 @@ import lombok.*;
 abstract class BasePostDTO {
 
     private String id;
-    private long timePosted;
+    private long timeCreated;
     private long timeLastEdited;
     private String authorUsername;
     private String content;

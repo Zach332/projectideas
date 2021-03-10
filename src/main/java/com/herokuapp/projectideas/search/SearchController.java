@@ -23,10 +23,14 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortedNumericSortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +85,37 @@ public class SearchController {
             booleanQuery.add(phraseQueryTitle.build(), Occur.SHOULD);
             booleanQuery.add(phraseQueryContent.build(), Occur.SHOULD);
 
-            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            TopDocs topDocs = indexSearcher.search(
+                booleanQuery.build(),
+                Database.ITEMS_PER_PAGE * 10
+            );
+            List<Document> documents = new ArrayList<>();
+            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                documents.add(indexSearcher.doc(scoreDoc.doc));
+            }
+
+            ideaSearcherManager.release(indexSearcher);
+            return documents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Document> getIdeaIndexSortedBy(String scoreType) {
+        try {
+            ideaSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = ideaSearcherManager.acquire();
+
+            Sort sort = new Sort(
+                new SortedNumericSortField(scoreType, SortField.Type.LONG, true)
+            );
+            TopDocs topDocs = indexSearcher.search(
+                new MatchAllDocsQuery(),
+                100000,
+                sort
+            );
+
             List<Document> documents = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
@@ -116,7 +150,37 @@ public class SearchController {
             booleanQuery.add(phraseQueryName.build(), Occur.SHOULD);
             booleanQuery.add(phraseQueryDescription.build(), Occur.SHOULD);
 
-            TopDocs topDocs = indexSearcher.search(booleanQuery.build(), 30);
+            TopDocs topDocs = indexSearcher.search(
+                booleanQuery.build(),
+                Database.ITEMS_PER_PAGE * 10
+            );
+            List<Document> documents = new ArrayList<>();
+            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                documents.add(indexSearcher.doc(scoreDoc.doc));
+            }
+
+            projectSearcherManager.release(indexSearcher);
+            return documents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Document> getProjectIndexSortedBy(String scoreType) {
+        try {
+            projectSearcherManager.maybeRefresh();
+            IndexSearcher indexSearcher = projectSearcherManager.acquire();
+
+            Sort sort = new Sort(
+                new SortedNumericSortField(scoreType, SortField.Type.LONG, true)
+            );
+            TopDocs topDocs = indexSearcher.search(
+                new MatchAllDocsQuery(),
+                100000,
+                sort
+            );
+
             List<Document> documents = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 documents.add(indexSearcher.doc(scoreDoc.doc));
@@ -178,6 +242,24 @@ public class SearchController {
         return ids;
     }
 
+    private List<String> getIdeasSortedBy(String scoreType) {
+        List<Document> documents = getIdeaIndexSortedBy(scoreType);
+        List<String> ids = documents
+            .stream()
+            .map(doc -> doc.get("id"))
+            .collect(Collectors.toList());
+        return ids;
+    }
+
+    private List<String> getProjectsSortedBy(String scoreType) {
+        List<Document> documents = getProjectIndexSortedBy(scoreType);
+        List<String> ids = documents
+            .stream()
+            .map(doc -> doc.get("id"))
+            .collect(Collectors.toList());
+        return ids;
+    }
+
     private List<String> searchForProject(String queryString) {
         List<Document> documents = searchProjectIndex(queryString);
         List<String> ids = documents
@@ -193,18 +275,7 @@ public class SearchController {
         int page
     ) {
         List<String> idResults = searchForIdea(queryString);
-        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
-            new DocumentPage<>(idResults, isLastPage),
-            page
-        );
-
-        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
-            .getDocuments()
-            .stream()
-            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
-            .collect(Collectors.toList());
-        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
+        return getIdeaPage(idResults, page, userId);
     }
 
     public PreviewProjectPageDTO searchForProjectByPage(
@@ -213,18 +284,46 @@ public class SearchController {
         String userId
     ) {
         List<String> idResults = searchForProject(queryString);
-        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
-        DocumentPage<Project> projectResultsPage = database.getProjectPageFromIds(
-            new DocumentPage<>(idResults, isLastPage),
-            page
-        );
+        return getProjectPage(idResults, page, userId);
+    }
 
-        List<PreviewProjectDTO> projectPreviews = projectResultsPage
-            .getDocuments()
-            .stream()
-            .map(project -> mapper.previewProjectDTO(project, userId, database))
-            .collect(Collectors.toList());
-        return new PreviewProjectPageDTO(projectPreviews, isLastPage);
+    public PreviewIdeaPageDTO getIdeaPageByRecency(int page, String userId) {
+        List<String> idResults = getIdeasSortedBy("recency");
+        return getIdeaPage(idResults, page, userId);
+    }
+
+    public PreviewIdeaPageDTO getIdeaPageByUpvotes(int page, String userId) {
+        List<String> idResults = getIdeasSortedBy("upvotes");
+        return getIdeaPage(idResults, page, userId);
+    }
+
+    public PreviewIdeaPageDTO getIdeaPageByHotness(int page, String userId) {
+        List<String> idResults = getIdeasSortedBy("hotness");
+        return getIdeaPage(idResults, page, userId);
+    }
+
+    public PreviewProjectPageDTO getProjectPageByRecency(
+        int page,
+        String userId
+    ) {
+        List<String> idResults = getProjectsSortedBy("recency");
+        return getProjectPage(idResults, page, userId);
+    }
+
+    public PreviewProjectPageDTO getProjectPageByUpvotes(
+        int page,
+        String userId
+    ) {
+        List<String> idResults = getProjectsSortedBy("upvotes");
+        return getProjectPage(idResults, page, userId);
+    }
+
+    public PreviewProjectPageDTO getProjectPageByHotness(
+        int page,
+        String userId
+    ) {
+        List<String> idResults = getProjectsSortedBy("hotness");
+        return getProjectPage(idResults, page, userId);
     }
 
     public List<String> searchForIdeaTags(String queryString) {
@@ -244,5 +343,56 @@ public class SearchController {
             .stream()
             .map(doc -> doc.get("name"))
             .collect(Collectors.toList());
+    }
+
+    private PreviewIdeaPageDTO getIdeaPage(
+        List<String> idResults,
+        int page,
+        String userId
+    ) {
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Idea> ideaResultsPage = database.getIdeaPageFromIds(
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
+            page
+        );
+
+        List<PreviewIdeaDTO> ideaPreviews = ideaResultsPage
+            .getDocuments()
+            .stream()
+            .map(idea -> mapper.previewIdeaDTO(idea, userId, database))
+            .collect(Collectors.toList());
+        return new PreviewIdeaPageDTO(ideaPreviews, isLastPage);
+    }
+
+    private PreviewProjectPageDTO getProjectPage(
+        List<String> idResults,
+        int page,
+        String userId
+    ) {
+        boolean isLastPage = page * Database.ITEMS_PER_PAGE >= idResults.size();
+        DocumentPage<Project> projectResultsPage = database.getProjectPageFromIds(
+            new DocumentPage<>(clampIdListToPage(idResults, page), isLastPage),
+            page
+        );
+
+        List<PreviewProjectDTO> projectPreviews = projectResultsPage
+            .getDocuments()
+            .stream()
+            .map(project -> mapper.previewProjectDTO(project, userId, database))
+            .collect(Collectors.toList());
+        return new PreviewProjectPageDTO(projectPreviews, isLastPage);
+    }
+
+    private List<String> clampIdListToPage(List<String> ids, int page) {
+        return ids.subList(
+            clamp((page - 1) * Database.ITEMS_PER_PAGE, ids.size()),
+            clamp(page * Database.ITEMS_PER_PAGE, ids.size())
+        );
+    }
+
+    private int clamp(int value, int maximum) {
+        if (value < 0) return 0;
+        if (value > maximum) return maximum;
+        return value;
     }
 }

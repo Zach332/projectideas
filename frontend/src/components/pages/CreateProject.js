@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Prompt, useParams } from "react-router-dom";
 import { Status, useGlobalState } from "../../State";
 import LoginWarning from "../logins/LoginWarning";
 import NotFound from "./NotFound";
@@ -109,6 +109,10 @@ export default function CreateProject() {
             <Helmet>
                 <title>Create Project | {Globals.Title}</title>
             </Helmet>
+            <Prompt
+                when={project.name != "" || project.description != ""}
+                message="You have unsaved changes; are you sure you want to leave?"
+            />
             <h1>Start a project based on:</h1>
             <div className="m-3">
                 <IdeaSummary idea={idea} />

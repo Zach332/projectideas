@@ -29,7 +29,7 @@ public class Idea extends Post implements Votable {
         this.type = "Idea";
         this.ideaId = this.id;
         long now = Instant.now().getEpochSecond();
-        this.timePosted = now;
+        this.timeCreated = now;
         // TODO: Keep this field updated
         this.timeLastEdited = now;
         this.authorId = authorId;

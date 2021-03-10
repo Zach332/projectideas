@@ -1,11 +1,13 @@
 import React from "react";
 import axios from "axios";
+import { useGlobalState } from "../../State";
 
 export default function Upvotes({ post, postType }) {
     const [userHasUpvoted, setUserHasUpvoted] = React.useState(
         post.userHasUpvoted
     );
     const [upvotes, setUpvotes] = React.useState(post.upvoteCount);
+    const [user] = useGlobalState("user");
 
     React.useEffect(() => {
         setUpvotes(post.upvoteCount);
@@ -57,6 +59,7 @@ export default function Upvotes({ post, postType }) {
             className="btn d-flex flex-column align-items-center"
             style={{ width: 50, boxShadow: "none" }}
             onClick={toggleUpvote}
+            disabled={!user.loggedIn}
         >
             <div>{userHasUpvoted ? filledUpvote : unfilledUpvote}</div>
             <div>{upvotes}</div>

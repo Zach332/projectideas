@@ -95,7 +95,7 @@ export default function Message({ message, setRerender }) {
                     <a
                         className="dropdown-item"
                         data-bs-toggle="modal"
-                        data-bs-target={"#" + message.id}
+                        data-bs-target={"#sendMessage" + message.id}
                     >
                         Reply
                     </a>
@@ -145,7 +145,7 @@ export default function Message({ message, setRerender }) {
                         ? message.senderUsername
                         : message.recipientUsername
                 }
-                id={message.id}
+                id={"sendMessage" + message.id}
             />
             <SendMessageModal
                 recipient={message.recipientProjectName}
