@@ -1,6 +1,5 @@
 package com.herokuapp.projectideas.database.document.user;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,9 +15,6 @@ public class UserJoinedProject implements RootDocument {
     protected String userId;
     protected String projectId;
     protected long timeJoined;
-
-    @JsonProperty("_etag")
-    protected String etag;
 
     public UserJoinedProject(String userId, String projectId) {
         this.id = UUID.randomUUID().toString();

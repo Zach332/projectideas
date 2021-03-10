@@ -1,6 +1,5 @@
 package com.herokuapp.projectideas.database.document.tag;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -27,9 +26,6 @@ public abstract class Tag implements RootDocument {
     protected String name;
     protected int usages;
     protected boolean standard;
-
-    @JsonProperty("_etag")
-    protected String etag;
 
     public Tag(String name) {
         this.id = UUID.randomUUID().toString();

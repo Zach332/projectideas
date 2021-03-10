@@ -9,7 +9,4 @@ public interface RootDocument {
 
     @JsonIgnore
     public String getPartitionKey();
-
-    @JsonIgnore
-    public String getEtag();
 }

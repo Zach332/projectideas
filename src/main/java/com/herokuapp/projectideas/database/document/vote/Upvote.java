@@ -1,6 +1,5 @@
 package com.herokuapp.projectideas.database.document.vote;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.herokuapp.projectideas.database.document.RootDocument;
 import java.time.Instant;
 import lombok.*;
@@ -16,9 +15,6 @@ public abstract class Upvote<T extends Votable> implements RootDocument {
     protected String id;
     protected String type;
     protected long timeUpvoted;
-
-    @JsonProperty("_etag")
-    protected String etag;
 
     public Upvote(String userId) {
         this.id = userId;
