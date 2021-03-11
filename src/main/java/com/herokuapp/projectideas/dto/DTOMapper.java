@@ -188,6 +188,10 @@ public abstract class DTOMapper {
         source = "project",
         qualifiedByName = "userHasUpvotedProject"
     )
+    @Mapping(
+        target = "timeSent",
+        expression = "java( java.time.Instant.now().getEpochSecond() )"
+    )
     public abstract ViewProjectDTO viewProjectDTO(
         Project project,
         @Context String userId,
@@ -208,6 +212,10 @@ public abstract class DTOMapper {
         target = "userHasUpvoted",
         source = "project",
         qualifiedByName = "userHasUpvotedProject"
+    )
+    @Mapping(
+        target = "timeSent",
+        expression = "java( java.time.Instant.now().getEpochSecond() )"
     )
     @Mapping(target = "joinRequests", source = "usersRequestingToJoin")
     public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(

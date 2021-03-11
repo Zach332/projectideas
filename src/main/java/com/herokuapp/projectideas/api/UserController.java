@@ -81,7 +81,7 @@ public class UserController {
     public void createUser(@RequestBody CreateUserDTO user) {
         if (database.containsUserWithUsername(user.getUsername())) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "Username " + user.getUsername() + " is already taken."
             );
         }
@@ -108,7 +108,7 @@ public class UserController {
                 user.getUsername().length() > 30
             ) {
                 throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                    HttpStatus.UNPROCESSABLE_ENTITY,
                     "Username " +
                     user.getUsername() +
                     " is too long or too short. " +
@@ -117,7 +117,7 @@ public class UserController {
             }
             if (database.containsUserWithUsername(user.getUsername())) {
                 throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                    HttpStatus.UNPROCESSABLE_ENTITY,
                     "Username " + user.getUsername() + " is already taken."
                 );
             }

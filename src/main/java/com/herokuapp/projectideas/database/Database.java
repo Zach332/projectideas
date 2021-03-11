@@ -36,8 +36,10 @@ import com.herokuapp.projectideas.database.document.vote.IdeaUpvote;
 import com.herokuapp.projectideas.database.document.vote.ProjectUpvote;
 import com.herokuapp.projectideas.database.document.vote.Upvote;
 import com.herokuapp.projectideas.database.document.vote.Votable;
+import com.herokuapp.projectideas.database.exception.OutdatedDocumentWriteException;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -235,16 +237,12 @@ public class Database {
         CosmosContainer container,
         Class<S> documentType
     ) {
-        /**
-         * Only upvote if the user exists
-         */
+        // Only upvote if the user exists
         if (getUser(upvote.getId()).isEmpty()) {
             return;
         }
 
-        /**
-         * Only upvote if the user has not already upvoted the document
-         */
+        // Only upvote if the user has not already upvoted the document
         try {
             container.createItem(upvote);
         } catch (ConflictException e) {
@@ -667,6 +665,8 @@ public class Database {
     }
 
     public void updateIdea(Idea idea) {
+        idea.setTimeLastEdited(Instant.now().getEpochSecond());
+
         indexController.tryUpdateIdea(idea);
         for (String tag : idea.getTags()) {
             Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
@@ -1157,6 +1157,14 @@ public class Database {
         );
     }
 
+    /**
+     * Updates project without any protection against overwriting new
+     * data that the user has not seen. This is acceptable for boolean
+     * fields like isPublic, but not for fields like description.
+     * @param project
+     * @param toPublic
+     * @param toPrivate
+     */
     public void updateProject(
         Project project,
         boolean toPublic,
@@ -1169,6 +1177,7 @@ public class Database {
         } else {
             indexController.tryUpdateProject(project);
         }
+        // TODO: Does we have to check every tag each update?
         for (String tag : project.getTags()) {
             Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
             if (existingTag.isPresent()) {
@@ -1183,6 +1192,31 @@ public class Database {
             new PartitionKey(project.getProjectId()),
             new CosmosItemRequestOptions()
         );
+    }
+
+    /**
+     * Updates a project and ensures that later update attempts do not
+     * overwrite new data that the user has not seen.
+     * @param project
+     * @param toPublic
+     * @param toPrivate
+     * @param timeOfProjectReceipt Time the user updating the project
+     * initially received it from the backend
+     * @throws OutdatedDocumentWriteException
+     */
+    public void updateProjectWithConcurrencyControl(
+        Project project,
+        boolean toPublic,
+        boolean toPrivate,
+        long timeOfProjectReceipt
+    ) throws OutdatedDocumentWriteException {
+        // Ensure user is editing the latest version of the project
+        if (project.getTimeLastEdited() >= timeOfProjectReceipt) {
+            throw new OutdatedDocumentWriteException();
+        }
+        project.setTimeLastEdited(Instant.now().getEpochSecond());
+
+        updateProject(project, toPublic, toPrivate);
     }
 
     public void deleteProject(String projectId) {

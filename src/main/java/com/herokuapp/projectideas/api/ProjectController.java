@@ -5,10 +5,11 @@ import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.project.ProjectJoinRequest;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.exception.OutdatedDocumentWriteException;
 import com.herokuapp.projectideas.dto.DTOMapper;
-import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
+import com.herokuapp.projectideas.dto.project.UpdateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,18 +109,18 @@ public class ProjectController {
     public void updateProject(
         @RequestHeader("authorization") String userId,
         @PathVariable String projectId,
-        @RequestBody CreateProjectDTO project
+        @RequestBody UpdateProjectDTO project
     ) {
         if (!project.isPublicProject() && project.isLookingForMembers()) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "A project cannot be looking for members while private."
             );
         }
 
         if (project.getName().length() > 175) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "Project name " +
                 project.getName() +
                 " is too long. " +
@@ -148,7 +149,23 @@ public class ProjectController {
             toPublic = true;
         }
         mapper.updateProjectFromDTO(existingProject, project);
-        database.updateProject(existingProject, toPublic, toPrivate);
+        try {
+            database.updateProjectWithConcurrencyControl(
+                existingProject,
+                toPublic,
+                toPrivate,
+                project.getTimeOfProjectReceipt()
+            );
+        } catch (OutdatedDocumentWriteException e) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Project " +
+                projectId +
+                " has been edited since the user initially loaded it. The user will" +
+                " need to save their changes elsewhere, redownload the project, and" +
+                " resubmit their edits."
+            );
+        }
     }
 
     @PutMapping("/api/projects/{projectId}/update")
@@ -193,7 +210,7 @@ public class ProjectController {
             );
         if (!publicProject && existingProject.isLookingForMembers()) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "A project cannot be private while looking for members."
             );
         }
@@ -214,7 +231,7 @@ public class ProjectController {
 
         if (!project.isLookingForMembers()) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "This project is not looking for new members."
             );
         }
@@ -240,7 +257,7 @@ public class ProjectController {
                 )
         ) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "User " +
                 user.getUsername() +
                 " has already requested to join this project"

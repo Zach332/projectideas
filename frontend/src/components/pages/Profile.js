@@ -125,7 +125,7 @@ export default function Profile() {
             })
             .catch((err) => {
                 console.log("Error changing username: " + err);
-                if (err.response.status == 409) {
+                if (err.response.status == 422) {
                     addToast(
                         "This username is already in use by another user. Please choose another.",
                         {

@@ -140,7 +140,7 @@ public class IdeaController {
     ) {
         if (idea.getTitle().length() > 175) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "Idea title " +
                 idea.getTitle() +
                 " is too long. " +
@@ -205,14 +205,14 @@ public class IdeaController {
 
         if (!project.isPublicProject() && project.isLookingForMembers()) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "A project cannot be looking for members while private."
             );
         }
 
         if (project.getName().length() > 175) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "Project name " +
                 project.getName() +
                 " is too long. " +
@@ -242,7 +242,7 @@ public class IdeaController {
     ) {
         if (idea.getTitle().length() > 175) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 "Idea title " +
                 idea.getTitle() +
                 " is too long. " +

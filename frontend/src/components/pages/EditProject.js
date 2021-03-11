@@ -23,6 +23,7 @@ export default function EditProject({ originalProject, setStatus }) {
                 publicProject: project.publicProject,
                 tags: project.tags,
                 githubLink: project.githubLink,
+                timeOfProjectReceipt: project.timeSent,
             })
             .then(() => {
                 addToast("Your idea was updated successfully.", {
@@ -32,9 +33,22 @@ export default function EditProject({ originalProject, setStatus }) {
             })
             .catch((err) => {
                 console.log("Error updating project: " + err);
-                addToast("Your project was not updated. Please try again.", {
-                    appearance: "error",
-                });
+                if (err.response.status == 409) {
+                    addToast(
+                        "This project has been edited by another user since you began editing. " +
+                            "Please save your changes elsewhere, refresh the page, and try again.",
+                        {
+                            appearance: "error",
+                        }
+                    );
+                } else {
+                    addToast(
+                        "Your project was not updated. Please try again.",
+                        {
+                            appearance: "error",
+                        }
+                    );
+                }
             });
         event.preventDefault();
     };
