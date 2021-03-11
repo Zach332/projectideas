@@ -147,8 +147,6 @@ public class IdeaController {
                 "Idea titles cannot be longer than 175 characters."
             );
         }
-        // TODO: Move this call into the createIdea function
-        // As is, creating an idea requires calling the findUser function twice
         User user = database
             .getUser(userId)
             .orElseThrow(
