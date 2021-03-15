@@ -114,7 +114,7 @@ public class IdeaController {
     ) {
         if (lookingForMembersOnly) {
             return database
-                .getPublicProjectsLookingForMemberBasedOnIdea(ideaId)
+                .getPublicProjectsLookingForMembersBasedOnIdea(ideaId)
                 .stream()
                 .map(
                     project ->

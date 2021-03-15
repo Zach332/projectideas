@@ -163,7 +163,7 @@ public class IndexController {
 
     private Document getTagDoc(Tag tag) {
         Document doc = new Document();
-        doc.add(new TextField("name", tag.getName(), Field.Store.YES));
+        doc.add(new TextField("name", tag.getId(), Field.Store.YES));
         doc.add(new FeatureField("features", "usages", tag.getUsages()));
         doc.add(
             new TextField("type", tag.getType().toString(), Field.Store.YES)
