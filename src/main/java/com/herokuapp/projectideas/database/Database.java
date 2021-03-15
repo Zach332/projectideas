@@ -39,6 +39,8 @@ import com.herokuapp.projectideas.database.document.vote.Votable;
 import com.herokuapp.projectideas.database.exception.OutdatedDocumentWriteException;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -987,9 +989,12 @@ public class Database {
     }
 
     public <T extends Tag> Optional<T> getTag(String name, Class<T> classType) {
-        // TODO: Change tag id field to be the same as name
-        return singleDocumentQuery(
-            GenericQueries.queryByPartitionKey(name, classType),
+        // The tag id is url encoded to deal with special characters (e.g. #).
+        String urlEncodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+        return readDocument(
+            urlEncodedName,
+            // Tag container is partitioned by type
+            classType.getSimpleName(),
             tagContainer,
             classType
         );
@@ -1004,7 +1009,7 @@ public class Database {
         tagContainer.replaceItem(
             tag,
             tag.getId(),
-            new PartitionKey(tag.getName()),
+            new PartitionKey(classType.getSimpleName()),
             new CosmosItemRequestOptions()
         );
     }
@@ -1108,7 +1113,7 @@ public class Database {
         );
     }
 
-    public List<Project> getPublicProjectsLookingForMemberBasedOnIdea(
+    public List<Project> getPublicProjectsLookingForMembersBasedOnIdea(
         String ideaId
     ) {
         return multipleDocumentQuery(
