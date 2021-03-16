@@ -201,7 +201,7 @@
                       <excludeDefaultDirectories>true</excludeDefaultDirectories>
                       <filesets>
                         <fileset>
-                            <directory>node_modules</directory>
+                            <directory>frontend/node_modules</directory>
                           </fileset>
                           <fileset>
                             <directory>.heroku/node</directory>
