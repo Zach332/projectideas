@@ -1,18 +1,21 @@
 export function toQuery(params, delimiter = "&") {
     const keys = Object.keys(params);
 
-    return keys.reduce((str, key, index) => {
-        let query = `${str}${key}=${params[key]}`;
+    return encodeURI(
+        keys.reduce((str, key, index) => {
+            let query = `${str}${key}=${params[key]}`;
 
-        if (index < keys.length - 1) {
-            query += delimiter;
-        }
+            if (index < keys.length - 1) {
+                query += delimiter;
+            }
 
-        return query;
-    }, "");
+            return query;
+        }, "")
+    ).replace(/#/g, "%23");
 }
 
 export function toParams(query) {
+    query = decodeURIComponent(query);
     const q = query.replace(/^\??\//, "");
 
     return q.split("&").reduce((values, param) => {
