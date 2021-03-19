@@ -74,12 +74,6 @@ export default function TagPicker({ post, setPost, postType }) {
             event.key === "-"
         ) {
             return;
-        } else if (
-            (event.keyCode >= 58 && event.keyCode <= 90) ||
-            (event.keyCode >= 160 && event.keyCode <= 165)
-        ) {
-            event.preventDefault();
-            setInvalidCharacter(true);
         }
     };
 
@@ -133,8 +127,7 @@ export default function TagPicker({ post, setPost, postType }) {
                 </div>
                 {(newTag.length > 29 || invalidCharacter) && (
                     <div className="col-auto text-red">
-                        Tags must be less than 30 characters, and include only
-                        lowercase letters, numbers, or dashes
+                        Tags must be less than 30 characters
                     </div>
                 )}
             </form>
