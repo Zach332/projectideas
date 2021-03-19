@@ -26,7 +26,7 @@ public class GenericQueries {
 
     private static final String USER_CONTAINER_PARTITION_KEY = "userId";
     private static final String POST_CONTAINER_PARTITION_KEY = "ideaId";
-    private static final String TAG_CONTAINER_PARTITION_KEY = "name";
+    private static final String TAG_CONTAINER_PARTITION_KEY = "type";
     private static final String PROJECT_CONTAINER_PARTITION_KEY = "projectId";
 
     public static <T extends RootDocument> SelectQuery queryByType(
