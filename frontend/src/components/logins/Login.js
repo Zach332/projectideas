@@ -17,7 +17,7 @@ export default function Login() {
     const googleParams = toQuery({
         client_id:
             "449086482050-t6e9tflhou1r9b905s42pvjtbvac23hl.apps.googleusercontent.com",
-        scope: "https%3A//www.googleapis.com/auth/userinfo.email",
+        scope: "https://www.googleapis.com/auth/userinfo.email",
         response_type: "token",
         redirect_uri: window.location.href + "/oauth2/code/google",
     });
