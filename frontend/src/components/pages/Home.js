@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import { Status } from "../../State";
+import { Status, useGlobalState } from "../../State";
 import { toParams, toQuery } from "../utils/Routing";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet";
@@ -11,6 +11,7 @@ import IdeaSummaryUpvotes from "../ideaComponents/IdeaSummaryUpvotes";
 export default function Home() {
     let history = useHistory();
     let location = useLocation();
+    const [user] = useGlobalState("user");
     const [ideas, setIdeas] = React.useState([]);
     const [status, setStatus] = React.useState(Status.Loading);
     const [lastPage, setLastPage] = React.useState(true);
@@ -63,6 +64,16 @@ export default function Home() {
             <Helmet>
                 <title>Home | {Globals.Title}</title>
             </Helmet>
+            {!user.loggedIn && (
+                <div className="bg-light p-3">
+                    <h3>Ideas with impact</h3>
+                    Here, you can post and find ideas for technologies—websites,
+                    apps, and more—that real people will use. If there is a
+                    technology that you wish existed, post the idea here. And if
+                    you want to develop a solution based on an idea, you can
+                    message the idea poster or even join a team.
+                </div>
+            )}
             <div className="d-flex align-items-center">
                 <div className="p-2 me-3">
                     <h1>Home</h1>

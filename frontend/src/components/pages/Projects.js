@@ -52,6 +52,14 @@ export default function Projects() {
             <Helmet>
                 <title>Projects | {Globals.Title}</title>
             </Helmet>
+            {!user.loggedIn && (
+                <div className="bg-light p-3">
+                    <h3>Get inspired</h3>
+                    Here, you can see projects that have been created based on
+                    ideas posted on projectideas. You can even request to join
+                    teams that are looking for new members.
+                </div>
+            )}
             <div className="d-flex align-items-center">
                 <div className="p-2 me-3">
                     <h1>Projects</h1>
