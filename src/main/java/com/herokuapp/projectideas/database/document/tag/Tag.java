@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.herokuapp.projectideas.database.document.RootDocument;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +24,9 @@ import lombok.Setter;
 @JsonSubTypes({ @Type(IdeaTag.class), @Type(ProjectTag.class) })
 public abstract class Tag implements RootDocument {
 
+    @Getter(AccessLevel.NONE)
     protected String id;
+
     protected String type;
     protected int usages;
     protected boolean standard;
@@ -34,7 +38,15 @@ public abstract class Tag implements RootDocument {
         this.standard = false;
     }
 
+    public String getId() {
+        return URLDecoder.decode(id, StandardCharsets.UTF_8);
+    }
+
     public String getPartitionKey() {
         return type;
+    }
+
+    public void urlDecodeId() {
+        id = URLDecoder.decode(id, StandardCharsets.UTF_8);
     }
 }
