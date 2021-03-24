@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function LoginWarning() {
     return (
-        <div className="p-4 bg-secondary">
+        <div className="p-4 bg-light">
             <h1 className="display-4">Login required</h1>
             <p className="lead">You must login to view this page.</p>
             <hr className="my-4" />
