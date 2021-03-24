@@ -59,6 +59,7 @@ public class Project implements RootDocument, Votable {
         this.publicProject = publicProject;
         this.lookingForMembers = lookingForMembers;
         this.usersRequestingToJoin = new ArrayList<>();
+        // TODO: Should this be stored url-encoded?
         this.tags = tags;
         this.upvoteCount = 0;
     }
