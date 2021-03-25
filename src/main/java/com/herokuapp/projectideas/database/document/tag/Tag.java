@@ -7,7 +7,6 @@ import com.herokuapp.projectideas.database.document.RootDocument;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,9 +23,7 @@ import lombok.Setter;
 @JsonSubTypes({ @Type(IdeaTag.class), @Type(ProjectTag.class) })
 public abstract class Tag implements RootDocument {
 
-    @Getter(AccessLevel.NONE)
     protected String id;
-
     protected String type;
     protected int usages;
     protected boolean standard;
