@@ -17,7 +17,7 @@ export default function ProjectJoinRequestPreview({
                 "/api/projects/" +
                     project.id +
                     "/joinrequests/" +
-                    request.username +
+                    encodeURIComponent(request.username) +
                     "?accept=" +
                     accept
             )

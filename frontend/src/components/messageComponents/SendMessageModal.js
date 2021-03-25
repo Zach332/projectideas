@@ -43,9 +43,9 @@ export default function SendMessageModal({
     const sendMessage = () => {
         let api;
         if (isProject) {
-            api = "/api/messages/projects/" + recipientId;
+            api = "/api/messages/projects/" + encodeURIComponent(recipientId);
         } else {
-            api = "/api/messages/" + recipient;
+            api = "/api/messages/" + encodeURIComponent(recipient);
         }
         axios
             .post(api, {
