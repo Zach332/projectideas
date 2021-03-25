@@ -11,7 +11,7 @@
     "react": "^16.13.1",
     "react-chrome-dino": "^0.1.3",
     "react-dom": "^16.13.1",
-    "react-helmet": "^6.1.0",
+    "react-helmet-async": "^1.0.9",
     "react-hooks-global-state": "^1.0.1",
     "react-markdown": "^5.0.2",
     "react-router-dom": "^5.2.0",

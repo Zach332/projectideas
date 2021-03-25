@@ -15,7 +15,7 @@ import EditProject from "./EditProject";
 import Modal from "../layout/Modal";
 import ProjectGitHubLinkModal from "../projectComponents/ProjectGitHubLinkModal";
 import LoadingDiv from "../general/LoadingDiv";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
 import Upvotes from "./../postComponents/Upvotes";

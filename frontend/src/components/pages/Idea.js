@@ -13,7 +13,7 @@ import { useGlobalState, Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
 import { formatTime } from "../utils/TimeFormatter";
 import LoadingDiv from "./../general/LoadingDiv";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
 

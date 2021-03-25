@@ -9,7 +9,7 @@ import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../postComponents/TagPicker";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 
 export default function CreateProject() {

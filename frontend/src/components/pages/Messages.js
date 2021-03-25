@@ -6,7 +6,7 @@ import { useGlobalState } from "../../State";
 import { motion, AnimateSharedLayout } from "framer-motion";
 import LoadingDiv from "./../general/LoadingDiv";
 import { Status } from "./../../State";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory, useLocation } from "react-router-dom";
 import { toParams, toQuery } from "../utils/Routing";

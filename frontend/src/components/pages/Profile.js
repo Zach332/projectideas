@@ -6,7 +6,7 @@ import { useToasts } from "react-toast-notifications";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { Status } from "./../../State";
 import LoadingDiv from "../general/LoadingDiv";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import MyProjects from "./MyProjects";
 import { toQuery } from "../utils/Routing";

@@ -4,7 +4,7 @@ import ProjectSummary from "../projectComponents/ProjectSummary";
 import { useGlobalState } from "../../State";
 import { Status } from "./../../State";
 import LoadingDiv from "./../general/LoadingDiv";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import LoginWarning from "./../logins/LoginWarning";
 import { toQuery } from "../utils/Routing";

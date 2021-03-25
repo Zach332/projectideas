@@ -5,7 +5,7 @@ import { Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
 

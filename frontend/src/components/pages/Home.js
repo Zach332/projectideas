@@ -3,7 +3,7 @@ import axios from "axios";
 import { Status, useGlobalState } from "../../State";
 import { toParams, toQuery } from "../utils/Routing";
 import LoadingDiv from "./../general/LoadingDiv";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory, useLocation } from "react-router-dom";
 import IdeaSummaryUpvotes from "../ideaComponents/IdeaSummaryUpvotes";
