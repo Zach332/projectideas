@@ -45,8 +45,4 @@ public abstract class Tag implements RootDocument {
     public String getPartitionKey() {
         return type;
     }
-
-    public void urlDecodeId() {
-        id = URLDecoder.decode(id, StandardCharsets.UTF_8);
-    }
 }
