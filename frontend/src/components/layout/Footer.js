@@ -21,7 +21,7 @@ export default function Footer() {
                         className="form-check-input"
                         type="checkbox"
                         id="lookingForMembers"
-                        onClick={switchMode}
+                        onChange={switchMode}
                         checked={theme.mode === "dark"}
                     />
                     <label
