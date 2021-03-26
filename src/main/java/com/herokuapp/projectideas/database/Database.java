@@ -672,6 +672,9 @@ public class Database {
         indexController.tryUpdateIdea(idea);
         for (String tag : idea.getTags()) {
             Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
+            // TODO: Change behavior here (and for projects)
+            // As it stands, updating an idea without changing the tags will
+            // increment the usages of each tag
             if (existingTag.isPresent()) {
                 incrementTagUsages(tag, IdeaTag.class);
             } else {
