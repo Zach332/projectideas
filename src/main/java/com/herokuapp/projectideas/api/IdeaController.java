@@ -85,13 +85,7 @@ public class IdeaController {
                         "Idea " + ideaId + " does not exist."
                     )
             );
-        Boolean ideaSavedByUser;
-        if (userId != null && !userId.equals("")) {
-            ideaSavedByUser = database.isIdeaSavedByUser(userId, ideaId);
-        } else {
-            ideaSavedByUser = null;
-        }
-        return mapper.viewIdeaDTO(idea, ideaSavedByUser, userId, database);
+        return mapper.viewIdeaDTO(idea, userId, database);
     }
 
     @GetMapping("/api/ideas/{ideaId}/comments")

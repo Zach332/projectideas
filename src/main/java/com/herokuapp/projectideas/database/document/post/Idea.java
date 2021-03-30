@@ -62,4 +62,8 @@ public class Idea extends Post implements Votable {
     public boolean userHasUpvoted(String userId, Database database) {
         return database.userHasUpvotedIdea(ideaId, userId);
     }
+
+    public boolean savedByUser(String userId, Database database) {
+        return database.userHasSavedIdea(ideaId, userId);
+    }
 }

@@ -55,6 +55,7 @@ public abstract class DTOMapper {
         source = "idea",
         qualifiedByName = "userHasUpvotedIdea"
     )
+    @Named("previewIdeaDTO")
     public abstract PreviewIdeaDTO previewIdeaDTO(
         Idea idea,
         @Context String userId,
@@ -66,15 +67,22 @@ public abstract class DTOMapper {
         source = "idea",
         qualifiedByName = "userHasUpvotedIdea"
     )
-    // TODO: Handle savedByUser the same way as userHasUpvoted
+    @Mapping(
+        target = "savedByUser",
+        source = "idea",
+        qualifiedByName = "userHasSavedIdea"
+    )
     public abstract ViewIdeaDTO viewIdeaDTO(
         Idea idea,
-        Boolean savedByUser,
         @Context String userId,
         @Context Database database
     );
 
-    @Mapping(target = "ideaPreviews", source = "documents")
+    @Mapping(
+        target = "ideaPreviews",
+        source = "documents",
+        qualifiedByName = "previewIdeaDTOList"
+    )
     public abstract PreviewIdeaPageDTO previewIdeaPageDTO(
         DocumentPage<Idea> documentPage,
         @Context String userId,
@@ -88,6 +96,15 @@ public abstract class DTOMapper {
         @Context Database database
     ) {
         return idea.userHasUpvoted(userId, database);
+    }
+
+    @Named("userHasSavedIdea")
+    protected boolean userHasSavedIdea(
+        Idea idea,
+        @Context String userId,
+        @Context Database database
+    ) {
+        return idea.savedByUser(userId, database);
     }
 
     public abstract ViewCommentDTO viewCommentDTO(Comment comment);
@@ -265,6 +282,14 @@ public abstract class DTOMapper {
     );
 
     // Document collection -> DTO collection
+
+    @IterableMapping(qualifiedByName = "previewIdeaDTO")
+    @Named("previewIdeaDTOList")
+    protected abstract List<PreviewIdeaDTO> previewIdeaDTOList(
+        List<Idea> ideas,
+        @Context String userId,
+        @Context Database database
+    );
 
     @IterableMapping(qualifiedByName = "previewProjectDTO")
     @Named("previewProjectDTOList")
