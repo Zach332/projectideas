@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
@@ -7,7 +7,7 @@ import { Prompt } from "react-router-dom";
 
 export default function ProjectJoinRequestModal({ project, submitRequest }) {
     const { addToast } = useToasts();
-    const [joinRequestMessage, setJoinRequestMessage] = React.useState("");
+    const [joinRequestMessage, setJoinRequestMessage] = useState("");
 
     useLeavePageWarning(joinRequestMessage != "");
 

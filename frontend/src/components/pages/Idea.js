@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Success from "../general/Success";
 import { useParams } from "react-router-dom";
 import { toQuery } from "../utils/Routing";
@@ -20,8 +20,8 @@ import { useHistory } from "react-router-dom";
 export default function Idea() {
     let history = useHistory();
     const { addToast } = useToasts();
-    const [status, setStatus] = React.useState(Status.Loading);
-    const [idea, setIdea] = React.useState({ title: "" });
+    const [status, setStatus] = useState(Status.Loading);
+    const [idea, setIdea] = useState({ title: "" });
     const [user] = useGlobalState("user");
     let params = useParams();
 

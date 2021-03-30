@@ -1,10 +1,10 @@
-import React from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 
 export default function Markdown() {
-    const [tryIt, setTryIt] = React.useState("");
+    const [tryIt, setTryIt] = useState("");
 
     const handleInputChange = (event) => {
         const target = event.target;

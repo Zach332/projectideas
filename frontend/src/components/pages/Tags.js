@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
@@ -11,9 +11,9 @@ import { useHistory } from "react-router-dom";
 
 export default function Tags() {
     let history = useHistory();
-    const [posts, setPosts] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.Loading);
-    const [lastPage, setLastPage] = React.useState(true);
+    const [posts, setPosts] = useState([]);
+    const [status, setStatus] = useState(Status.Loading);
+    const [lastPage, setLastPage] = useState(true);
     const params = toParams(window.location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 

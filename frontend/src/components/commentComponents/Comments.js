@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import Comment from "./Comment";
@@ -8,11 +8,11 @@ import { motion, AnimateSharedLayout } from "framer-motion";
 export default function Comments({ ideaId }) {
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
-    const [rows, setRows] = React.useState(1);
-    const [showButton, setShowButton] = React.useState("hidden");
-    const [comment, setComment] = React.useState("");
-    const [comments, setComments] = React.useState([]);
-    const [rerender, setRerender] = React.useState(0);
+    const [rows, setRows] = useState(1);
+    const [showButton, setShowButton] = useState("hidden");
+    const [comment, setComment] = useState("");
+    const [comments, setComments] = useState([]);
+    const [rerender, setRerender] = useState(0);
     var commentInput;
 
     const onFocus = () => {

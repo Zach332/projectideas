@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Status, useGlobalState } from "../../State";
 import { toParams, toQuery } from "../utils/Routing";
@@ -12,10 +12,10 @@ export default function Home() {
     let history = useHistory();
     let location = useLocation();
     const [user] = useGlobalState("user");
-    const [ideas, setIdeas] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.Loading);
-    const [lastPage, setLastPage] = React.useState(true);
-    const [sort, setSort] = React.useState("hotness");
+    const [ideas, setIdeas] = useState([]);
+    const [status, setStatus] = useState(Status.Loading);
+    const [lastPage, setLastPage] = useState(true);
+    const [sort, setSort] = useState("hotness");
     const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 

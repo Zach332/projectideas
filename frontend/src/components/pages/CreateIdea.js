@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Success from "../general/Success";
 import LoginWarning from "../logins/LoginWarning";
@@ -17,13 +17,13 @@ import { Link } from "react-router-dom";
 
 export default function CreateIdea() {
     const { addToast } = useToasts();
-    const [idea, setIdea] = React.useState({
+    const [idea, setIdea] = useState({
         title: "",
         content: "",
         tags: [],
     });
 
-    const [status, setStatus] = React.useState(Status.NotSubmitted);
+    const [status, setStatus] = useState(Status.NotSubmitted);
     const [user] = useGlobalState("user");
     const [savedIdea] = useGlobalState("newIdea");
 

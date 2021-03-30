@@ -1,4 +1,3 @@
-import React from "react";
 import { toQuery } from "../utils/Routing";
 import GitHubSymbol from "../../GitHub-Mark.png";
 import GitHubSymbolLight from "../../GitHub-Mark-Light.png";

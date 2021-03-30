@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Success from "../general/Success";
 import XMark from "../../x.svg";
 import { toParams } from "../utils/Routing";
@@ -8,7 +8,7 @@ import Spinner from "../general/Spinner";
 import { Link } from "react-router-dom";
 
 export default function LoginLandingGithub() {
-    const [status, setStatus] = React.useState(Status.Loading);
+    const [status, setStatus] = useState(Status.Loading);
 
     useEffect(() => {
         const params = toParams(window.location.search.replace(/^\?/, ""));
