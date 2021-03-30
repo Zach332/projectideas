@@ -318,17 +318,8 @@ public class Database {
         CosmosContainer container,
         Class<T> upvoteType
     ) {
-        try {
-            container.readItem(
-                userId,
-                new PartitionKey(partitionKey),
-                upvoteType
-            );
-        } catch (NotFoundException e) {
-            return false;
-        }
-
-        return true;
+        return readDocument(userId, partitionKey, postContainer, upvoteType)
+            .isPresent();
     }
 
     // Users
@@ -467,6 +458,16 @@ public class Database {
             postContainer,
             pageNum,
             Idea.class
+        );
+    }
+
+    public boolean userHasSavedIdea(String ideaId, String userId) {
+        return (
+            countQuery(
+                GenericQueries.queryByPartitionKey(userId, UserSavedIdea.class),
+                userContainer
+            ) >
+            0
         );
     }
 

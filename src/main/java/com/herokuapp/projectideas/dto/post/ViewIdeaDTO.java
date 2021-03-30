@@ -9,6 +9,6 @@ import lombok.*;
 public class ViewIdeaDTO extends PreviewIdeaDTO {
 
     private boolean deleted;
-    private Boolean savedByUser;
+    private boolean savedByUser;
     private List<String> tags;
 }
