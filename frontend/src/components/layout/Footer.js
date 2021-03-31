@@ -49,6 +49,13 @@ export default function Footer() {
                     >
                         Privacy
                     </NavLink>
+                    <NavLink
+                        className="nav-item nav-link"
+                        activeClassName="nav-item nav-link active"
+                        to="/contact"
+                    >
+                        Contact
+                    </NavLink>
                 </ul>
             </nav>
         </div>
