@@ -15,9 +15,13 @@ export default function Navbar() {
     }, [user]);
 
     useEffect(() => {
-        axios.get("/api/messages/numunread").then((response) => {
-            setUnreadMessages(response.data);
-        });
+        if (location.pathname === "/messages") {
+            setUnreadMessages(0);
+        } else {
+            axios.get("/api/messages/numunread").then((response) => {
+                setUnreadMessages(response.data);
+            });
+        }
     }, [location]);
 
     let rightNavbar;
