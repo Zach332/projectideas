@@ -124,4 +124,4 @@ const horizontalRule = `A horizontal rule is below
 
 Another section`;
 const link = "[a link](https://projectideas.herokuapp.com)";
-const image = "![cool logo](https://bit.ly/3lO0Oqr)";
+const image = "![cool logo](https://bit.ly/3rxWQUR)";
