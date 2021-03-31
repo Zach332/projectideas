@@ -24,6 +24,7 @@ import StyleDiv from "./components/general/StyleDiv";
 import Footer from "./components/layout/Footer";
 import { HelmetProvider } from "react-helmet-async";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import Contact from "./components/pages/Contact";
 
 function App() {
     return (
@@ -127,6 +128,11 @@ function App() {
                                         path="/markdown"
                                         exact
                                         component={Markdown}
+                                    />
+                                    <Route
+                                        path="/contact"
+                                        exact
+                                        component={Contact}
                                     />
                                     <Route component={NotFound} />
                                 </Switch>
