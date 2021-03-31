@@ -891,16 +891,6 @@ public class Database {
         return getUser(recipientId).get().getUnreadMessages();
     }
 
-    public void markReceivedMessageAsRead(
-        String messageId,
-        String recipientId
-    ) {
-        ReceivedMessage message = getReceivedMessage(recipientId, messageId)
-            .get();
-        message.setUnread(false);
-        updateReceivedMessage(message);
-    }
-
     public void markAllReceivedMessagesAsRead(String recipientId) {
         User recipient = getUser(recipientId).get();
         recipient.setUnreadMessages(0);
@@ -919,7 +909,15 @@ public class Database {
         )
             .stream()
             .forEach(
-                messageId -> markReceivedMessageAsRead(messageId, recipientId)
+                messageId -> {
+                    ReceivedMessage message = getReceivedMessage(
+                        recipientId,
+                        messageId
+                    )
+                        .get();
+                    message.setUnread(false);
+                    updateReceivedMessage(message);
+                }
             );
     }
 
