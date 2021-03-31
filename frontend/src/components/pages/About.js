@@ -32,4 +32,8 @@ Often, programmers looking to improve their skills create replicas when they wou
 
 projectideas is a solution that enables developers to work on projects that solve a real need. It lets engineers to talk to the people their product is designed for, and to center their efforts on the actual consumer. It also provides a way for engineers to post information about the ideas they are working on so that their solutions can reach their intended audience.
 
+## GitHub
+
+projectideas is open source! You can find the repository at [github.com/Zach332/projectideas](https://github.com/Zach332/projectideas).
+
 `;
