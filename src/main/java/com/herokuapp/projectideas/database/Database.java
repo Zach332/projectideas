@@ -768,8 +768,10 @@ public class Database {
     ) {
         User sender = getUser(senderId).get();
         User recipient = getUserByUsername(recipientUsername).get();
-        // TODO: Store count of unread received messages in each user object, use transaction
-        // to ensure the count remains accurate
+
+        recipient.setUnreadMessages(recipient.getUnreadMessages() + 1);
+        updateUser(recipient.getUserId(), recipient);
+
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
             sender.getUsername(),
@@ -780,6 +782,7 @@ public class Database {
             recipientUsername,
             content
         );
+
         // TODO: Handle failure here
         userContainer.createItem(receivedMessage);
         userContainer.createItem(sentMessage);
@@ -885,30 +888,14 @@ public class Database {
     }
 
     public int getNumberOfUnreadMessages(String recipientId) {
-        // TODO: Improve efficiency here
-        return countQuery(
-            GenericQueries
-                .queryByPartitionKey(recipientId, ReceivedMessage.class)
-                .addRestrictions(new RestrictionBuilder().eq("unread", true)),
-            userContainer
-        );
-    }
-
-    public void markReceivedMessageAsRead(
-        String messageId,
-        String recipientId
-    ) {
-        markReceivedMessage(messageId, recipientId, false);
-    }
-
-    public void markReceivedMessageAsUnread(
-        String messageId,
-        String recipientId
-    ) {
-        markReceivedMessage(messageId, recipientId, true);
+        return getUser(recipientId).get().getUnreadMessages();
     }
 
     public void markAllReceivedMessagesAsRead(String recipientId) {
+        User recipient = getUser(recipientId).get();
+        recipient.setUnreadMessages(0);
+        updateUser(recipientId, recipient);
+
         multipleDocumentQuery(
             GenericQueries
                 .queryByType(ReceivedMessage.class)
@@ -922,19 +909,16 @@ public class Database {
         )
             .stream()
             .forEach(
-                messageId -> markReceivedMessageAsRead(messageId, recipientId)
+                messageId -> {
+                    ReceivedMessage message = getReceivedMessage(
+                        recipientId,
+                        messageId
+                    )
+                        .get();
+                    message.setUnread(false);
+                    updateReceivedMessage(message);
+                }
             );
-    }
-
-    private void markReceivedMessage(
-        String messageId,
-        String recipientId,
-        boolean unread
-    ) {
-        ReceivedMessage message = getReceivedMessage(recipientId, messageId)
-            .get();
-        message.setUnread(unread);
-        updateReceivedMessage(message);
     }
 
     public void updateReceivedMessage(ReceivedMessage message) {
