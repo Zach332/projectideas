@@ -85,14 +85,6 @@ public class MessageController {
         database.markReceivedMessageAsRead(messageId, userId);
     }
 
-    @PostMapping("/api/messages/received/{messageId}/markasunread")
-    public void markMessageAsUnread(
-        @RequestHeader("authorization") String userId,
-        @PathVariable String messageId
-    ) {
-        database.markReceivedMessageAsUnread(messageId, userId);
-    }
-
     @PostMapping("/api/messages/received/markallasread")
     public void markAllMessagesAsRead(
         @RequestHeader("authorization") String userId
