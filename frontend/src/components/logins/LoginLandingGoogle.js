@@ -5,9 +5,10 @@ import { toParams } from "../utils/Routing";
 import axios from "axios";
 import { login, Status } from "../../State";
 import Spinner from "../general/Spinner";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 export default function LoginLandingGoogle() {
+    const history = useHistory();
     const [status, setStatus] = useState(Status.Loading);
 
     useEffect(() => {
@@ -30,6 +31,7 @@ export default function LoginLandingGoogle() {
                     response.data.admin
                 );
                 setStatus(Status.Success);
+                history.push("/login/oauth2/code/google");
             })
             .catch((err) => {
                 onFailure(err);
