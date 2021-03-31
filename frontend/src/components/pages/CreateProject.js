@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Prompt, useParams } from "react-router-dom";
 import { Status, useGlobalState } from "../../State";
 import LoginWarning from "../logins/LoginWarning";
@@ -14,9 +14,9 @@ import { Globals } from "../../GlobalData";
 
 export default function CreateProject() {
     const [user] = useGlobalState("user");
-    const [idea, setIdea] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.Loading);
-    const [project, setProject] = React.useState({
+    const [idea, setIdea] = useState([]);
+    const [status, setStatus] = useState(Status.Loading);
+    const [project, setProject] = useState({
         name: "",
         description: "",
         lookingForMembers: true,

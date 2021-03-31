@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Message from "../messageComponents/Message";
 import LoginWarning from "../logins/LoginWarning";
@@ -14,15 +14,15 @@ import { toParams, toQuery } from "../utils/Routing";
 export default function Messages() {
     let location = useLocation();
     let history = useHistory();
-    const [messages, setMessages] = React.useState([]);
+    const [messages, setMessages] = useState([]);
     const [user] = useGlobalState("user");
-    const [rerender, setRerender] = React.useState(0);
-    const [status, setStatus] = React.useState(Status.Loading);
+    const [rerender, setRerender] = useState(0);
+    const [status, setStatus] = useState(Status.Loading);
 
-    const [rotateMode, setRotateMode] = React.useState(0);
-    const [mode, setMode] = React.useState("Received");
+    const [rotateMode, setRotateMode] = useState(0);
+    const [mode, setMode] = useState("Received");
 
-    const [lastPage, setLastPage] = React.useState(true);
+    const [lastPage, setLastPage] = useState(true);
     const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 

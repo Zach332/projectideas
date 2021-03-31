@@ -1,4 +1,3 @@
-import React from "react";
 import Spinner from "../general/Spinner";
 
 export default function LoadingDiv({ isLoading, children, ...props }) {

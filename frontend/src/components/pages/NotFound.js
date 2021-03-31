@@ -1,4 +1,3 @@
-import React from "react";
 import ChromeDinoGame from "react-chrome-dino";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";

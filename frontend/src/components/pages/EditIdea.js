@@ -1,5 +1,5 @@
-import React from "react";
 import axios from "axios";
+import { useState } from "react";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { Status } from "../../State";
 import { useToasts } from "react-toast-notifications";
@@ -11,8 +11,8 @@ import { Link, Prompt } from "react-router-dom";
 
 export default function EditIdea({ originalIdea, setStatus }) {
     const { addToast } = useToasts();
-    const [idea, setIdea] = React.useState(originalIdea);
-    const [edited, setEdited] = React.useState(false);
+    const [idea, setIdea] = useState(originalIdea);
+    const [edited, setEdited] = useState(false);
 
     useLeavePageWarning(edited);
 

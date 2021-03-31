@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Status } from "../../State";
 import Spinner from "../general/Spinner";
@@ -12,11 +12,11 @@ import ProjectSummaryUpvotes from "./../projectComponents/ProjectSummaryUpvotes"
 export default function Search() {
     let history = useHistory();
     let location = useLocation();
-    const [posts, setPosts] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.NotSubmitted);
-    const [query, setQuery] = React.useState("");
-    const [lastPage, setLastPage] = React.useState(true);
-    const [type, setType] = React.useState("ideas");
+    const [posts, setPosts] = useState([]);
+    const [status, setStatus] = useState(Status.NotSubmitted);
+    const [query, setQuery] = useState("");
+    const [lastPage, setLastPage] = useState(true);
+    const [type, setType] = useState("ideas");
     const params = toParams(location.search.replace(/^\?/, ""));
     if (!params.page) params.page = 1;
 

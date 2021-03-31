@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { Status, useGlobalState } from "../../State";
 import NotFound from "./NotFound";
@@ -13,10 +13,10 @@ import { Globals } from "../../GlobalData";
 export default function JoinProject() {
     let history = useHistory();
     const [user] = useGlobalState("user");
-    const [idea, setIdea] = React.useState([]);
-    const [rerender, setRerender] = React.useState(0);
-    const [projects, setProjects] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.Loading);
+    const [idea, setIdea] = useState([]);
+    const [rerender, setRerender] = useState(0);
+    const [projects, setProjects] = useState([]);
+    const [status, setStatus] = useState(Status.Loading);
     let params = useParams();
 
     useEffect(() => {

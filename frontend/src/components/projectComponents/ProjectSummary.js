@@ -1,4 +1,3 @@
-import React from "react";
 import ProjectJoinRequestButton from "./ProjectJoinRequestButton";
 import ProjectJoinRequestModal from "./ProjectJoinRequestModal";
 import { Link } from "react-router-dom";

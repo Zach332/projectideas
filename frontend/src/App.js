@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ToastProvider } from "react-toast-notifications";
 import Navbar from "./components/layout/Navbar";

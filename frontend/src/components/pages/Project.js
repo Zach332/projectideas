@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Success from "../general/Success";
 import axios from "axios";
@@ -23,9 +23,9 @@ import Upvotes from "./../postComponents/Upvotes";
 export default function Project() {
     let history = useHistory();
     const { addToast } = useToasts();
-    const [status, setStatus] = React.useState(Status.Loading);
-    const [rerender, setRerender] = React.useState(0);
-    const [project, setProject] = React.useState({
+    const [status, setStatus] = useState(Status.Loading);
+    const [rerender, setRerender] = useState(0);
+    const [project, setProject] = useState({
         name: "",
         teamMemberUsernames: [],
         lookingForMembers: true,
@@ -34,7 +34,7 @@ export default function Project() {
         id: "",
         joinRequests: "",
     });
-    const [newGithubLink, setNewGithubLink] = React.useState("");
+    const [newGithubLink, setNewGithubLink] = useState("");
     let params = useParams();
 
     useEffect(() => {

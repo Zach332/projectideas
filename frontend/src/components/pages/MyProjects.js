@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import ProjectSummary from "../projectComponents/ProjectSummary";
 import { useGlobalState } from "../../State";
@@ -10,11 +10,11 @@ import LoginWarning from "./../logins/LoginWarning";
 import { toQuery } from "../utils/Routing";
 
 export default function MyProjects({ noHeading }) {
-    const [projects, setProjects] = React.useState([]);
-    const [status, setStatus] = React.useState(Status.Loading);
+    const [projects, setProjects] = useState([]);
+    const [status, setStatus] = useState(Status.Loading);
     const [user] = useGlobalState("user");
-    const [page, setPage] = React.useState(1);
-    const [lastPage, setLastPage] = React.useState(true);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(true);
 
     useEffect(() => {
         setStatus(Status.Loading);

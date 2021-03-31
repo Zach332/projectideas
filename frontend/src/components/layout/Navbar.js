@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import NameLogo from "../../namelogo.svg";
 import { userPersistenceKey, useGlobalState } from "../../State";
@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 export default function Navbar() {
     let location = useLocation();
     const [user] = useGlobalState("user");
-    const [unreadMessages, setUnreadMessages] = React.useState(0);
+    const [unreadMessages, setUnreadMessages] = useState(0);
 
     useEffect(() => {
         localStorage.setItem(userPersistenceKey, JSON.stringify(user));

@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";

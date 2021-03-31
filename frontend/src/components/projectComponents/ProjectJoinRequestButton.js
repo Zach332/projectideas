@@ -1,4 +1,3 @@
-import React from "react";
 import { useGlobalState } from "../../State";
 
 export default function ProjectJoinRequestButton({ project }) {

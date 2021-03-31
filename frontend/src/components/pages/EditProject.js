@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Status } from "../../State";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
@@ -9,8 +9,8 @@ import { Globals } from "../../GlobalData";
 import { Prompt } from "react-router-dom";
 
 export default function EditProject({ originalProject, setStatus }) {
-    const [edited, setEdited] = React.useState(false);
-    const [project, setProject] = React.useState(originalProject);
+    const [edited, setEdited] = useState(false);
+    const [project, setProject] = useState(originalProject);
     const { addToast } = useToasts();
     useLeavePageWarning(edited);
 

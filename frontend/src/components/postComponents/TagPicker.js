@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { toQuery } from "../utils/Routing";
 
 export default function TagPicker({ post, setPost, postType }) {
-    const [tagSuggestions, setTagSuggestions] = React.useState([]);
-    const [newTag, setNewTag] = React.useState("");
-    const [invalidCharacter, setInvalidCharacter] = React.useState(false);
+    const [tagSuggestions, setTagSuggestions] = useState([]);
+    const [newTag, setNewTag] = useState("");
+    const [invalidCharacter, setInvalidCharacter] = useState(false);
 
     useEffect(() => {
         axios.get("/api/tags/standard/" + postType).then((response) => {

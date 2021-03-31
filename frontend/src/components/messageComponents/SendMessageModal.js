@@ -1,4 +1,3 @@
-import React from "react";
 import axios from "axios";
 import Modal from "../layout/Modal";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
@@ -6,6 +5,7 @@ import { useToasts } from "react-toast-notifications";
 import LoginWarning from "./../logins/LoginWarning";
 import { useGlobalState } from "../../State";
 import { Prompt } from "react-router-dom";
+import { useState } from "react";
 
 export default function SendMessageModal({
     recipient,
@@ -14,7 +14,7 @@ export default function SendMessageModal({
     isProject,
 }) {
     const [user] = useGlobalState("user");
-    const [messageToSend, setMessageToSend] = React.useState("");
+    const [messageToSend, setMessageToSend] = useState("");
 
     useLeavePageWarning(messageToSend != "");
 

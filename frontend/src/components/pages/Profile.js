@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { login, logout, useGlobalState } from "../../State";
 import LoginWarning from "../logins/LoginWarning";
 import axios from "axios";
@@ -14,21 +14,21 @@ import { toQuery } from "../utils/Routing";
 export default function Profile() {
     const { addToast } = useToasts();
     const [user] = useGlobalState("user");
-    const [userData, setUserData] = React.useState([]);
-    const [savedIdeas, setSavedIdeas] = React.useState([]);
-    const [myIdeas, setMyIdeas] = React.useState([]);
-    const [rerender, setRerender] = React.useState(0);
-    const [changingUsername, setChangingUsername] = React.useState(false);
-    const [status, setStatus] = React.useState({
+    const [userData, setUserData] = useState([]);
+    const [savedIdeas, setSavedIdeas] = useState([]);
+    const [myIdeas, setMyIdeas] = useState([]);
+    const [rerender, setRerender] = useState(0);
+    const [changingUsername, setChangingUsername] = useState(false);
+    const [status, setStatus] = useState({
         userData: Status.Loading,
         savedIdeas: Status.Loading,
         myIdeas: Status.Loading,
     });
-    const [lastPage, setLastPage] = React.useState({
+    const [lastPage, setLastPage] = useState({
         savedIdeas: true,
         myIdeas: true,
     });
-    const [page, setPage] = React.useState({
+    const [page, setPage] = useState({
         savedIdeas: 1,
         myIdeas: 1,
     });

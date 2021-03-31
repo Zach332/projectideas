@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import CheckMark from "../../check.svg";
 import { useKeyPress } from "../hooks/Keys";
 import { useHistory } from "react-router-dom";

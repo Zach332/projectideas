@@ -1,15 +1,13 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useGlobalState } from "../../State";
 
 export default function Upvotes({ post, postType }) {
-    const [userHasUpvoted, setUserHasUpvoted] = React.useState(
-        post.userHasUpvoted
-    );
-    const [upvotes, setUpvotes] = React.useState(post.upvoteCount);
+    const [userHasUpvoted, setUserHasUpvoted] = useState(post.userHasUpvoted);
+    const [upvotes, setUpvotes] = useState(post.upvoteCount);
     const [user] = useGlobalState("user");
 
-    React.useEffect(() => {
+    useEffect(() => {
         setUpvotes(post.upvoteCount);
         setUserHasUpvoted(post.userHasUpvoted);
     }, [post]);

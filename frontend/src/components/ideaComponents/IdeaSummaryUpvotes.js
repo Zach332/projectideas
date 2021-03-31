@@ -1,4 +1,3 @@
-import React from "react";
 import Upvotes from "../postComponents/Upvotes";
 import IdeaSummary from "./IdeaSummary";
 
