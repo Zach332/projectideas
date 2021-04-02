@@ -48,6 +48,10 @@ public class MessageController {
     public int getNumberOfUnreadMessages(
         @RequestHeader("authorization") String userId
     ) {
+        // TODO: Do this kind of argument validity check for more API endpoints
+        if (!ControllerUtils.isUUIDValid(userId)) {
+            return 0;
+        }
         return database.getNumberOfUnreadMessages(userId);
     }
 
