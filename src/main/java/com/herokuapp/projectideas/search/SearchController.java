@@ -57,10 +57,7 @@ public class SearchController {
 
     public static Query getIdQuery(String id) {
         PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
-        String[] terms = id.split("-");
-        for (String term : terms) {
-            phraseQuery.add(new Term("id", term));
-        }
+        phraseQuery.add(new Term("id", id));
         return phraseQuery.build();
     }
 

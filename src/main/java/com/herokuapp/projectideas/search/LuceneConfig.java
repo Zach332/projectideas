@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.custom.CustomAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.SearcherFactory;
@@ -57,8 +57,14 @@ public class LuceneConfig {
     }
 
     @Bean
-    public Analyzer analyzer() {
-        return new StandardAnalyzer();
+    public Analyzer analyzer() throws IOException {
+        return CustomAnalyzer
+            .builder()
+            .withTokenizer("whitespace")
+            .addTokenFilter("lowercase")
+            .addTokenFilter("stop")
+            .addTokenFilter("porterstem")
+            .build();
     }
 
     @Bean
