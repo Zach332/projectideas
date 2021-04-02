@@ -8,3 +8,4 @@ target
 .vscode
 node_modules
 lucene
+logfile.txt
