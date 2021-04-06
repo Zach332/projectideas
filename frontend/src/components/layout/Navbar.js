@@ -17,7 +17,7 @@ export default function Navbar() {
     useEffect(() => {
         if (location.pathname === "/messages") {
             setUnreadMessages(0);
-        } else {
+        } else if (user.loggedIn) {
             axios.get("/api/messages/numunread").then((response) => {
                 setUnreadMessages(response.data);
             });
