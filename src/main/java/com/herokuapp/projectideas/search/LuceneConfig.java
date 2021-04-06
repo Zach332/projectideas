@@ -63,7 +63,6 @@ public class LuceneConfig {
             .withTokenizer("whitespace")
             .addTokenFilter("lowercase")
             .addTokenFilter("stop")
-            .addTokenFilter("porterstem")
             .build();
     }
 
