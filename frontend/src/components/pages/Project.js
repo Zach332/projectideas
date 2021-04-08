@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Success from "../general/Success";
 import axios from "axios";
 import NotFound from "./NotFound";
-import { Status } from "../../State";
+import { Status, useGlobalState } from "../../State";
 import { toQuery } from "../utils/Routing";
 import { useToasts } from "react-toast-notifications";
 import { motion, AnimateSharedLayout } from "framer-motion";
@@ -23,6 +23,7 @@ import Upvotes from "./../postComponents/Upvotes";
 export default function Project() {
     let history = useHistory();
     const { addToast } = useToasts();
+    const [user] = useGlobalState("user");
     const [status, setStatus] = useState(Status.Loading);
     const [rerender, setRerender] = useState(0);
     const [project, setProject] = useState({
@@ -36,6 +37,7 @@ export default function Project() {
     });
     const [newGithubLink, setNewGithubLink] = useState("");
     let params = useParams();
+    let admin = project.userIsTeamMember || user.admin;
 
     useEffect(() => {
         axios
@@ -204,7 +206,7 @@ export default function Project() {
 
     var githubLink;
     if (!project.githubLink || project.githubLink === "") {
-        if (project.userIsTeamMember) {
+        if (admin) {
             githubLink = (
                 <button
                     type="button"
@@ -219,7 +221,7 @@ export default function Project() {
             githubLink = <div></div>;
         }
     } else {
-        if (project.userIsTeamMember) {
+        if (admin) {
             githubLink = (
                 <div className="d-flex">
                     <a
@@ -312,7 +314,7 @@ export default function Project() {
             >
                 Message team
             </button>
-            {project.userIsTeamMember && (
+            {admin && (
                 <span className="ms-3">
                     <button
                         type="button"
@@ -323,7 +325,7 @@ export default function Project() {
                     </button>
                 </span>
             )}
-            {project.userIsTeamMember && project.joinRequests.length > 0 && (
+            {admin && project.joinRequests.length > 0 && (
                 <div className="mt-3 p-2 bg-secondary">
                     <AnimateSharedLayout>
                         <h4>Join requests</h4>
@@ -360,7 +362,7 @@ export default function Project() {
                     ))}
                 </tbody>
             </table>
-            {project.userIsTeamMember && (
+            {admin && (
                 <div>
                     <div className="form-check form-switch">
                         <input
@@ -394,15 +396,17 @@ export default function Project() {
                             </label>
                         </div>
                     )}
-                    <button
-                        type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#leaveConfirmation"
-                        className="btn btn-danger btn-sm mt-4"
-                    >
-                        Leave team
-                    </button>
                 </div>
+            )}
+            {project.userIsTeamMember && (
+                <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#leaveConfirmation"
+                    className="btn btn-danger btn-sm mt-4"
+                >
+                    Leave team
+                </button>
             )}
             <ProjectJoinRequestModal
                 project={project}
