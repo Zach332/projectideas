@@ -137,7 +137,10 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (!existingProject.userIsTeamMember(userId)) {
+        if (
+            !database.isUserAdmin(userId) &&
+            !existingProject.userIsTeamMember(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         boolean toPublic = false;
@@ -183,7 +186,10 @@ public class ProjectController {
                         "Project " + projectId + " does not exist."
                     )
             );
-        if (!existingProject.userIsTeamMember(userId)) {
+        if (
+            !database.isUserAdmin(userId) &&
+            !existingProject.userIsTeamMember(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         if (lookingForMembers) {
@@ -214,7 +220,10 @@ public class ProjectController {
                 "A project cannot be private while looking for members."
             );
         }
-        if (!existingProject.userIsTeamMember(userId)) {
+        if (
+            !database.isUserAdmin(userId) &&
+            !existingProject.userIsTeamMember(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         existingProject.setPublicProject(publicProject);
@@ -305,7 +314,9 @@ public class ProjectController {
                     )
             );
 
-        if (!project.userIsTeamMember(userId)) {
+        if (
+            !database.isUserAdmin(userId) && !project.userIsTeamMember(userId)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
