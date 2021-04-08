@@ -28,6 +28,7 @@ export default function EditProject({ originalProject, setStatus }) {
             .then(() => {
                 addToast("Your idea was updated successfully.", {
                     appearance: "success",
+                    autoDismiss: true,
                 });
                 setStatus(Status.Success);
             })
