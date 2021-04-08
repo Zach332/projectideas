@@ -80,7 +80,7 @@ public class ProjectController {
                     )
             );
 
-        if (project.userIsTeamMember(userId)) {
+        if (project.userIsTeamMember(userId) || database.isUserAdmin(userId)) {
             return mapper.viewProjectAsTeamMemberDTO(project, userId, database);
         } else if (project.userHasRequestedToJoin(userId)) {
             return mapper.viewProjectDTO(project, userId, database);
