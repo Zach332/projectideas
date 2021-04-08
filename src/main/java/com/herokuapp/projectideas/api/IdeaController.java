@@ -252,8 +252,8 @@ public class IdeaController {
                     )
             );
         if (
-            !existingIdea.getAuthorId().equals(userId) &&
-            !database.isUserAdmin(userId)
+            !database.isUserAdmin(userId) &&
+            !existingIdea.getAuthorId().equals(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -278,8 +278,8 @@ public class IdeaController {
                     )
             );
         if (
-            !existingComment.getAuthorId().equals(userId) &&
-            !database.isUserAdmin(userId)
+            !database.isUserAdmin(userId) &&
+            !existingComment.getAuthorId().equals(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -334,8 +334,8 @@ public class IdeaController {
                     )
             );
         if (
-            !ideaToDelete.getAuthorId().equals(userId) &&
-            !database.isUserAdmin(userId)
+            !database.isUserAdmin(userId) &&
+            !ideaToDelete.getAuthorId().equals(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -358,8 +358,8 @@ public class IdeaController {
                     )
             );
         if (
-            !commentToDelete.getAuthorId().equals(userId) &&
-            !database.isUserAdmin(userId)
+            !database.isUserAdmin(userId) &&
+            !commentToDelete.getAuthorId().equals(userId)
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
