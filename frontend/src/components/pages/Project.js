@@ -287,11 +287,9 @@ export default function Project() {
                 <div className="me-auto">
                     <Upvotes post={project} postType="project" />
                 </div>
-                <div className="d-flex align-items-center">
-                    <div>
-                        <ProjectJoinRequestButton project={project} />
-                        <div className="text-end">{githubLink}</div>
-                    </div>
+                <div className="d-flex flex-column flex-wrap align-items-end">
+                    <ProjectJoinRequestButton project={project} />
+                    <div className="text-end">{githubLink}</div>
                 </div>
             </div>
             {project.tags && project.tags.length > 0 && (
