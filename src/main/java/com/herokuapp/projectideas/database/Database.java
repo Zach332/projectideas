@@ -548,7 +548,11 @@ public class Database {
     }
 
     public boolean isUserAdmin(String userId) {
-        return getUser(userId).get().isAdmin();
+        Optional<User> user = getUser(userId);
+        if (user.isEmpty()) {
+            return false;
+        }
+        return user.get().isAdmin();
     }
 
     public void deleteUser(String id) {
