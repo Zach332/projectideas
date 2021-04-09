@@ -144,6 +144,7 @@ export default function Project() {
                 publicProject: project.publicProject,
                 tags: project.tags,
                 githubLink: newGithubLink,
+                timeOfProjectReceipt: project.timeSent,
             })
             .then(() => {
                 setProject({
