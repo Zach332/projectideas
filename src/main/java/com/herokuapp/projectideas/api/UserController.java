@@ -2,6 +2,7 @@ package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
@@ -29,16 +30,15 @@ public class UserController {
 
     @GetMapping("/api/users/{id}")
     public ViewUserDTO getUser(@PathVariable String id) {
-        User user = database
-            .getUser(id)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User " + id + " does not exist."
-                    )
+        try {
+            User user = database.getUser(id);
+            return mapper.viewUserDTO(user);
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User " + id + " does not exist."
             );
-        return mapper.viewUserDTO(user);
+        }
     }
 
     @GetMapping("/api/users/{userId}/postedideas")
@@ -79,7 +79,7 @@ public class UserController {
 
     @PostMapping("/api/users")
     public void createUser(@RequestBody CreateUserDTO user) {
-        if (database.containsUserWithUsername(user.getUsername())) {
+        if (database.userWithUsernameExists(user.getUsername())) {
             throw new ResponseStatusException(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 "Username " + user.getUsername() + " is already taken."
@@ -93,36 +93,35 @@ public class UserController {
         @PathVariable String id,
         @RequestBody CreateUserDTO user
     ) {
-        User existingUser = database
-            .getUser(id)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User " + id + " does not exist."
-                    )
+        try {
+            User existingUser = database.getUser(id);
+            if (!existingUser.getUsername().equals(user.getUsername())) {
+                if (
+                    user.getUsername().length() < 3 ||
+                    user.getUsername().length() > 30
+                ) {
+                    throw new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_ENTITY,
+                        "Username " +
+                        user.getUsername() +
+                        " is too long or too short. " +
+                        "Usernames must be between 3 and 30 characters (inclusive)."
+                    );
+                }
+                if (database.userWithUsernameExists(user.getUsername())) {
+                    throw new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_ENTITY,
+                        "Username " + user.getUsername() + " is already taken."
+                    );
+                }
+            }
+            mapper.updateUserFromDTO(existingUser, user);
+            database.updateUser(id, existingUser);
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User " + id + " does not exist."
             );
-        if (!existingUser.getUsername().equals(user.getUsername())) {
-            if (
-                user.getUsername().length() < 3 ||
-                user.getUsername().length() > 30
-            ) {
-                throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Username " +
-                    user.getUsername() +
-                    " is too long or too short. " +
-                    "Usernames must be between 3 and 30 characters (inclusive)."
-                );
-            }
-            if (database.containsUserWithUsername(user.getUsername())) {
-                throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Username " + user.getUsername() + " is already taken."
-                );
-            }
         }
-        mapper.updateUserFromDTO(existingUser, user);
-        database.updateUser(id, existingUser);
     }
 }

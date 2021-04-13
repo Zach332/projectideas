@@ -1,15 +1,26 @@
 package com.herokuapp.projectideas.api;
 
-import java.util.UUID;
+import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.document.UserEditable;
+import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ControllerUtils {
 
-    public static boolean isUUIDValid(String uuid) {
+    @Autowired
+    private static Database database;
+
+    public static <T extends UserEditable> boolean userIsAuthorized(
+        T document,
+        String userId
+    ) {
         try {
-            UUID.fromString(uuid);
-        } catch (IllegalArgumentException exception) {
+            return (
+                document.userIsAuthorizedToEdit(userId) ||
+                database.isUserAdmin(userId)
+            );
+        } catch (EmptyPointReadException e) { // If the user does not exist
             return false;
         }
-        return true;
     }
 }
