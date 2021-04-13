@@ -171,7 +171,7 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/api/projects/{projectId}/update")
+    @PutMapping("/api/projects/{projectId}/updatelookingformembers")
     public void updateLookingForMembers(
         @RequestHeader("authorization") String userId,
         @PathVariable String projectId,

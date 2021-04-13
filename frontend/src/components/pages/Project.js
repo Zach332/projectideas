@@ -60,7 +60,7 @@ export default function Project() {
             .put(
                 "/api/projects/" +
                     project.id +
-                    "/update?lookingForMembers=" +
+                    "/updatelookingformembers?lookingForMembers=" +
                     !project.lookingForMembers
             )
             .then(() => {
