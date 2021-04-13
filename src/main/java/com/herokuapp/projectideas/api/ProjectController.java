@@ -171,6 +171,31 @@ public class ProjectController {
         }
     }
 
+    @PutMapping("/api/projects/{projectId}/updatelink")
+    public void updateLink(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String projectId,
+        @RequestParam("link") String link
+    ) {
+        Project existingProject = database
+            .getProject(projectId)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Project " + projectId + " does not exist."
+                    )
+            );
+        if (
+            !database.isUserAdmin(userId) &&
+            !existingProject.userIsTeamMember(userId)
+        ) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        existingProject.setGithubLink(link);
+        database.updateProject(existingProject, false, false);
+    }
+
     @PutMapping("/api/projects/{projectId}/updatelookingformembers")
     public void updateLookingForMembers(
         @RequestHeader("authorization") String userId,

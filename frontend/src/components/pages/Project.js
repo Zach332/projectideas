@@ -137,15 +137,12 @@ export default function Project() {
 
     const submitLink = () => {
         axios
-            .put("/api/projects/" + project.id, {
-                name: project.name,
-                description: project.description,
-                lookingForMembers: project.lookingForMembers,
-                publicProject: project.publicProject,
-                tags: project.tags,
-                githubLink: newGithubLink,
-                timeOfProjectReceipt: project.timeSent,
-            })
+            .put(
+                "/api/projects/" +
+                    project.id +
+                    "/updatelink?link=" +
+                    newGithubLink
+            )
             .then(() => {
                 setProject({
                     ...project,
