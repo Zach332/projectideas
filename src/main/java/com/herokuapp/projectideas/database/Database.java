@@ -36,6 +36,8 @@ import com.herokuapp.projectideas.database.document.vote.IdeaUpvote;
 import com.herokuapp.projectideas.database.document.vote.ProjectUpvote;
 import com.herokuapp.projectideas.database.document.vote.Upvote;
 import com.herokuapp.projectideas.database.document.vote.Votable;
+import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
+import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import com.herokuapp.projectideas.database.exception.OutdatedDocumentWriteException;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
@@ -46,6 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -65,6 +69,10 @@ public class Database {
 
     public static final int ITEMS_PER_PAGE = 10;
 
+    private static final Logger logger = LoggerFactory.getLogger(
+        Database.class
+    );
+
     public Database(
         @Value("${azure.cosmos.uri}") String uri,
         @Value("${azure.cosmos.key}") String key,
@@ -79,28 +87,48 @@ public class Database {
             database.getContainer(collectionPrefix + "_projects");
     }
 
-    private <T> Optional<T> readDocument(
+    private <T> boolean documentExists(
         String id,
         String partitionKey,
         CosmosContainer container,
         Class<T> documentType
     ) {
         try {
-            return Optional.of(
+            return (
                 container
                     .readItem(id, new PartitionKey(partitionKey), documentType)
-                    .getItem()
+                    .getStatusCode() ==
+                200
             );
         } catch (NotFoundException e) {
-            return Optional.empty();
+            return false;
         }
     }
 
-    private <T> Optional<T> singleDocumentQuery(
+    private <T> T readDocument(
+        String id,
+        String partitionKey,
+        CosmosContainer container,
+        Class<T> documentType
+    ) throws EmptyPointReadException {
+        try {
+            return container
+                .readItem(id, new PartitionKey(partitionKey), documentType)
+                .getItem();
+        } catch (NotFoundException e) {
+            throw new EmptyPointReadException(
+                documentType.getSimpleName(),
+                id,
+                partitionKey
+            );
+        }
+    }
+
+    private <T> T singleDocumentQuery(
         SelectQuery query,
         CosmosContainer container,
         Class<T> classType
-    ) {
+    ) throws EmptySingleDocumentQueryException {
         return container
             .queryItems(
                 query.createQuery(),
@@ -108,7 +136,14 @@ public class Database {
                 classType
             )
             .stream()
-            .findAny();
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new EmptySingleDocumentQueryException(
+                        classType.getSimpleName(),
+                        query.createQuery()
+                    )
+            );
     }
 
     private <T> List<T> multipleDocumentQuery(
@@ -240,7 +275,7 @@ public class Database {
         Class<S> documentType
     ) {
         // Only upvote if the user exists
-        if (getUser(upvote.getId()).isEmpty()) {
+        if (!userExists(upvote.getId())) {
             return;
         }
 
@@ -318,8 +353,7 @@ public class Database {
         CosmosContainer container,
         Class<T> upvoteType
     ) {
-        return readDocument(userId, partitionKey, postContainer, upvoteType)
-            .isPresent();
+        return documentExists(userId, partitionKey, postContainer, upvoteType);
     }
 
     // Users
@@ -328,11 +362,16 @@ public class Database {
         userContainer.createItem(user);
     }
 
-    public Optional<User> getUser(String userId) {
+    public boolean userExists(String userId) {
+        return documentExists(userId, userId, userContainer, User.class);
+    }
+
+    public User getUser(String userId) throws EmptyPointReadException {
         return readDocument(userId, userId, userContainer, User.class);
     }
 
-    public Optional<User> getUserByEmail(String email) {
+    public User getUserByEmail(String email)
+        throws EmptySingleDocumentQueryException {
         return singleDocumentQuery(
             GenericQueries
                 .queryByType(User.class)
@@ -342,7 +381,22 @@ public class Database {
         );
     }
 
-    public Optional<User> getUserByUsername(String username) {
+    public boolean userWithUsernameExists(String username) {
+        return (
+            countQuery(
+                GenericQueries
+                    .queryByType(User.class)
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("username", username)
+                    ),
+                userContainer
+            ) >
+            0
+        );
+    }
+
+    public User getUserByUsername(String username)
+        throws EmptySingleDocumentQueryException {
         return singleDocumentQuery(
             GenericQueries
                 .queryByType(User.class)
@@ -354,12 +408,9 @@ public class Database {
         );
     }
 
-    public boolean containsUserWithUsername(String username) {
-        return getUserByUsername(username).isPresent();
-    }
-
-    public void updateUser(String id, User user) {
-        User oldUser = getUser(id).get();
+    public void updateUser(String id, User user)
+        throws EmptyPointReadException {
+        User oldUser = getUser(id);
 
         // Handle username denormalization
         if (!user.getUsername().equals(oldUser.getUsername())) {
@@ -432,16 +483,21 @@ public class Database {
     }
 
     public void unsaveIdeaForUser(String ideaId, String userId) {
-        UserSavedIdea savedIdea = singleDocumentQuery(
-            GenericQueries
-                .queryByPartitionKey(userId, UserSavedIdea.class)
-                .addRestrictions(new RestrictionBuilder().eq("ideaId", ideaId)),
-            userContainer,
-            UserSavedIdea.class
-        )
-            .get();
+        try {
+            UserSavedIdea savedIdea = singleDocumentQuery(
+                GenericQueries
+                    .queryByPartitionKey(userId, UserSavedIdea.class)
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("ideaId", ideaId)
+                    ),
+                userContainer,
+                UserSavedIdea.class
+            );
 
-        userContainer.deleteItem(savedIdea, new CosmosItemRequestOptions());
+            userContainer.deleteItem(savedIdea, new CosmosItemRequestOptions());
+        } catch (EmptySingleDocumentQueryException e) {
+            logger.debug(e.toString());
+        }
     }
 
     public DocumentPage<Idea> getSavedIdeasForUser(String userId, int pageNum) {
@@ -520,17 +576,24 @@ public class Database {
     }
 
     public void leaveProjectForUser(String userId, String projectId) {
-        UserJoinedProject joinedProject = singleDocumentQuery(
-            GenericQueries
-                .queryByPartitionKey(userId, UserJoinedProject.class)
-                .addRestrictions(
-                    new RestrictionBuilder().eq("projectId", projectId)
-                ),
-            userContainer,
-            UserJoinedProject.class
-        )
-            .get();
-        userContainer.deleteItem(joinedProject, new CosmosItemRequestOptions());
+        try {
+            UserJoinedProject joinedProject = singleDocumentQuery(
+                GenericQueries
+                    .queryByPartitionKey(userId, UserJoinedProject.class)
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("projectId", projectId)
+                    ),
+                userContainer,
+                UserJoinedProject.class
+            );
+
+            userContainer.deleteItem(
+                joinedProject,
+                new CosmosItemRequestOptions()
+            );
+        } catch (EmptySingleDocumentQueryException e) {
+            logger.debug(e.toString());
+        }
     }
 
     public boolean isIdeaSavedByUser(String userId, String ideaId) {
@@ -547,12 +610,8 @@ public class Database {
         );
     }
 
-    public boolean isUserAdmin(String userId) {
-        Optional<User> user = getUser(userId);
-        if (user.isEmpty()) {
-            return false;
-        }
-        return user.get().isAdmin();
+    public boolean isUserAdmin(String userId) throws EmptyPointReadException {
+        return getUser(userId).isAdmin();
     }
 
     public void deleteUser(String id) {
@@ -579,9 +638,12 @@ public class Database {
     public void createIdea(Idea idea) {
         // Create or update idea tags
         for (String tag : idea.getTags()) {
-            Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
-            if (existingTag.isPresent()) {
-                incrementTagUsages(tag, IdeaTag.class);
+            // TODO: Improve efficiency here
+            // We check if each tag exists and then get that tag again to update it
+            if (tagExists(tag, IdeaTag.class)) {
+                try {
+                    incrementTagUsages(tag, IdeaTag.class);
+                } catch (EmptyPointReadException e) {}
             } else {
                 createTag(new IdeaTag(tag));
             }
@@ -667,7 +729,7 @@ public class Database {
         );
     }
 
-    public Optional<Idea> getIdea(String id) {
+    public Idea getIdea(String id) throws EmptyPointReadException {
         return readDocument(id, id, postContainer, Idea.class);
     }
 
@@ -676,12 +738,13 @@ public class Database {
 
         indexController.tryUpdateIdea(idea);
         for (String tag : idea.getTags()) {
-            Optional<IdeaTag> existingTag = getTag(tag, IdeaTag.class);
             // TODO: Change behavior here (and for projects)
             // As it stands, updating an idea without changing the tags will
             // increment the usages of each tag
-            if (existingTag.isPresent()) {
-                incrementTagUsages(tag, IdeaTag.class);
+            if (tagExists(tag, IdeaTag.class)) {
+                try {
+                    incrementTagUsages(tag, IdeaTag.class);
+                } catch (EmptyPointReadException e) {}
             } else {
                 createTag(new IdeaTag(tag));
             }
@@ -699,15 +762,27 @@ public class Database {
         indexController.tryDeleteIdea(idea.getIdeaId());
 
         // Remove ideaId from author's postedIdeaIds list
-        UserPostedIdea postedIdea = singleDocumentQuery(
-            GenericQueries
-                .queryByPartitionKey(idea.getAuthorId(), UserPostedIdea.class)
-                .eq("ideaId", idea.getIdeaId()),
-            userContainer,
-            UserPostedIdea.class
-        )
-            .get();
-        userContainer.deleteItem(postedIdea, new CosmosItemRequestOptions());
+        UserPostedIdea postedIdea;
+        try {
+            postedIdea =
+                singleDocumentQuery(
+                    GenericQueries
+                        .queryByPartitionKey(
+                            idea.getAuthorId(),
+                            UserPostedIdea.class
+                        )
+                        .eq("ideaId", idea.getIdeaId()),
+                    userContainer,
+                    UserPostedIdea.class
+                );
+
+            userContainer.deleteItem(
+                postedIdea,
+                new CosmosItemRequestOptions()
+            );
+        } catch (EmptySingleDocumentQueryException e) {
+            logger.debug(e.toString());
+        }
 
         idea.delete();
         postContainer.replaceItem(
@@ -734,7 +809,8 @@ public class Database {
         );
     }
 
-    public Optional<Comment> getCommentOnIdea(String ideaId, String commentId) {
+    public Comment getCommentOnIdea(String ideaId, String commentId)
+        throws EmptySingleDocumentQueryException {
         return singleDocumentQuery(
             GenericQueries.queryByIdAndPartitionKey(
                 commentId,
@@ -769,9 +845,9 @@ public class Database {
         String senderId,
         String recipientUsername,
         String content
-    ) {
-        User sender = getUser(senderId).get();
-        User recipient = getUserByUsername(recipientUsername).get();
+    ) throws EmptyPointReadException, EmptySingleDocumentQueryException {
+        User sender = getUser(senderId);
+        User recipient = getUserByUsername(recipientUsername);
 
         recipient.setUnreadMessages(recipient.getUnreadMessages() + 1);
         updateUser(recipient.getUserId(), recipient);
@@ -806,9 +882,10 @@ public class Database {
         String senderId,
         String recipientProjectId,
         String content
-    ) {
-        User sender = getUser(senderId).get();
-        Project recipientProject = getProject(recipientProjectId).get();
+    ) throws EmptyPointReadException {
+        User sender = getUser(senderId);
+        // TODO: Prevent messaging private projects
+        Project recipientProject = getProject(recipientProjectId);
         for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
             String recipientId = recipient.getUserId();
             // Skip the user sending the message
@@ -836,8 +913,8 @@ public class Database {
     public void sendGroupAdminMessage(
         String recipientProjectId,
         String content
-    ) {
-        Project recipientProject = getProject(recipientProjectId).get();
+    ) throws EmptyPointReadException {
+        Project recipientProject = getProject(recipientProjectId);
         for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
             String recipientId = recipient.getUserId();
             ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
@@ -851,10 +928,10 @@ public class Database {
         }
     }
 
-    public Optional<ReceivedMessage> getReceivedMessage(
+    public ReceivedMessage getReceivedMessage(
         String recipientId,
         String messageId
-    ) {
+    ) throws EmptyPointReadException {
         return readDocument(
             messageId,
             recipientId,
@@ -891,12 +968,14 @@ public class Database {
         );
     }
 
-    public int getNumberOfUnreadMessages(String recipientId) {
-        return getUser(recipientId).get().getUnreadMessages();
+    public int getNumberOfUnreadMessages(String recipientId)
+        throws EmptyPointReadException {
+        return getUser(recipientId).getUnreadMessages();
     }
 
-    public void markAllReceivedMessagesAsRead(String recipientId) {
-        User recipient = getUser(recipientId).get();
+    public void markAllReceivedMessagesAsRead(String recipientId)
+        throws EmptyPointReadException {
+        User recipient = getUser(recipientId);
         recipient.setUnreadMessages(0);
         updateUser(recipientId, recipient);
 
@@ -914,13 +993,12 @@ public class Database {
             .stream()
             .forEach(
                 messageId -> {
-                    ReceivedMessage message = getReceivedMessage(
-                        recipientId,
-                        messageId
-                    )
-                        .get();
-                    message.setUnread(false);
-                    updateReceivedMessage(message);
+                    ReceivedMessage message;
+                    try {
+                        message = getReceivedMessage(recipientId, messageId);
+                        message.setUnread(false);
+                        updateReceivedMessage(message);
+                    } catch (EmptyPointReadException e) {}
                 }
             );
     }
@@ -980,7 +1058,19 @@ public class Database {
         );
     }
 
-    public <T extends Tag> Optional<T> getTag(String name, Class<T> classType) {
+    public <T extends Tag> boolean tagExists(String name, Class<T> classType) {
+        String urlEncodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+        return documentExists(
+            urlEncodedName,
+            // Tag container is partitioned by type
+            classType.getSimpleName(),
+            tagContainer,
+            classType
+        );
+    }
+
+    public <T extends Tag> T getTag(String name, Class<T> classType)
+        throws EmptyPointReadException {
         // The tag id is url encoded to deal with special characters (e.g. #).
         String urlEncodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
         return readDocument(
@@ -995,8 +1085,8 @@ public class Database {
     public <T extends Tag> void incrementTagUsages(
         String name,
         Class<T> classType
-    ) {
-        Tag tag = getTag(name, classType).get();
+    ) throws EmptyPointReadException {
+        Tag tag = getTag(name, classType);
         tag.setUsages(tag.getUsages() + 1);
         tagContainer.replaceItem(
             tag,
@@ -1014,9 +1104,10 @@ public class Database {
 
     public void createProject(Project project, String projectCreatorId) {
         for (String tag : project.getTags()) {
-            Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
-            if (existingTag.isPresent()) {
-                incrementTagUsages(tag, ProjectTag.class);
+            if (tagExists(tag, ProjectTag.class)) {
+                try {
+                    incrementTagUsages(tag, ProjectTag.class);
+                } catch (EmptyPointReadException e) {}
             } else {
                 createTag(new ProjectTag(tag));
             }
@@ -1085,7 +1176,9 @@ public class Database {
         );
     }
 
-    public Optional<Project> getProject(String projectId) {
+    // TODO: Should this check for authorization if private?
+    // In the event that a previously public project goes private
+    public Project getProject(String projectId) throws EmptyPointReadException {
         return readDocument(
             projectId,
             projectId,
@@ -1175,10 +1268,12 @@ public class Database {
             indexController.tryUpdateProject(project);
         }
         // TODO: Does we have to check every tag each update?
+        // TODO: This code is repeated multiple times
         for (String tag : project.getTags()) {
-            Optional<ProjectTag> existingTag = getTag(tag, ProjectTag.class);
-            if (existingTag.isPresent()) {
-                incrementTagUsages(tag, ProjectTag.class);
+            if (tagExists(tag, ProjectTag.class)) {
+                try {
+                    incrementTagUsages(tag, ProjectTag.class);
+                } catch (EmptyPointReadException e) {}
             } else {
                 createTag(new ProjectTag(tag));
             }

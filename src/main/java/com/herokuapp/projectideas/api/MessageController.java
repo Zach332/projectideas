@@ -1,11 +1,14 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
+import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.message.SendMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessagePageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessagePageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class MessageController {
@@ -48,11 +52,11 @@ public class MessageController {
     public int getNumberOfUnreadMessages(
         @RequestHeader("authorization") String userId
     ) {
-        // TODO: Do this kind of argument validity check for more API endpoints
-        if (!ControllerUtils.isUUIDValid(userId)) {
-            return 0;
+        try {
+            return database.getNumberOfUnreadMessages(userId);
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        return database.getNumberOfUnreadMessages(userId);
     }
 
     @PostMapping("/api/messages/{recipientUsername}")
@@ -61,11 +65,20 @@ public class MessageController {
         @PathVariable("recipientUsername") String recipientUsername,
         @RequestBody SendMessageDTO message
     ) {
-        database.sendIndividualMessage(
-            userId,
-            recipientUsername,
-            message.getContent()
-        );
+        try {
+            database.sendIndividualMessage(
+                userId,
+                recipientUsername,
+                message.getContent()
+            );
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        } catch (EmptySingleDocumentQueryException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User " + recipientUsername + " does not exist."
+            );
+        }
     }
 
     @PostMapping("/api/messages/projects/{recipientProjectId}")
@@ -74,18 +87,33 @@ public class MessageController {
         @PathVariable("recipientProjectId") String recipientProjectId,
         @RequestBody SendMessageDTO message
     ) {
-        database.sendGroupMessage(
-            userId,
-            recipientProjectId,
-            message.getContent()
-        );
+        try {
+            database.sendGroupMessage(
+                userId,
+                recipientProjectId,
+                message.getContent()
+            );
+        } catch (EmptyPointReadException e) {
+            if (e.getDocumentType().equals("User")) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            } else {
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Project " + recipientProjectId + " does not exist."
+                );
+            }
+        }
     }
 
     @PostMapping("/api/messages/received/markallasread")
     public void markAllMessagesAsRead(
         @RequestHeader("authorization") String userId
     ) {
-        database.markAllReceivedMessagesAsRead(userId);
+        try {
+            database.markAllReceivedMessagesAsRead(userId);
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     @DeleteMapping("/api/messages/received/{messageId}")

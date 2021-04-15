@@ -2,13 +2,13 @@ package com.herokuapp.projectideas.login;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.user.User;
+import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -56,12 +56,17 @@ public class LoginController {
     }
 
     public User getUserByEmail(String email) {
-        Optional<User> user = database.getUserByEmail(email);
-        if (!user.isPresent()) {
+        try {
+            return database.getUserByEmail(email);
+        } catch (EmptySingleDocumentQueryException e) {
             database.createUser(new User(generateUsername(), email));
-            return database.getUserByEmail(email).get();
+            // TODO: Have the create user function return the user so this nested try/catch is not necessary
+            try {
+                return database.getUserByEmail(email);
+            } catch (EmptySingleDocumentQueryException e1) {
+                return null;
+            }
         }
-        return user.get();
     }
 
     private String generateUsername() {
