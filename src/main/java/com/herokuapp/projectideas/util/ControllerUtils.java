@@ -1,4 +1,4 @@
-package com.herokuapp.projectideas.api;
+package com.herokuapp.projectideas.util;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.UserEditable;

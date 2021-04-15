@@ -14,6 +14,7 @@ import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
 import com.herokuapp.projectideas.dto.project.UpdateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
+import com.herokuapp.projectideas.util.ControllerUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

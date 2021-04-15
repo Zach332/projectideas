@@ -17,6 +17,7 @@ import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
+import com.herokuapp.projectideas.util.ControllerUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
