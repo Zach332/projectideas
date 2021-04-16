@@ -265,7 +265,13 @@ export default function Project() {
     }
 
     if (status === Status.NotSubmitted) {
-        return <EditProject originalProject={project} setStatus={setStatus} />;
+        return (
+            <EditProject
+                originalProject={project}
+                setStatus={setStatus}
+                setRerender={setRerender}
+            />
+        );
     }
 
     if (status === Status.Success) {

@@ -8,7 +8,11 @@ import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { Prompt } from "react-router-dom";
 
-export default function EditProject({ originalProject, setStatus }) {
+export default function EditProject({
+    originalProject,
+    setStatus,
+    setRerender,
+}) {
     const [edited, setEdited] = useState(false);
     const [project, setProject] = useState(originalProject);
     const { addToast } = useToasts();
@@ -30,7 +34,8 @@ export default function EditProject({ originalProject, setStatus }) {
                     appearance: "success",
                     autoDismiss: true,
                 });
-                setStatus(Status.Success);
+                setStatus(Status.Loaded);
+                setRerender((rerender) => rerender + 1);
             })
             .catch((err) => {
                 console.log("Error updating project: " + err);
