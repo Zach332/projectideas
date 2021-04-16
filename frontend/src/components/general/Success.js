@@ -3,19 +3,19 @@ import CheckMark from "../../check.svg";
 import { useKeyPress } from "../hooks/Keys";
 import { useHistory } from "react-router-dom";
 
-export default function Success() {
+export default function Success({ link, message }) {
     let history = useHistory();
     const enterPress = useKeyPress("Enter");
     const isMobile = window.innerWidth <= 768;
 
     useEffect(() => {
         if (enterPress) {
-            history.push("/");
+            history.push(link);
         }
     }, [enterPress]);
 
     const onClick = () => {
-        history.push("/");
+        history.push(link);
     };
 
     return (
@@ -23,7 +23,7 @@ export default function Success() {
             <img
                 src={CheckMark}
                 className="mx-auto d-block p-4"
-                alt="Successful login"
+                alt="Success"
             />
             <div className="text-center">
                 <button
@@ -31,7 +31,7 @@ export default function Success() {
                     className="btn btn-link btn-lg"
                     onClick={onClick}
                 >
-                    Homepage {isMobile ? "" : "(press enter)"}
+                    {message} {isMobile ? "" : "(press enter)"}
                     <svg
                         width="1em"
                         height="1em"

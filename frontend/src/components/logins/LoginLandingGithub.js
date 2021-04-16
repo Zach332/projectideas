@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Success from "../general/Success";
 import XMark from "../../x.svg";
 import { toParams } from "../utils/Routing";
 import axios from "axios";
 import { login, Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { Link, useHistory } from "react-router-dom";
+import HomeSuccess from "./../general/HomeSuccess";
 
 export default function LoginLandingGithub() {
     const history = useHistory();
@@ -44,7 +44,7 @@ export default function LoginLandingGithub() {
 
     let result;
     if (status == Status.Success) {
-        result = <Success />;
+        result = <HomeSuccess />;
     } else if (status == Status.Failure) {
         result = (
             <div className="text-center">

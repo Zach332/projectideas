@@ -3,7 +3,6 @@ import { Prompt, useParams } from "react-router-dom";
 import { Status, useGlobalState } from "../../State";
 import LoginWarning from "../logins/LoginWarning";
 import NotFound from "./NotFound";
-import Success from "../general/Success";
 import axios from "axios";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import { useToasts } from "react-toast-notifications";
@@ -11,6 +10,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
+import HomeSuccess from "./../general/HomeSuccess";
 
 export default function CreateProject() {
     const [user] = useGlobalState("user");
@@ -95,7 +95,7 @@ export default function CreateProject() {
     if (status === Status.Success) {
         return (
             <div>
-                <Success />
+                <HomeSuccess />
             </div>
         );
     }

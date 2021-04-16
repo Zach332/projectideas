@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Success from "../general/Success";
 import axios from "axios";
 import NotFound from "./NotFound";
 import { Status, useGlobalState } from "../../State";
@@ -19,6 +18,7 @@ import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
 import Upvotes from "./../postComponents/Upvotes";
+import HomeSuccess from "./../general/HomeSuccess";
 
 export default function Project() {
     let history = useHistory();
@@ -269,7 +269,7 @@ export default function Project() {
     }
 
     if (status === Status.Success) {
-        return <Success />;
+        return <HomeSuccess />;
     }
 
     return (

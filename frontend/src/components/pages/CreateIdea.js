@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Success from "../general/Success";
 import LoginWarning from "../logins/LoginWarning";
 import {
     useGlobalState,
@@ -14,6 +13,7 @@ import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { Link } from "react-router-dom";
+import HomeSuccess from "./../general/HomeSuccess";
 
 export default function CreateIdea() {
     const { addToast } = useToasts();
@@ -123,7 +123,7 @@ export default function CreateIdea() {
     } else if (status === Status.Success) {
         return (
             <div>
-                <Success />
+                <HomeSuccess />
             </div>
         );
     }

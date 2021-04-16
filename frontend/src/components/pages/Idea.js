@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Success from "../general/Success";
 import { useParams } from "react-router-dom";
 import { toQuery } from "../utils/Routing";
 import axios from "axios";
@@ -16,6 +15,7 @@ import LoadingDiv from "./../general/LoadingDiv";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
+import HomeSuccess from "./../general/HomeSuccess";
 
 export default function Idea() {
     let history = useHistory();
@@ -118,7 +118,7 @@ export default function Idea() {
     }
 
     if (status === Status.Success) {
-        return <Success />;
+        return <HomeSuccess />;
     }
 
     if (status === Status.NotSubmitted) {
