@@ -23,6 +23,7 @@ import Projects from "./components/pages/Projects";
 import StyleDiv from "./components/general/StyleDiv";
 import Footer from "./components/layout/Footer";
 import { HelmetProvider } from "react-helmet-async";
+import "jquery";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Contact from "./components/pages/Contact";
 

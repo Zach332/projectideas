@@ -23,6 +23,7 @@ export default function Modal({
                         </h4>
                         <button
                             type="button"
+                            id={id + "close"}
                             className="btn btn-close"
                             data-bs-dismiss="modal"
                         >

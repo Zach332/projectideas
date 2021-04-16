@@ -1,4 +1,5 @@
 import Modal from "../layout/Modal";
+import $ from "jquery";
 
 export default function ProjectGitHubLinkModal({
     id,
@@ -10,9 +11,15 @@ export default function ProjectGitHubLinkModal({
         setGitHubLink(event.target.value);
     };
 
+    const submitLinkPreventDefault = (event) => {
+        event.preventDefault();
+        submitLink();
+        $("#" + id + "close").trigger("click");
+    };
+
     const joinRequestForm = (
         <div className="mx-auto">
-            <form className="py-4">
+            <form className="py-4" onSubmit={submitLinkPreventDefault}>
                 <input
                     className="form-control"
                     value={gitHubLink}
