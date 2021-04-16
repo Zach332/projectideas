@@ -10,7 +10,7 @@ import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
-import HomeSuccess from "./../general/HomeSuccess";
+import Success from "./../general/Success";
 
 export default function CreateProject() {
     const [user] = useGlobalState("user");
@@ -19,6 +19,7 @@ export default function CreateProject() {
     const [project, setProject] = useState({
         name: "",
         description: "",
+        id: "",
         lookingForMembers: true,
         publicProject: true,
         tags: [],
@@ -46,9 +47,10 @@ export default function CreateProject() {
                 publicProject: project.publicProject,
                 tags: project.tags,
             })
-            .then(() => {
+            .then((response) => {
                 setStatus(Status.Success);
                 setProject({
+                    id: response.data,
                     name: "",
                     description: "",
                     lookingForMembers: true,
@@ -95,7 +97,10 @@ export default function CreateProject() {
     if (status === Status.Success) {
         return (
             <div>
-                <HomeSuccess />
+                <Success
+                    link={"/project/" + project.id}
+                    message="Go to your new project"
+                />
             </div>
         );
     }

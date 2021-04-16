@@ -191,7 +191,7 @@ public class IdeaController {
     }
 
     @PostMapping("/api/ideas/{ideaId}/projects")
-    public void createProject(
+    public String createProject(
         @RequestHeader("authorization") String userId,
         @PathVariable String ideaId,
         @RequestBody CreateProjectDTO project
@@ -215,18 +215,17 @@ public class IdeaController {
 
         try {
             User user = database.getUser(userId);
-            database.createProject(
-                new Project(
-                    project.getName(),
-                    project.getDescription(),
-                    ideaId,
-                    new UsernameIdPair(user),
-                    project.isPublicProject(),
-                    project.isLookingForMembers(),
-                    project.getTags()
-                ),
-                userId
+            Project newProject = new Project(
+                project.getName(),
+                project.getDescription(),
+                ideaId,
+                new UsernameIdPair(user),
+                project.isPublicProject(),
+                project.isLookingForMembers(),
+                project.getTags()
             );
+            database.createProject(newProject, userId);
+            return newProject.getId();
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
