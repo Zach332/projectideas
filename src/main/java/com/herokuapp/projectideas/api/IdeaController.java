@@ -6,6 +6,8 @@ import com.herokuapp.projectideas.database.document.post.Idea;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
+import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
+import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
 import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
@@ -15,6 +17,7 @@ import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
 import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
+import com.herokuapp.projectideas.util.ControllerUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,16 +79,15 @@ public class IdeaController {
         @RequestHeader(value = "authorization", required = false) String userId,
         @PathVariable String ideaId
     ) {
-        Idea idea = database
-            .getIdea(ideaId)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Idea " + ideaId + " does not exist."
-                    )
+        try {
+            Idea idea = database.getIdea(ideaId);
+            return mapper.viewIdeaDTO(idea, userId, database);
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Idea " + ideaId + " does not exist."
             );
-        return mapper.viewIdeaDTO(idea, userId, database);
+        }
     }
 
     @GetMapping("/api/ideas/{ideaId}/comments")
@@ -141,20 +143,21 @@ public class IdeaController {
                 "Idea titles cannot be longer than 175 characters."
             );
         }
-        User user = database
-            .getUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
+
+        try {
+            User user = database.getUser(userId);
+            database.createIdea(
+                new Idea(
+                    userId,
+                    user.getUsername(),
+                    idea.getTitle(),
+                    idea.getContent(),
+                    idea.getTags()
+                )
             );
-        database.createIdea(
-            new Idea(
-                userId,
-                user.getUsername(),
-                idea.getTitle(),
-                idea.getContent(),
-                idea.getTags()
-            )
-        );
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     @GetMapping("/api/ideas/search")
@@ -172,19 +175,19 @@ public class IdeaController {
         @PathVariable String ideaId,
         @RequestBody PostCommentDTO comment
     ) {
-        User user = database
-            .getUser(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN)
+        try {
+            User user = database.getUser(userId);
+            database.createComment(
+                new Comment(
+                    ideaId,
+                    user.getId(),
+                    user.getUsername(),
+                    comment.getContent()
+                )
             );
-        database.createComment(
-            new Comment(
-                ideaId,
-                user.getId(),
-                user.getUsername(),
-                comment.getContent()
-            )
-        );
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PostMapping("/api/ideas/{ideaId}/projects")
@@ -193,8 +196,6 @@ public class IdeaController {
         @PathVariable String ideaId,
         @RequestBody CreateProjectDTO project
     ) {
-        User user = database.getUser(userId).get();
-
         if (!project.isPublicProject() && project.isLookingForMembers()) {
             throw new ResponseStatusException(
                 HttpStatus.UNPROCESSABLE_ENTITY,
@@ -212,18 +213,23 @@ public class IdeaController {
             );
         }
 
-        database.createProject(
-            new Project(
-                project.getName(),
-                project.getDescription(),
-                ideaId,
-                new UsernameIdPair(user),
-                project.isPublicProject(),
-                project.isLookingForMembers(),
-                project.getTags()
-            ),
-            userId
-        );
+        try {
+            User user = database.getUser(userId);
+            database.createProject(
+                new Project(
+                    project.getName(),
+                    project.getDescription(),
+                    ideaId,
+                    new UsernameIdPair(user),
+                    project.isPublicProject(),
+                    project.isLookingForMembers(),
+                    project.getTags()
+                ),
+                userId
+            );
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PutMapping("/api/ideas/{id}")
@@ -242,23 +248,20 @@ public class IdeaController {
             );
         }
 
-        Idea existingIdea = database
-            .getIdea(id)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Idea " + id + " does not exist."
-                    )
+        try {
+            Idea existingIdea = database.getIdea(id);
+            if (ControllerUtils.userIsAuthorized(existingIdea, userId)) {
+                mapper.updateIdeaFromDTO(existingIdea, idea);
+                database.updateIdea(existingIdea);
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Idea " + id + " does not exist."
             );
-        if (
-            !database.isUserAdmin(userId) &&
-            !existingIdea.getAuthorId().equals(userId)
-        ) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        mapper.updateIdeaFromDTO(existingIdea, idea);
-        database.updateIdea(existingIdea);
     }
 
     @PutMapping("/api/ideas/{ideaId}/comments/{commentId}")
@@ -268,23 +271,23 @@ public class IdeaController {
         @PathVariable String commentId,
         @RequestBody PostCommentDTO comment
     ) {
-        Comment existingComment = database
-            .getCommentOnIdea(ideaId, commentId)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Comment " + commentId + " does not exist."
-                    )
+        try {
+            Comment existingComment = database.getCommentOnIdea(
+                ideaId,
+                commentId
             );
-        if (
-            !database.isUserAdmin(userId) &&
-            !existingComment.getAuthorId().equals(userId)
-        ) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            if (ControllerUtils.userIsAuthorized(existingComment, userId)) {
+                mapper.updateCommentFromDTO(existingComment, comment);
+                database.updateComment(existingComment);
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        } catch (EmptySingleDocumentQueryException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Comment " + commentId + " does not exist."
+            );
         }
-        mapper.updateCommentFromDTO(existingComment, comment);
-        database.updateComment(existingComment);
     }
 
     @PostMapping("/api/ideas/{ideaId}/save")
@@ -324,22 +327,19 @@ public class IdeaController {
         @RequestHeader("authorization") String userId,
         @PathVariable String id
     ) {
-        Idea ideaToDelete = database
-            .getIdea(id)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Idea " + id + " does not exist."
-                    )
+        try {
+            Idea ideaToDelete = database.getIdea(id);
+            if (ControllerUtils.userIsAuthorized(ideaToDelete, userId)) {
+                database.deleteIdea(ideaToDelete);
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Idea " + id + " does not exist."
             );
-        if (
-            !database.isUserAdmin(userId) &&
-            !ideaToDelete.getAuthorId().equals(userId)
-        ) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        database.deleteIdea(ideaToDelete);
     }
 
     @DeleteMapping("/api/ideas/{ideaId}/comments/{commentId}")
@@ -348,21 +348,21 @@ public class IdeaController {
         @PathVariable String ideaId,
         @PathVariable String commentId
     ) {
-        Comment commentToDelete = database
-            .getCommentOnIdea(ideaId, commentId)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Comment " + commentId + " does not exist."
-                    )
+        try {
+            Comment commentToDelete = database.getCommentOnIdea(
+                ideaId,
+                commentId
             );
-        if (
-            !database.isUserAdmin(userId) &&
-            !commentToDelete.getAuthorId().equals(userId)
-        ) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            if (ControllerUtils.userIsAuthorized(commentToDelete, userId)) {
+                database.deleteComment(commentId, ideaId);
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        } catch (EmptySingleDocumentQueryException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Comment " + commentId + " does not exist."
+            );
         }
-        database.deleteComment(commentId, ideaId);
     }
 }
