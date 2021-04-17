@@ -43,7 +43,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-// TODO: Compile errors for unmapped fields
 @Mapper(componentModel = "spring")
 public abstract class DTOMapper {
 
