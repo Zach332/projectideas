@@ -1,7 +1,7 @@
 package com.herokuapp.projectideas.database.document.user;
 
+import com.herokuapp.projectideas.database.document.Authorization;
 import com.herokuapp.projectideas.database.document.RootDocument;
-import com.herokuapp.projectideas.database.document.UserEditable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class User implements RootDocument, UserEditable {
+public class User implements RootDocument, Authorization {
 
     protected String id;
     protected String type;
@@ -33,6 +33,10 @@ public class User implements RootDocument, UserEditable {
 
     public String getPartitionKey() {
         return userId;
+    }
+
+    public boolean userIsAuthorizedToView(String userId) {
+        return this.userId.equals(userId);
     }
 
     public boolean userIsAuthorizedToEdit(String userId) {

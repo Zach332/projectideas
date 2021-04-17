@@ -2,8 +2,8 @@ package com.herokuapp.projectideas.database.document.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.document.Authorization;
 import com.herokuapp.projectideas.database.document.RootDocument;
-import com.herokuapp.projectideas.database.document.UserEditable;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.time.Instant;
@@ -16,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Project implements RootDocument, Votable, UserEditable {
+public class Project implements RootDocument, Votable, Authorization {
 
     protected String id;
     protected String type;
@@ -113,6 +113,14 @@ public class Project implements RootDocument, Votable, UserEditable {
 
     public boolean userHasUpvoted(String userId, Database database) {
         return database.userHasUpvotedProject(projectId, userId);
+    }
+
+    public boolean userIsAuthorizedToView(String userId) {
+        if (this.publicProject) {
+            return true;
+        } else {
+            return userIsTeamMember(userId);
+        }
     }
 
     public boolean userIsAuthorizedToEdit(String userId) {
