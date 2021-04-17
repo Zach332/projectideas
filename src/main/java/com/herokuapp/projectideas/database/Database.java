@@ -4,6 +4,7 @@ import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.implementation.ConflictException;
 import com.azure.cosmos.implementation.NotFoundException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
@@ -870,9 +871,12 @@ public class Database {
             content
         );
 
-        // TODO: Handle failure here
-        userContainer.createItem(receivedMessage);
-        userContainer.createItem(sentMessage);
+        try {
+            userContainer.createItem(receivedMessage);
+            userContainer.createItem(sentMessage);
+        } catch (CosmosException e) {
+            logger.error("Individual message failed to send.", e);
+        }
     }
 
     public void sendIndividualAdminMessage(String recipientId, String content) {
