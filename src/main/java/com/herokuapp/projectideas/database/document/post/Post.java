@@ -1,12 +1,12 @@
 package com.herokuapp.projectideas.database.document.post;
 
+import com.herokuapp.projectideas.database.document.Authorization;
 import com.herokuapp.projectideas.database.document.RootDocument;
-import com.herokuapp.projectideas.database.document.UserEditable;
 import lombok.*;
 
 @Getter
 @Setter
-public abstract class Post implements RootDocument, UserEditable {
+public abstract class Post implements RootDocument, Authorization {
 
     protected String id;
     protected String type;
@@ -19,6 +19,10 @@ public abstract class Post implements RootDocument, UserEditable {
 
     public String getPartitionKey() {
         return ideaId;
+    }
+
+    public boolean userIsAuthorizedToView(String userId) {
+        return true;
     }
 
     public boolean userIsAuthorizedToEdit(String userId) {
