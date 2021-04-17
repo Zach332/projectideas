@@ -106,7 +106,7 @@ export default function TagPicker({ post, setPost, postType }) {
             <div className="mt-1">
                 <br></br>
             </div>
-            <form className="row g-3">
+            <div className="row g-3">
                 <div className="col-auto">
                     <span>Add tag</span>
                 </div>
@@ -130,7 +130,7 @@ export default function TagPicker({ post, setPost, postType }) {
                         Tags must be less than 30 characters
                     </div>
                 )}
-            </form>
+            </div>
             {filterTagSuggestions(tagSuggestions).map((tag) => (
                 <span
                     className="badge btn rounded-pill bg-secondary me-2"
