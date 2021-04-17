@@ -4,6 +4,7 @@ import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.implementation.ConflictException;
 import com.azure.cosmos.implementation.NotFoundException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
@@ -238,7 +239,13 @@ public class Database {
             if (document.isPresent()) {
                 orderedDocuments.add(document.get());
             } else {
-                // TODO: Log failure here, this should not happen without a database error at some point in time
+                logger.debug(
+                    "getDocumentPageFromPartitionKeyPage encountered a document " +
+                    "reference to a document that does not exist: \n" +
+                    classType.getSimpleName() +
+                    " with partition key " +
+                    partitionKey
+                );
             }
         }
 
@@ -358,8 +365,9 @@ public class Database {
 
     // Users
 
-    public void createUser(User user) {
+    public User createUser(User user) {
         userContainer.createItem(user);
+        return user;
     }
 
     public boolean userExists(String userId) {
@@ -863,9 +871,12 @@ public class Database {
             content
         );
 
-        // TODO: Handle failure here
-        userContainer.createItem(receivedMessage);
-        userContainer.createItem(sentMessage);
+        try {
+            userContainer.createItem(receivedMessage);
+            userContainer.createItem(sentMessage);
+        } catch (CosmosException e) {
+            logger.error("Individual message failed to send.", e);
+        }
     }
 
     public void sendIndividualAdminMessage(String recipientId, String content) {
@@ -877,54 +888,61 @@ public class Database {
         userContainer.createItem(receivedMessage);
     }
 
-    // TODO: Handle failure if one or more messages fail to save
     public void sendGroupMessage(
         String senderId,
         String recipientProjectId,
         String content
     ) throws EmptyPointReadException {
-        User sender = getUser(senderId);
-        // TODO: Prevent messaging private projects
-        Project recipientProject = getProject(recipientProjectId);
-        for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
-            String recipientId = recipient.getUserId();
-            // Skip the user sending the message
-            if (recipientId.equals(senderId)) {
-                continue;
+        try {
+            User sender = getUser(senderId);
+            // TODO: Prevent messaging private projects
+            Project recipientProject = getProject(recipientProjectId);
+            for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
+                String recipientId = recipient.getUserId();
+                // Skip the user sending the message
+                if (recipientId.equals(senderId)) {
+                    continue;
+                }
+                ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                    recipientId,
+                    sender.getUsername(),
+                    content,
+                    recipientProjectId,
+                    recipientProject.getName()
+                );
+                userContainer.createItem(receivedGroupMessage);
             }
-            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
-                recipientId,
-                sender.getUsername(),
-                content,
+            SentGroupMessage sentGroupMessage = new SentGroupMessage(
+                senderId,
                 recipientProjectId,
-                recipientProject.getName()
+                recipientProject.getName(),
+                content
             );
-            userContainer.createItem(receivedGroupMessage);
+            userContainer.createItem(sentGroupMessage);
+        } catch (CosmosException e) {
+            logger.error("Group message failed to send.", e);
         }
-        SentGroupMessage sentGroupMessage = new SentGroupMessage(
-            senderId,
-            recipientProjectId,
-            recipientProject.getName(),
-            content
-        );
-        userContainer.createItem(sentGroupMessage);
     }
 
     public void sendGroupAdminMessage(
         String recipientProjectId,
         String content
     ) throws EmptyPointReadException {
-        Project recipientProject = getProject(recipientProjectId);
-        for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
-            String recipientId = recipient.getUserId();
-            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
-                recipientId,
-                "projectideas",
-                content,
-                recipientProjectId,
-                recipientProject.getName()
-            );
-            userContainer.createItem(receivedGroupMessage);
+        try {
+            Project recipientProject = getProject(recipientProjectId);
+            for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
+                String recipientId = recipient.getUserId();
+                ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                    recipientId,
+                    "projectideas",
+                    content,
+                    recipientProjectId,
+                    recipientProject.getName()
+                );
+                userContainer.createItem(receivedGroupMessage);
+            }
+        } catch (CosmosException e) {
+            logger.error("Group admin message failed to send.", e);
         }
     }
 

@@ -59,13 +59,7 @@ public class LoginController {
         try {
             return database.getUserByEmail(email);
         } catch (EmptySingleDocumentQueryException e) {
-            database.createUser(new User(generateUsername(), email));
-            // TODO: Have the create user function return the user so this nested try/catch is not necessary
-            try {
-                return database.getUserByEmail(email);
-            } catch (EmptySingleDocumentQueryException e1) {
-                return null;
-            }
+            return database.createUser(new User(generateUsername(), email));
         }
     }
 
