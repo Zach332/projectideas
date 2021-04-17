@@ -238,7 +238,13 @@ public class Database {
             if (document.isPresent()) {
                 orderedDocuments.add(document.get());
             } else {
-                // TODO: Log failure here, this should not happen without a database error at some point in time
+                logger.debug(
+                    "getDocumentPageFromPartitionKeyPage encountered a document " +
+                    "reference to a document that does not exist: \n" +
+                    classType.getSimpleName() +
+                    " with partition key " +
+                    partitionKey
+                );
             }
         }
 
