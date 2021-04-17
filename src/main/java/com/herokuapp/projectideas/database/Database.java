@@ -1050,6 +1050,7 @@ public class Database {
 
     public void createTag(Tag tag) {
         tagContainer.createItem(tag);
+        indexController.tryIndexTag(tag);
     }
 
     public List<IdeaTag> getIdeaTags() {

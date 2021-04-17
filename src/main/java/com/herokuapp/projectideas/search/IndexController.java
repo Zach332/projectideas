@@ -103,6 +103,12 @@ public class IndexController {
         projectIndexWriter.commit();
     }
 
+    private void indexTag(Tag tag) throws IOException {
+        Document doc = getTagDoc(tag);
+        tagIndexWriter.addDocument(doc);
+        tagIndexWriter.commit();
+    }
+
     private Document getIdeaDoc(Idea idea) {
         Document doc = new Document();
         doc.add(new TextField("title", idea.getTitle(), Field.Store.YES));
@@ -216,6 +222,12 @@ public class IndexController {
     public void tryIndexProject(Project project) {
         try {
             indexProject(project);
+        } catch (Exception ignored) {}
+    }
+
+    public void tryIndexTag(Tag tag) {
+        try {
+            indexTag(tag);
         } catch (Exception ignored) {}
     }
 
