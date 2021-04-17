@@ -17,15 +17,10 @@ import HomeSuccess from "./../general/HomeSuccess";
 
 export default function CreateIdea() {
     const { addToast } = useToasts();
-    const [idea, setIdea] = useState({
-        title: "",
-        content: "",
-        tags: [],
-    });
+    const [idea, setIdea] = useGlobalState("newIdea");
 
     const [status, setStatus] = useState(Status.NotSubmitted);
     const [user] = useGlobalState("user");
-    const [savedIdea] = useGlobalState("newIdea");
 
     const handleInputChange = (event) => {
         const target = event.target;
@@ -39,10 +34,6 @@ export default function CreateIdea() {
     useEffect(() => {
         localStorage.setItem(newIdeaPersistenceKey, JSON.stringify(idea));
     }, [idea]);
-
-    useEffect(() => {
-        setIdea(savedIdea);
-    }, []);
 
     const handleSubmit = (event) => {
         axios
