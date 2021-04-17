@@ -35,6 +35,10 @@ public class User implements RootDocument, Authorization {
         return userId;
     }
 
+    public boolean userIsAuthorizedToView(String userId) {
+        return this.userId.equals(userId);
+    }
+
     public boolean userIsAuthorizedToEdit(String userId) {
         return this.userId.equals(userId);
     }

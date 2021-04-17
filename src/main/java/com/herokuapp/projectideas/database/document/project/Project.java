@@ -115,6 +115,14 @@ public class Project implements RootDocument, Votable, Authorization {
         return database.userHasUpvotedProject(projectId, userId);
     }
 
+    public boolean userIsAuthorizedToView(String userId) {
+        if (this.publicProject) {
+            return true;
+        } else {
+            return userIsTeamMember(userId);
+        }
+    }
+
     public boolean userIsAuthorizedToEdit(String userId) {
         return userIsTeamMember(userId);
     }

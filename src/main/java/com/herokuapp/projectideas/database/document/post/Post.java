@@ -21,6 +21,10 @@ public abstract class Post implements RootDocument, Authorization {
         return ideaId;
     }
 
+    public boolean userIsAuthorizedToView(String userId) {
+        return true;
+    }
+
     public boolean userIsAuthorizedToEdit(String userId) {
         return authorId.equals(userId);
     }
