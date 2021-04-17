@@ -10,7 +10,21 @@ public class ControllerUtils {
     @Autowired
     private static Database database;
 
-    public static <T extends Authorization> boolean userIsAuthorized(
+    public static <T extends Authorization> boolean userIsAuthorizedToView(
+        T document,
+        String userId
+    ) {
+        try {
+            return (
+                document.userIsAuthorizedToView(userId) ||
+                database.isUserAdmin(userId)
+            );
+        } catch (EmptyPointReadException e) { // If the user does not exist
+            return false;
+        }
+    }
+
+    public static <T extends Authorization> boolean userIsAuthorizedToEdit(
         T document,
         String userId
     ) {

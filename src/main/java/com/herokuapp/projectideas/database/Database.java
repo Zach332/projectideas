@@ -1194,8 +1194,6 @@ public class Database {
         );
     }
 
-    // TODO: Should this check for authorization if private?
-    // In the event that a previously public project goes private
     public Project getProject(String projectId) throws EmptyPointReadException {
         return readDocument(
             projectId,

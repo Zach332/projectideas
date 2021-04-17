@@ -249,7 +249,7 @@ public class IdeaController {
 
         try {
             Idea existingIdea = database.getIdea(id);
-            if (ControllerUtils.userIsAuthorized(existingIdea, userId)) {
+            if (ControllerUtils.userIsAuthorizedToEdit(existingIdea, userId)) {
                 mapper.updateIdeaFromDTO(existingIdea, idea);
                 database.updateIdea(existingIdea);
             } else {
@@ -275,7 +275,9 @@ public class IdeaController {
                 ideaId,
                 commentId
             );
-            if (ControllerUtils.userIsAuthorized(existingComment, userId)) {
+            if (
+                ControllerUtils.userIsAuthorizedToEdit(existingComment, userId)
+            ) {
                 mapper.updateCommentFromDTO(existingComment, comment);
                 database.updateComment(existingComment);
             } else {
@@ -328,7 +330,7 @@ public class IdeaController {
     ) {
         try {
             Idea ideaToDelete = database.getIdea(id);
-            if (ControllerUtils.userIsAuthorized(ideaToDelete, userId)) {
+            if (ControllerUtils.userIsAuthorizedToEdit(ideaToDelete, userId)) {
                 database.deleteIdea(ideaToDelete);
             } else {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -352,7 +354,9 @@ public class IdeaController {
                 ideaId,
                 commentId
             );
-            if (ControllerUtils.userIsAuthorized(commentToDelete, userId)) {
+            if (
+                ControllerUtils.userIsAuthorizedToEdit(commentToDelete, userId)
+            ) {
                 database.deleteComment(commentId, ideaId);
             } else {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
