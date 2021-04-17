@@ -358,8 +358,9 @@ public class Database {
 
     // Users
 
-    public void createUser(User user) {
+    public User createUser(User user) {
         userContainer.createItem(user);
+        return user;
     }
 
     public boolean userExists(String userId) {
