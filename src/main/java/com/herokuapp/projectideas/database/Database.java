@@ -928,17 +928,21 @@ public class Database {
         String recipientProjectId,
         String content
     ) throws EmptyPointReadException {
-        Project recipientProject = getProject(recipientProjectId);
-        for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
-            String recipientId = recipient.getUserId();
-            ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
-                recipientId,
-                "projectideas",
-                content,
-                recipientProjectId,
-                recipientProject.getName()
-            );
-            userContainer.createItem(receivedGroupMessage);
+        try {
+            Project recipientProject = getProject(recipientProjectId);
+            for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
+                String recipientId = recipient.getUserId();
+                ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
+                    recipientId,
+                    "projectideas",
+                    content,
+                    recipientProjectId,
+                    recipientProject.getName()
+                );
+                userContainer.createItem(receivedGroupMessage);
+            }
+        } catch (CosmosException e) {
+            logger.error("Group admin message failed to send.", e);
         }
     }
 
