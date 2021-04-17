@@ -126,7 +126,7 @@ export default function EditProject({
                         className="form-check-input"
                         type="checkbox"
                         id="lookingForMembers"
-                        onClick={flipLookingForMembers}
+                        onChange={flipLookingForMembers}
                         checked={project.lookingForMembers}
                     />
                     <label
@@ -143,7 +143,7 @@ export default function EditProject({
                             className="form-check-input"
                             type="checkbox"
                             id="publicProject"
-                            onClick={flipPublicProject}
+                            onChange={flipPublicProject}
                             checked={project.publicProject}
                         />
                         <label
