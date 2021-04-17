@@ -1303,7 +1303,7 @@ public class Database {
         long timeOfProjectReceipt
     ) throws OutdatedDocumentWriteException {
         // Ensure user is editing the latest version of the project
-        if (project.getTimeLastEdited() >= timeOfProjectReceipt) {
+        if (project.getTimeLastEdited() > timeOfProjectReceipt) {
             throw new OutdatedDocumentWriteException();
         }
         project.setTimeLastEdited(Instant.now().getEpochSecond());
