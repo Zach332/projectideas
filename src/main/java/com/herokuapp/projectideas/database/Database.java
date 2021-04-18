@@ -1204,6 +1204,19 @@ public class Database {
         );
     }
 
+    public Project getProjectByInviteId(String inviteId)
+        throws EmptySingleDocumentQueryException {
+        return singleDocumentQuery(
+            GenericQueries
+                .queryByType(Project.class)
+                .addRestrictions(
+                    new RestrictionBuilder().eq("inviteId", inviteId)
+                ),
+            projectContainer,
+            Project.class
+        );
+    }
+
     public List<Project> getProjectsBasedOnIdea(String ideaId) {
         return multipleDocumentQuery(
             GenericQueries

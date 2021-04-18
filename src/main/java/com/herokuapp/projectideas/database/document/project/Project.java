@@ -31,11 +31,15 @@ public class Project implements RootDocument, Votable, Authorization {
     protected String description;
     protected String githubLink;
     protected List<UsernameIdPair> teamMembers;
+
+    @Setter(AccessLevel.NONE)
     protected boolean publicProject;
+
     protected boolean lookingForMembers;
     protected List<ProjectJoinRequest> usersRequestingToJoin;
     protected List<String> tags;
     protected int upvoteCount;
+    protected String inviteId;
 
     public Project(
         String name,
@@ -62,6 +66,16 @@ public class Project implements RootDocument, Votable, Authorization {
         this.usersRequestingToJoin = new ArrayList<>();
         this.tags = tags;
         this.upvoteCount = 0;
+        this.inviteId = publicProject ? null : UUID.randomUUID().toString();
+    }
+
+    public void setPublicProject(boolean publicProject) {
+        this.publicProject = publicProject;
+        if (publicProject) {
+            this.inviteId = null;
+        } else {
+            this.inviteId = UUID.randomUUID().toString();
+        }
     }
 
     public String getPartitionKey() {

@@ -9,4 +9,5 @@ import lombok.*;
 public class ViewProjectAsTeamMemberDTO extends ViewProjectDTO {
 
     private List<ViewProjectJoinRequestDTO> joinRequests;
+    private String inviteId;
 }
