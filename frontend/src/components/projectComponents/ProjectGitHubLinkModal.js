@@ -17,7 +17,7 @@ export default function ProjectGitHubLinkModal({
         $("#" + id + "close").trigger("click");
     };
 
-    const joinRequestForm = (
+    const linkForm = (
         <div className="mx-auto">
             <form className="py-4" onSubmit={submitLinkPreventDefault}>
                 <input
@@ -35,7 +35,7 @@ export default function ProjectGitHubLinkModal({
             <Modal
                 id={id}
                 title={"Edit repository link"}
-                body={joinRequestForm}
+                body={linkForm}
                 submit="Submit"
                 onClick={submitLink}
             />
