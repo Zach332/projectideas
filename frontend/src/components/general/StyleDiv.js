@@ -15,11 +15,9 @@ export default function StyleDiv({ children, ...props }) {
 
     if (theme.mode === "light") {
         import("../../css/light.scss");
-        import("../../css/unhide.css");
         return <div {...props}>{children}</div>;
     } else {
         import("../../css/dark.scss");
-        import("../../css/unhide.css");
         return <div {...props}>{children}</div>;
     }
 }
