@@ -405,6 +405,45 @@ public class ProjectController {
         }
     }
 
+    @PostMapping("/api/projects/invites/{inviteId}/accept")
+    public void acceptInvite(
+        @RequestHeader("authorization") String userId,
+        @PathVariable String inviteId
+    ) {
+        try {
+            User user = database.getUser(userId);
+            Project project = database.getProjectByInviteId(inviteId);
+
+            // Do not accept invite for existing memeber
+            if (project.userIsTeamMember(userId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+
+            project.getTeamMembers().add(new UsernameIdPair(user));
+
+            database.joinProjectForUser(
+                user.getUserId(),
+                project.getProjectId()
+            );
+
+            database.sendGroupAdminMessage(
+                project.getProjectId(),
+                user.getUsername() +
+                " has accepted an invite to join " +
+                project.getName()
+            );
+
+            database.updateProject(project, false, false);
+        } catch (EmptyPointReadException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        } catch (EmptySingleDocumentQueryException e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Invite id " + inviteId + " does not correspond to a project."
+            );
+        }
+    }
+
     @PostMapping("/api/projects/{projectId}/leave")
     public void leaveProject(
         @RequestHeader("authorization") String userId,
