@@ -50,7 +50,9 @@ export default function LoginLandingGithub() {
             <div className="text-center">
                 <img
                     src={XMark}
-                    className="mx-auto w-25 d-block py-4"
+                    className="mx-auto d-block m-4"
+                    width="215px"
+                    height="215px"
                     alt="Login failed"
                 />
                 <h2>Login failed</h2>
