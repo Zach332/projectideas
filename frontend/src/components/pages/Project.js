@@ -54,7 +54,7 @@ export default function Project() {
             .catch(() => {
                 setStatus(Status.NotFound);
             });
-    }, [rerender]);
+    }, [rerender, project.publicProject]);
 
     const flipLookingForMembers = () => {
         axios
