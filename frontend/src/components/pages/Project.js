@@ -32,6 +32,7 @@ export default function Project() {
         lookingForMembers: true,
         publicProject: true,
         githubLink: "",
+        inviteId: "",
         id: "",
         joinRequests: "",
     });
@@ -398,6 +399,7 @@ export default function Project() {
                             </label>
                         </div>
                     )}
+                    {!project.publicProject && <div>{project.inviteId}</div>}
                 </div>
             )}
             {project.userIsTeamMember && (
