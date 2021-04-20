@@ -406,7 +406,7 @@ public class ProjectController {
     }
 
     @PostMapping("/api/projects/invites/{inviteId}/accept")
-    public void acceptInvite(
+    public String acceptInvite(
         @RequestHeader("authorization") String userId,
         @PathVariable String inviteId
     ) {
@@ -434,6 +434,8 @@ public class ProjectController {
             );
 
             database.updateProject(project, false, false);
+
+            return project.getId();
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         } catch (EmptySingleDocumentQueryException e) {
