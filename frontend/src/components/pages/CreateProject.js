@@ -160,7 +160,8 @@ export default function CreateProject() {
                         htmlFor="lookingForMembers"
                     >
                         Look for new members - your project will appear as an
-                        option if a user wants to join a team
+                        option if someone wants to join a team (otherwise, you
+                        can add members with an invite link)
                     </label>
                 </div>
                 {!project.lookingForMembers && (
@@ -177,8 +178,8 @@ export default function CreateProject() {
                             htmlFor="publicProject"
                         >
                             Public - your project will appear when people browse
-                            projects (anyone with the link can still see private
-                            projects)
+                            projects (private projects are only viewable by team
+                            members)
                         </label>
                     </div>
                 )}
