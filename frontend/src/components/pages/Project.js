@@ -172,6 +172,14 @@ export default function Project() {
         setStatus(Status.NotSubmitted);
     };
 
+    const copyInviteLink = () => {
+        navigator.clipboard.writeText(inviteLink);
+        addToast("Copied invite link to clipboard.", {
+            appearance: "success",
+            autoDismiss: true,
+        });
+    };
+
     const leave = () => {
         axios
             .post("/api/projects/" + project.id + "/leave")
@@ -421,9 +429,7 @@ export default function Project() {
                             </div>
                             <button
                                 className="btn btn-sm btn-secondary"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(inviteLink);
-                                }}
+                                onClick={copyInviteLink}
                             >
                                 Copy to clipboard
                             </button>
