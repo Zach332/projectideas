@@ -32,12 +32,19 @@ export default function Project() {
         lookingForMembers: true,
         publicProject: true,
         githubLink: "",
+        inviteId: "",
         id: "",
         joinRequests: "",
     });
     const [newGithubLink, setNewGithubLink] = useState("");
     let params = useParams();
     let admin = project.userIsTeamMember || user.admin;
+    let inviteLink =
+        location.protocol +
+        "//" +
+        location.host +
+        "/invite?" +
+        toQuery({ id: project.inviteId });
 
     useEffect(() => {
         axios
@@ -53,7 +60,7 @@ export default function Project() {
             .catch(() => {
                 setStatus(Status.NotFound);
             });
-    }, [rerender]);
+    }, [rerender, project.publicProject]);
 
     const flipLookingForMembers = () => {
         axios
@@ -163,6 +170,14 @@ export default function Project() {
 
     const edit = () => {
         setStatus(Status.NotSubmitted);
+    };
+
+    const copyInviteLink = () => {
+        navigator.clipboard.writeText(inviteLink);
+        addToast("Copied invite link to clipboard.", {
+            appearance: "success",
+            autoDismiss: true,
+        });
     };
 
     const leave = () => {
@@ -396,6 +411,28 @@ export default function Project() {
                             >
                                 Public
                             </label>
+                        </div>
+                    )}
+                    {!project.publicProject && (
+                        <div className="d-flex flex-wrap flex-row align-items-center mt-3">
+                            <div>
+                                <label htmlFor="inviteLink">Invite link</label>
+                            </div>
+                            <div className="mx-3 w-50">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="inviteLink"
+                                    value={inviteLink}
+                                    readOnly
+                                />
+                            </div>
+                            <button
+                                className="btn btn-sm btn-secondary"
+                                onClick={copyInviteLink}
+                            >
+                                Copy to clipboard
+                            </button>
                         </div>
                     )}
                 </div>

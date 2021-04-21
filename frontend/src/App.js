@@ -25,6 +25,7 @@ import Footer from "./components/layout/Footer";
 import { HelmetProvider } from "react-helmet-async";
 import Contact from "./components/pages/Contact";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import Invite from "./components/pages/Invite";
 
 function App() {
     return (
@@ -123,6 +124,11 @@ function App() {
                                         path="/messages"
                                         exact
                                         component={Messages}
+                                    />
+                                    <Route
+                                        path="/invite"
+                                        exact
+                                        component={Invite}
                                     />
                                     <Route
                                         path="/markdown"
