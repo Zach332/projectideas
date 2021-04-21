@@ -80,14 +80,15 @@ public class ProjectController {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
 
-            if (project.userIsTeamMember(userId)) {
+            //TODO: Handle this through ControllerUtils
+            if (
+                project.userIsTeamMember(userId) || database.isUserAdmin(userId)
+            ) {
                 return mapper.viewProjectAsTeamMemberDTO(
                     project,
                     userId,
                     database
                 );
-            } else if (project.userHasRequestedToJoin(userId)) {
-                return mapper.viewProjectDTO(project, userId, database);
             } else {
                 return mapper.viewProjectDTO(project, userId, database);
             }
