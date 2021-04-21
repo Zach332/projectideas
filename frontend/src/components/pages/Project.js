@@ -39,6 +39,12 @@ export default function Project() {
     const [newGithubLink, setNewGithubLink] = useState("");
     let params = useParams();
     let admin = project.userIsTeamMember || user.admin;
+    let inviteLink =
+        location.protocol +
+        "//" +
+        location.host +
+        "/invite?" +
+        toQuery({ id: project.inviteId });
 
     useEffect(() => {
         axios
@@ -399,7 +405,30 @@ export default function Project() {
                             </label>
                         </div>
                     )}
-                    {!project.publicProject && <div>{project.inviteId}</div>}
+                    {!project.publicProject && (
+                        <div className="d-flex flex-wrap flex-row align-items-center mt-3">
+                            <div>
+                                <label htmlFor="inviteLink">Invite link</label>
+                            </div>
+                            <div className="mx-3 w-50">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="inviteLink"
+                                    value={inviteLink}
+                                    readOnly
+                                />
+                            </div>
+                            <button
+                                className="btn btn-sm btn-secondary"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(inviteLink);
+                                }}
+                            >
+                                Copy to clipboard
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
             {project.userIsTeamMember && (
