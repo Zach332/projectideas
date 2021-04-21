@@ -152,7 +152,7 @@ export default function CreateProject() {
                         className="form-check-input"
                         type="checkbox"
                         id="lookingForMembers"
-                        onClick={flipLookingForMembers}
+                        onChange={flipLookingForMembers}
                         defaultChecked
                     />
                     <label
@@ -170,7 +170,7 @@ export default function CreateProject() {
                             className="form-check-input"
                             type="checkbox"
                             id="publicProject"
-                            onClick={flipPublicProject}
+                            onChange={flipPublicProject}
                             checked={project.publicProject}
                         />
                         <label
