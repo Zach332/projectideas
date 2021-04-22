@@ -66,7 +66,7 @@ public class Project implements RootDocument, Votable, Authorization {
         this.usersRequestingToJoin = new ArrayList<>();
         this.tags = tags;
         this.upvoteCount = 0;
-        this.inviteId = publicProject ? null : UUID.randomUUID().toString();
+        this.inviteId = UUID.randomUUID().toString();
     }
 
     public void setPublicProject(boolean publicProject) {
