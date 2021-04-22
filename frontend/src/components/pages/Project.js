@@ -184,7 +184,6 @@ export default function Project() {
         axios
             .post("/api/projects/" + project.id + "/leave")
             .then(() => {
-                setRerender((rerender) => rerender + 1);
                 addToast("You have left this team successfully.", {
                     appearance: "success",
                     autoDismiss: true,
