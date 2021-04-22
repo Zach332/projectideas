@@ -413,28 +413,26 @@ export default function Project() {
                             </label>
                         </div>
                     )}
-                    {!project.publicProject && (
-                        <div className="d-flex flex-wrap flex-row align-items-center mt-3">
-                            <div>
-                                <label htmlFor="inviteLink">Invite link</label>
-                            </div>
-                            <div className="mx-3 w-50">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="inviteLink"
-                                    value={inviteLink}
-                                    readOnly
-                                />
-                            </div>
-                            <button
-                                className="btn btn-sm btn-secondary"
-                                onClick={copyInviteLink}
-                            >
-                                Copy to clipboard
-                            </button>
+                    <div className="d-flex flex-wrap flex-row align-items-center mt-3">
+                        <div>
+                            <label htmlFor="inviteLink">Invite link</label>
                         </div>
-                    )}
+                        <div className="mx-3 w-50">
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="inviteLink"
+                                value={inviteLink}
+                                readOnly
+                            />
+                        </div>
+                        <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={copyInviteLink}
+                        >
+                            Copy to clipboard
+                        </button>
+                    </div>
                 </div>
             )}
             {project.userIsTeamMember && (
