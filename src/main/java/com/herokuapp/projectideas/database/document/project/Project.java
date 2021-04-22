@@ -71,11 +71,7 @@ public class Project implements RootDocument, Votable, Authorization {
 
     public void setPublicProject(boolean publicProject) {
         this.publicProject = publicProject;
-        if (publicProject) {
-            this.inviteId = null;
-        } else {
-            this.inviteId = UUID.randomUUID().toString();
-        }
+        this.inviteId = UUID.randomUUID().toString();
     }
 
     public String getPartitionKey() {

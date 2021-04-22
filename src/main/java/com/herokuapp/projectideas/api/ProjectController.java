@@ -436,7 +436,7 @@ public class ProjectController {
 
             database.updateProject(project, false, false);
 
-            return project.getId();
+            return project.getProjectId();
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         } catch (EmptySingleDocumentQueryException e) {
