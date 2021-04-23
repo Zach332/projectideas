@@ -1,5 +1,7 @@
 package com.herokuapp.projectideas.api;
 
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.post.Comment;
 import com.herokuapp.projectideas.database.document.post.Idea;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -155,6 +158,7 @@ public class IdeaController {
                     idea.getTags()
                 )
             );
+            // TODO: Rename database exceptions better for the API perspective
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -231,34 +235,44 @@ public class IdeaController {
         }
     }
 
-    @PutMapping("/api/ideas/{id}")
+    @PatchMapping(
+        path = "/api/ideas/{id}",
+        consumes = "application/json-patch+json"
+    )
     public void updateIdea(
         @RequestHeader("authorization") String userId,
         @PathVariable String id,
-        @RequestBody PostIdeaDTO idea
+        @RequestBody JsonPatch ideaPatch
     ) {
-        if (idea.getTitle().length() > 175) {
-            throw new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "Idea title " +
-                idea.getTitle() +
-                " is too long. " +
-                "Idea titles cannot be longer than 175 characters."
-            );
-        }
-
         try {
-            Idea existingIdea = database.getIdea(id);
-            if (ControllerUtils.userIsAuthorizedToEdit(existingIdea, userId)) {
-                mapper.updateIdeaFromDTO(existingIdea, idea);
-                database.updateIdea(existingIdea);
-            } else {
+            Idea idea = database.getIdea(id);
+
+            if (!ControllerUtils.userIsAuthorizedToEdit(idea, userId)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
+
+            Idea patchedIdea = mapper.getIdeaFromPatch(idea, ideaPatch);
+
+            if (patchedIdea.getTitle().length() > 175) {
+                throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Idea title " +
+                    patchedIdea.getTitle() +
+                    " is too long. " +
+                    "Idea titles cannot be longer than 175 characters."
+                );
+            }
+
+            database.updateIdea(patchedIdea);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Idea " + id + " does not exist."
+            );
+        } catch (IllegalArgumentException | JsonPatchException e) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Patch was formatted incorrectly. The idea was not updated."
             );
         }
     }

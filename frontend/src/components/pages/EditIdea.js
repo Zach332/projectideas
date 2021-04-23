@@ -1,4 +1,5 @@
 import axios from "axios";
+import { createPatch } from "rfc6902";
 import { useState } from "react";
 import { useLeavePageWarning } from "../hooks/LeavePageWarning";
 import { Status } from "../../State";
@@ -9,9 +10,10 @@ import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { Link, Prompt } from "react-router-dom";
 
-export default function EditIdea({ originalIdea, setStatus }) {
+export default function EditIdea({ idea, setStatus }) {
     const { addToast } = useToasts();
-    const [idea, setIdea] = useState(originalIdea);
+    const originalIdea = JSON.parse(JSON.stringify(idea));
+    const [editedIdea, setIdea] = useState(idea);
     const [edited, setEdited] = useState(false);
 
     useLeavePageWarning(edited);
@@ -28,11 +30,15 @@ export default function EditIdea({ originalIdea, setStatus }) {
 
     const handleSubmit = (event) => {
         axios
-            .put("/api/ideas/" + idea.id, {
-                title: idea.title,
-                content: idea.content,
-                tags: idea.tags,
-            })
+            .patch(
+                "/api/ideas/" + originalIdea.id,
+                createPatch(originalIdea, editedIdea),
+                {
+                    headers: {
+                        "Content-Type": "application/json-patch+json",
+                    },
+                }
+            )
             .then(() => {
                 addToast("Your idea was updated successfully.", {
                     appearance: "success",
@@ -63,28 +69,36 @@ export default function EditIdea({ originalIdea, setStatus }) {
                     <label htmlFor="title">Title</label>
                     <input
                         type="text"
-                        value={idea.title}
+                        value={editedIdea.title}
                         className="form-control"
                         id="title"
                         onChange={handleInputChange}
                     />
                 </div>
-                {idea.title.length > 175 && <div>Your title is too long.</div>}
+                {editedIdea.title.length > 175 && (
+                    <div>Your title is too long.</div>
+                )}
                 <div className="form-group mt-2 mb-3">
                     <label htmlFor="content">Details</label>
                     <textarea
-                        value={idea.content}
+                        value={editedIdea.content}
                         className="form-control"
                         rows="10"
                         id="content"
                         onChange={handleInputChange}
                     ></textarea>
                 </div>
-                <TagPicker post={idea} setPost={setIdea} postType="idea" />
+                <TagPicker
+                    post={editedIdea}
+                    setPost={setIdea}
+                    postType="idea"
+                />
                 <br></br>
                 <button
                     type="submit"
-                    disabled={idea.title === "" || idea.title.length > 175}
+                    disabled={
+                        editedIdea.title === "" || editedIdea.title.length > 175
+                    }
                     className="btn btn-primary"
                 >
                     Update Idea
@@ -97,7 +111,7 @@ export default function EditIdea({ originalIdea, setStatus }) {
                 </Link>{" "}
                 is supported. A preview of your idea is below.
             </p>
-            <IdeaCard idea={idea} />
+            <IdeaCard idea={editedIdea} />
         </div>
     );
 }

@@ -1,5 +1,9 @@
 package com.herokuapp.projectideas.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.DocumentPage;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
@@ -22,7 +26,6 @@ import com.herokuapp.projectideas.dto.message.ViewSentIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessagePageDTO;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
-import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
@@ -42,9 +45,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class DTOMapper {
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     // Document -> DTO
 
@@ -306,10 +313,10 @@ public abstract class DTOMapper {
         CreateUserDTO createUserDTO
     );
 
-    public abstract void updateIdeaFromDTO(
-        @MappingTarget Idea idea,
-        PostIdeaDTO postIdeaDTO
-    );
+    public Idea getIdeaFromPatch(Idea idea, JsonPatch patch)
+        throws IllegalArgumentException, JsonPatchException {
+        return patchDocument(patch, idea, Idea.class);
+    }
 
     public abstract void updateCommentFromDTO(
         @MappingTarget Comment comment,
@@ -320,4 +327,15 @@ public abstract class DTOMapper {
         @MappingTarget Project project,
         CreateProjectDTO createProjectDTO
     );
+
+    private <T> T patchDocument(
+        JsonPatch patch,
+        T targetDocument,
+        Class<T> targetClass
+    ) throws IllegalArgumentException, JsonPatchException {
+        JsonNode patchedDocument = patch.apply(
+            objectMapper.convertValue(targetDocument, JsonNode.class)
+        );
+        return objectMapper.convertValue(patchedDocument, targetClass);
+    }
 }
