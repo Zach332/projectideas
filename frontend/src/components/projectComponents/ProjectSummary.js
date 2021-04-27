@@ -16,7 +16,7 @@ export default function ProjectSummary({ project, setRerender }) {
                 to={projectLink}
                 className="list-group-item list-group-item-action flex-column align-items-start rounded border"
             >
-                <div className="d-flex justify-content-between">
+                <div className="d-flex flex-wrap justify-content-between">
                     <h5 className="mb-1">{project.name}</h5>
                     <ProjectJoinRequestButton project={project} />
                 </div>

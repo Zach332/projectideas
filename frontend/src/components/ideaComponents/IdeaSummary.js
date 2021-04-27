@@ -11,14 +11,9 @@ export default function IdeaSummary({ idea }) {
             to={ideaLink}
             className="list-group-item list-group-item-action flex-column align-items-start rounded border"
         >
-            <div className="d-flex justify-content-between">
+            <div className="d-flex flex-wrap justify-content-between">
                 <h5 className="mb-1">{idea.title}</h5>
-                <small
-                    className="text-muted"
-                    style={{
-                        minWidth: 65,
-                    }}
-                >
+                <small className="text-muted">
                     {formatTime(idea.timeCreated)}
                 </small>
             </div>
