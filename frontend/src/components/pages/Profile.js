@@ -239,12 +239,7 @@ export default function Profile() {
                             }
                         >
                             <div className="col-12">
-                                <label
-                                    htmlFor="username"
-                                    className="col-sm-2 col-form-label"
-                                >
-                                    Username
-                                </label>
+                                <label htmlFor="username">Username</label>
                             </div>
                             <div className="mx-sm-3 col-12">
                                 <input
