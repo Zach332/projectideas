@@ -11,7 +11,7 @@ public class EmailTemplates {
     public SimpleMailMessage unreadMessagesTemplate() {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setText(unreadMessagesText);
-        message.setSubject("Unread Messages");
+        message.setSubject("New Unread Messages");
         return message;
     }
 
