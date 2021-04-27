@@ -127,7 +127,7 @@ export default function Search() {
             <Helmet>
                 <title>
                     {query === ""
-                        ? "Search " + type
+                        ? "Search " + type + " "
                         : "Search " + type + " for " + query + " "}
                     | {Globals.Title}
                 </title>
