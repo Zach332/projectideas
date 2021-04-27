@@ -1,7 +1,12 @@
 .card {
     word-break: break-word;
 }
-
 .list-group-item {
+    word-break: break-word;
+}
+h1 {
+    word-break: break-word;
+}
+div {
     word-break: break-word;
 }
