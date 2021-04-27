@@ -30,7 +30,6 @@ import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
-import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
@@ -212,10 +211,6 @@ public abstract class DTOMapper {
         source = "project",
         qualifiedByName = "userHasUpvotedProject"
     )
-    @Mapping(
-        target = "timeSent",
-        expression = "java( java.time.Instant.now().getEpochSecond() )"
-    )
     public abstract ViewProjectDTO viewProjectDTO(
         Project project,
         @Context String userId,
@@ -236,10 +231,6 @@ public abstract class DTOMapper {
         target = "userHasUpvoted",
         source = "project",
         qualifiedByName = "userHasUpvotedProject"
-    )
-    @Mapping(
-        target = "timeSent",
-        expression = "java( java.time.Instant.now().getEpochSecond() )"
     )
     @Mapping(target = "joinRequests", source = "usersRequestingToJoin")
     public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
@@ -323,10 +314,10 @@ public abstract class DTOMapper {
         PostCommentDTO postCommentDTO
     );
 
-    public abstract void updateProjectFromDTO(
-        @MappingTarget Project project,
-        CreateProjectDTO createProjectDTO
-    );
+    public Project getProjectFromPatch(Project project, JsonPatch patch)
+        throws IllegalArgumentException, JsonPatchException {
+        return patchDocument(patch, project, Project.class);
+    }
 
     private <T> T patchDocument(
         JsonPatch patch,

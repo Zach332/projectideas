@@ -39,7 +39,6 @@ import com.herokuapp.projectideas.database.document.vote.Upvote;
 import com.herokuapp.projectideas.database.document.vote.Votable;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
-import com.herokuapp.projectideas.database.exception.OutdatedDocumentWriteException;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.search.IndexController;
 import java.net.URLEncoder;
@@ -1278,9 +1277,9 @@ public class Database {
     }
 
     /**
-     * Updates project without any protection against overwriting new
-     * data that the user has not seen. This is acceptable for boolean
-     * fields like isPublic, but not for fields like description.
+     * Updates project without updating the time last edited.
+     * This is acceptable for boolean fields like isPublic, but
+     * not for fields like description.
      * @param project
      * @param toPublic
      * @param toPrivate
@@ -1317,27 +1316,18 @@ public class Database {
     }
 
     /**
-     * Updates a project and ensures that later update attempts do not
-     * overwrite new data that the user has not seen.
+     * Updates a project and updates the time last edited
      * @param project
      * @param toPublic
      * @param toPrivate
-     * @param timeOfProjectReceipt Time the user updating the project
-     * initially received it from the backend
      * @throws OutdatedDocumentWriteException
      */
     public void updateProjectWithConcurrencyControl(
         Project project,
         boolean toPublic,
-        boolean toPrivate,
-        long timeOfProjectReceipt
-    ) throws OutdatedDocumentWriteException {
-        // Ensure user is editing the latest version of the project
-        if (project.getTimeLastEdited() > timeOfProjectReceipt) {
-            throw new OutdatedDocumentWriteException();
-        }
+        boolean toPrivate
+    ) {
         project.setTimeLastEdited(Instant.now().getEpochSecond());
-
         updateProject(project, toPublic, toPrivate);
     }
 

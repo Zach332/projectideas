@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPatch } from "rfc6902";
 import { Status } from "../../State";
 import axios from "axios";
 import { useToasts } from "react-toast-notifications";
@@ -9,26 +10,29 @@ import { Globals } from "../../GlobalData";
 import { Prompt } from "react-router-dom";
 
 export default function EditProject({
-    originalProject,
+    project,
     setStatus,
     setRerender,
+    lastModified,
 }) {
     const [edited, setEdited] = useState(false);
-    const [project, setProject] = useState(originalProject);
+    const originalProject = JSON.parse(JSON.stringify(project));
+    const [editedProject, setProject] = useState(project);
     const { addToast } = useToasts();
     useLeavePageWarning(edited);
 
     const handleSubmit = (event) => {
         axios
-            .put("/api/projects/" + project.id, {
-                name: project.name,
-                description: project.description,
-                lookingForMembers: project.lookingForMembers,
-                publicProject: project.publicProject,
-                tags: project.tags,
-                githubLink: project.githubLink,
-                timeOfProjectReceipt: project.timeSent,
-            })
+            .patch(
+                "/api/projects/" + originalProject.id,
+                createPatch(originalProject, editedProject),
+                {
+                    headers: {
+                        "Content-Type": "application/json-patch+json",
+                        "If-Unmodified-Since": lastModified,
+                    },
+                }
+            )
             .then(() => {
                 addToast("Your idea was updated successfully.", {
                     appearance: "success",
@@ -39,7 +43,7 @@ export default function EditProject({
             })
             .catch((err) => {
                 console.log("Error updating project: " + err);
-                if (err.response.status == 409) {
+                if (err.response.status == 412) {
                     addToast(
                         "This project has been edited by another user since you began editing. " +
                             "Please save your changes elsewhere, refresh the page, and try again.",
@@ -100,12 +104,12 @@ export default function EditProject({
                     <input
                         type="text"
                         className="form-control"
-                        value={project.name}
+                        value={editedProject.name}
                         id="name"
                         onChange={handleInputChange}
                     />
                 </div>
-                {project.name.length > 175 && (
+                {editedProject.name.length > 175 && (
                     <div>Your project name is too long.</div>
                 )}
                 <div className="form-group mt-2 mb-3">
@@ -116,7 +120,7 @@ export default function EditProject({
                     <textarea
                         className="form-control"
                         id="description"
-                        value={project.description}
+                        value={editedProject.description}
                         rows="5"
                         onChange={handleInputChange}
                     ></textarea>
@@ -127,7 +131,7 @@ export default function EditProject({
                         type="checkbox"
                         id="lookingForMembers"
                         onChange={flipLookingForMembers}
-                        checked={project.lookingForMembers}
+                        checked={editedProject.lookingForMembers}
                     />
                     <label
                         className="form-check-label"
@@ -137,14 +141,14 @@ export default function EditProject({
                         option if a user wants to join a team
                     </label>
                 </div>
-                {!project.lookingForMembers && (
+                {!editedProject.lookingForMembers && (
                     <div className="form-check form-switch mb-3">
                         <input
                             className="form-check-input"
                             type="checkbox"
                             id="publicProject"
                             onChange={flipPublicProject}
-                            checked={project.publicProject}
+                            checked={editedProject.publicProject}
                         />
                         <label
                             className="form-check-label"
@@ -157,14 +161,17 @@ export default function EditProject({
                     </div>
                 )}
                 <TagPicker
-                    post={project}
+                    post={editedProject}
                     setPost={setProject}
                     postType="project"
                 />
                 <br></br>
                 <button
                     type="submit"
-                    disabled={project.name === "" || project.name.length > 175}
+                    disabled={
+                        editedProject.name === "" ||
+                        editedProject.name.length > 175
+                    }
                     className="btn btn-primary mt-4"
                 >
                     Update project

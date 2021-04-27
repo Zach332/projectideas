@@ -35,6 +35,7 @@ export default function Project() {
         id: "",
         joinRequests: "",
     });
+    const [lastModified, setLastModified] = useState();
     const [newGithubLink, setNewGithubLink] = useState("");
     let params = useParams();
     let admin = project.userIsTeamMember || user.admin;
@@ -47,6 +48,7 @@ export default function Project() {
                     setStatus(Status.NotFound);
                 } else {
                     setProject(response.data);
+                    setLastModified(response.headers["last-modified"]);
                     setStatus(Status.Loaded);
                 }
             })
@@ -267,9 +269,10 @@ export default function Project() {
     if (status === Status.NotSubmitted) {
         return (
             <EditProject
-                originalProject={project}
+                project={project}
                 setStatus={setStatus}
                 setRerender={setRerender}
+                lastModified={lastModified}
             />
         );
     }

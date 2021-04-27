@@ -1,5 +1,7 @@
 package com.herokuapp.projectideas.api;
 
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.project.ProjectJoinRequest;
@@ -7,17 +9,17 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
-import com.herokuapp.projectideas.database.exception.OutdatedDocumentWriteException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
-import com.herokuapp.projectideas.dto.project.UpdateProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
 import com.herokuapp.projectideas.util.ControllerUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -69,7 +72,7 @@ public class ProjectController {
     }
 
     @GetMapping("/api/projects/{projectId}")
-    public ViewProjectDTO getProject(
+    public ResponseEntity<ViewProjectDTO> getProject(
         @RequestHeader(value = "authorization", required = false) String userId,
         @PathVariable String projectId
     ) {
@@ -80,17 +83,25 @@ public class ProjectController {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
 
+            ViewProjectDTO viewProjectDTO;
             if (project.userIsTeamMember(userId)) {
-                return mapper.viewProjectAsTeamMemberDTO(
-                    project,
-                    userId,
-                    database
-                );
+                viewProjectDTO =
+                    mapper.viewProjectAsTeamMemberDTO(
+                        project,
+                        userId,
+                        database
+                    );
             } else if (project.userHasRequestedToJoin(userId)) {
-                return mapper.viewProjectDTO(project, userId, database);
+                viewProjectDTO =
+                    mapper.viewProjectDTO(project, userId, database);
             } else {
-                return mapper.viewProjectDTO(project, userId, database);
+                viewProjectDTO =
+                    mapper.viewProjectDTO(project, userId, database);
             }
+            return ResponseEntity
+                .ok()
+                .lastModified(project.getTimeLastEdited() * 1000)
+                .body(viewProjectDTO);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -115,61 +126,26 @@ public class ProjectController {
         database.unupvoteProject(projectId, userId);
     }
 
-    @PutMapping("/api/projects/{projectId}")
+    @PatchMapping(
+        path = "/api/projects/{projectId}",
+        consumes = "application/json-patch+json"
+    )
     public void updateProject(
+        WebRequest request,
         @RequestHeader("authorization") String userId,
         @PathVariable String projectId,
-        @RequestBody UpdateProjectDTO project
+        @RequestBody JsonPatch projectPatch
     ) {
-        if (!project.isPublicProject() && project.isLookingForMembers()) {
-            throw new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "A project cannot be looking for members while private."
-            );
-        }
-
-        if (project.getName().length() > 175) {
-            throw new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "Project name " +
-                project.getName() +
-                " is too long. " +
-                "Project names cannot be longer than 175 characters."
-            );
-        }
-
         try {
-            Project existingProject = database.getProject(projectId);
+            Project project = database.getProject(projectId);
 
-            if (
-                !ControllerUtils.userIsAuthorizedToEdit(existingProject, userId)
-            ) {
+            if (!ControllerUtils.userIsAuthorizedToEdit(project, userId)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
 
-            boolean toPublic = false;
-            boolean toPrivate = false;
-            if (
-                existingProject.isPublicProject() && !project.isPublicProject()
-            ) {
-                toPrivate = true;
-            }
-            if (
-                !existingProject.isPublicProject() && project.isPublicProject()
-            ) {
-                toPublic = true;
-            }
-            mapper.updateProjectFromDTO(existingProject, project);
-            try {
-                database.updateProjectWithConcurrencyControl(
-                    existingProject,
-                    toPublic,
-                    toPrivate,
-                    project.getTimeOfProjectReceipt()
-                );
-            } catch (OutdatedDocumentWriteException e) {
+            if (request.checkNotModified(project.getTimeLastEdited() * 1000)) {
                 throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                    HttpStatus.PRECONDITION_FAILED,
                     "Project " +
                     projectId +
                     " has been edited since the user initially loaded it. The user will" +
@@ -177,10 +153,59 @@ public class ProjectController {
                     " resubmit their edits."
                 );
             }
+
+            Project patchedProject = mapper.getProjectFromPatch(
+                project,
+                projectPatch
+            );
+
+            boolean toPublic = false;
+            boolean toPrivate = false;
+            if (
+                project.isPublicProject() && !patchedProject.isPublicProject()
+            ) {
+                toPrivate = true;
+            }
+            if (
+                !project.isPublicProject() && patchedProject.isPublicProject()
+            ) {
+                toPublic = true;
+            }
+
+            if (
+                !patchedProject.isPublicProject() &&
+                patchedProject.isLookingForMembers()
+            ) {
+                throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "A project cannot be looking for members while private."
+                );
+            }
+
+            if (patchedProject.getName().length() > 175) {
+                throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Project name " +
+                    patchedProject.getName() +
+                    " is too long. " +
+                    "Project names cannot be longer than 175 characters."
+                );
+            }
+
+            database.updateProjectWithConcurrencyControl(
+                patchedProject,
+                toPublic,
+                toPrivate
+            );
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Project " + projectId + " does not exist."
+            );
+        } catch (IllegalArgumentException | JsonPatchException e) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Patch was formatted incorrectly. The project was not updated."
             );
         }
     }
@@ -476,6 +501,7 @@ public class ProjectController {
         }
     }
 
+    // TODO: Rename function
     @GetMapping("/api/projects/search")
     public PreviewProjectPageDTO searchIdeas(
         @RequestHeader(value = "authorization", required = false) String userId,
