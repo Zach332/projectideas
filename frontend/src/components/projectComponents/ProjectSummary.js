@@ -20,12 +20,7 @@ export default function ProjectSummary({ project, setRerender }) {
                     <h5 className="mb-1">{project.name}</h5>
                     <ProjectJoinRequestButton project={project} />
                 </div>
-                <p
-                    className="mb-1"
-                    style={{
-                        wordBreak: "break-word",
-                    }}
-                >
+                <p className="mb-1">
                     {project.description.substring(0, MAX_LENGTH)}
                     {project.description.length > MAX_LENGTH && "..."}
                 </p>

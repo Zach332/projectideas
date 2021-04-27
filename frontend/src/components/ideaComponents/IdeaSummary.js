@@ -13,16 +13,16 @@ export default function IdeaSummary({ idea }) {
         >
             <div className="d-flex justify-content-between">
                 <h5 className="mb-1">{idea.title}</h5>
-                <small className="text-muetd">
+                <small
+                    className="text-muted"
+                    style={{
+                        minWidth: 65,
+                    }}
+                >
                     {formatTime(idea.timeCreated)}
                 </small>
             </div>
-            <p
-                className="mb-1"
-                style={{
-                    wordBreak: "break-word",
-                }}
-            >
+            <p className="mb-1">
                 {removeMd(idea.content).substring(0, MAX_LENGTH)}
                 {removeMd(idea.content).length > MAX_LENGTH && "..."}
             </p>

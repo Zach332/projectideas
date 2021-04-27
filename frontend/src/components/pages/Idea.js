@@ -179,7 +179,6 @@ export default function Idea() {
                                     <div
                                         className="me-auto"
                                         style={{
-                                            wordBreak: "break-word",
                                             minWidth: 75,
                                         }}
                                     >
