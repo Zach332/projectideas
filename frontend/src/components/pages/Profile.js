@@ -145,74 +145,6 @@ export default function Profile() {
         event.preventDefault();
     };
 
-    let usernameForm;
-    if (!changingUsername) {
-        usernameForm = (
-            <form
-                className="my-5 row row-cols-lg-auto g-3 align-items-center"
-                onSubmit={handleChange}
-            >
-                <div className="col-12">
-                    <label
-                        htmlFor="username"
-                        className="col-sm-2 col-form-label"
-                    >
-                        Username
-                    </label>
-                </div>
-                <div className="mx-sm-3 col-12">
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="username"
-                        defaultValue={userData.username}
-                        readOnly
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary">
-                    Change
-                </button>
-            </form>
-        );
-    } else {
-        usernameForm = (
-            <form
-                className="my-5 row row-cols-lg-auto g-3 align-items-center"
-                onSubmit={handleSubmit}
-            >
-                <div className="col-12">
-                    <label
-                        htmlFor="username"
-                        className="col-sm-2 col-form-label"
-                    >
-                        Username
-                    </label>
-                </div>
-                <div className="mx-sm-3 col-12">
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="username"
-                        placeholder="AwesomeNewUsername"
-                        onChange={handleInputChange}
-                    />
-                </div>
-                <div className="col-12">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={
-                            userData.username.length < 3 ||
-                            userData.username.length > 30
-                        }
-                    >
-                        Submit
-                    </button>
-                </div>
-            </form>
-        );
-    }
-
     const onCLick = () => {
         logout();
         addToast("Logged out successfully", {
@@ -300,7 +232,53 @@ export default function Profile() {
                     role="tabpanel"
                 >
                     <LoadingDiv isLoading={status.userData === Status.Loading}>
-                        {usernameForm}
+                        <form
+                            className="my-5 row row-cols-lg-auto g-3 align-items-center"
+                            onSubmit={
+                                changingUsername ? handleSubmit : handleChange
+                            }
+                        >
+                            <div className="col-12">
+                                <label
+                                    htmlFor="username"
+                                    className="col-sm-2 col-form-label"
+                                >
+                                    Username
+                                </label>
+                            </div>
+                            <div className="mx-sm-3 col-12">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="username"
+                                    defaultValue={userData.username}
+                                    onChange={handleInputChange}
+                                    placeholder="AwesomeNewUsername"
+                                    readOnly={!changingUsername}
+                                />
+                            </div>
+                            {changingUsername ? (
+                                <div className="col-12">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        disabled={
+                                            userData.username.length < 3 ||
+                                            userData.username.length > 30
+                                        }
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                >
+                                    Change
+                                </button>
+                            )}
+                        </form>
                         <form className="my-5 row row-cols-lg-auto g-3 align-items-center">
                             <div className="col-12">
                                 <label htmlFor="email">Email</label>
