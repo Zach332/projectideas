@@ -643,21 +643,11 @@ public class Database {
     }
 
     public void createIdea(Idea idea) {
-        // Create or update idea tags
-        for (String tag : idea.getTags()) {
-            // TODO: Improve efficiency here
-            // We check if each tag exists and then get that tag again to update it
-            if (tagExists(tag, IdeaTag.class)) {
-                try {
-                    incrementTagUsages(tag, IdeaTag.class);
-                } catch (EmptyPointReadException e) {}
-            } else {
-                createTag(new IdeaTag(tag));
-            }
-        }
-
         // Save idea to database
         postContainer.createItem(idea);
+
+        // Update idea tags
+        updateAddedAndRemovedTags(idea.getTags(), null, IdeaTag.class);
 
         // Update idea index
         indexController.tryIndexIdea(idea);
@@ -740,22 +730,17 @@ public class Database {
         return readDocument(id, id, postContainer, Idea.class);
     }
 
-    public void updateIdea(Idea idea) {
+    public void updateIdea(
+        Idea idea,
+        List<String> addedTags,
+        List<String> removedTags
+    ) {
         idea.setTimeLastEdited(Instant.now().getEpochSecond());
 
         indexController.tryUpdateIdea(idea);
-        for (String tag : idea.getTags()) {
-            // TODO: Change behavior here (and for projects)
-            // As it stands, updating an idea without changing the tags will
-            // increment the usages of each tag
-            if (tagExists(tag, IdeaTag.class)) {
-                try {
-                    incrementTagUsages(tag, IdeaTag.class);
-                } catch (EmptyPointReadException e) {}
-            } else {
-                createTag(new IdeaTag(tag));
-            }
-        }
+
+        updateAddedAndRemovedTags(addedTags, removedTags, IdeaTag.class);
+
         postContainer.replaceItem(
             idea,
             idea.getId(),
@@ -1114,6 +1099,48 @@ public class Database {
         );
     }
 
+    public <T extends Tag> void decrementTagUsages(
+        String name,
+        Class<T> classType
+    ) throws EmptyPointReadException {
+        Tag tag = getTag(name, classType);
+        tag.setUsages(tag.getUsages() - 1);
+        tagContainer.replaceItem(
+            tag,
+            tag.getId(),
+            new PartitionKey(classType.getSimpleName()),
+            new CosmosItemRequestOptions()
+        );
+    }
+
+    private <T extends Tag> void updateAddedAndRemovedTags(
+        List<String> addedTags,
+        List<String> removedTags,
+        Class<T> tagType
+    ) {
+        if (addedTags != null) {
+            for (String tag : addedTags) {
+                if (tagExists(tag, tagType)) {
+                    try {
+                        incrementTagUsages(tag, tagType);
+                    } catch (EmptyPointReadException e) {}
+                } else {
+                    createTag(new IdeaTag(tag));
+                }
+            }
+        }
+
+        if (removedTags != null) {
+            for (String tag : removedTags) {
+                try {
+                    decrementTagUsages(tag, tagType);
+                } catch (EmptyPointReadException e) {
+                    logger.debug(e.toString());
+                }
+            }
+        }
+    }
+
     public void deleteTag(Tag tag) {
         tagContainer.deleteItem(tag, new CosmosItemRequestOptions());
     }
@@ -1121,16 +1148,9 @@ public class Database {
     // Projects
 
     public void createProject(Project project, String projectCreatorId) {
-        for (String tag : project.getTags()) {
-            if (tagExists(tag, ProjectTag.class)) {
-                try {
-                    incrementTagUsages(tag, ProjectTag.class);
-                } catch (EmptyPointReadException e) {}
-            } else {
-                createTag(new ProjectTag(tag));
-            }
-        }
         projectContainer.createItem(project);
+
+        updateAddedAndRemovedTags(project.getTags(), null, ProjectTag.class);
 
         if (project.isPublicProject()) indexController.tryIndexProject(project);
 
@@ -1287,7 +1307,9 @@ public class Database {
     public void updateProject(
         Project project,
         boolean toPublic,
-        boolean toPrivate
+        boolean toPrivate,
+        List<String> addedTags,
+        List<String> removedTags
     ) {
         if (toPublic) {
             indexController.tryIndexProject(project);
@@ -1296,17 +1318,9 @@ public class Database {
         } else {
             indexController.tryUpdateProject(project);
         }
-        // TODO: Does we have to check every tag each update?
-        // TODO: This code is repeated multiple times
-        for (String tag : project.getTags()) {
-            if (tagExists(tag, ProjectTag.class)) {
-                try {
-                    incrementTagUsages(tag, ProjectTag.class);
-                } catch (EmptyPointReadException e) {}
-            } else {
-                createTag(new ProjectTag(tag));
-            }
-        }
+
+        updateAddedAndRemovedTags(addedTags, removedTags, ProjectTag.class);
+
         projectContainer.replaceItem(
             project,
             project.getId(),
@@ -1325,10 +1339,12 @@ public class Database {
     public void updateProjectWithConcurrencyControl(
         Project project,
         boolean toPublic,
-        boolean toPrivate
+        boolean toPrivate,
+        List<String> addedTags,
+        List<String> removedTags
     ) {
         project.setTimeLastEdited(Instant.now().getEpochSecond());
-        updateProject(project, toPublic, toPrivate);
+        updateProject(project, toPublic, toPrivate, addedTags, removedTags);
     }
 
     public void deleteProject(String projectId) {

@@ -263,7 +263,15 @@ public class IdeaController {
                 );
             }
 
-            database.updateIdea(patchedIdea);
+            List<String> addedTags = ControllerUtils.getTagsOnlyInFirstDocument(
+                patchedIdea,
+                idea
+            );
+            List<String> removedTags = ControllerUtils.getTagsOnlyInFirstDocument(
+                idea,
+                patchedIdea
+            );
+            database.updateIdea(patchedIdea, addedTags, removedTags);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,

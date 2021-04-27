@@ -15,6 +15,7 @@ import com.herokuapp.projectideas.dto.project.RequestToJoinProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.search.SearchController;
 import com.herokuapp.projectideas.util.ControllerUtils;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -192,10 +193,20 @@ public class ProjectController {
                 );
             }
 
+            List<String> addedTags = ControllerUtils.getTagsOnlyInFirstDocument(
+                patchedProject,
+                project
+            );
+            List<String> removedTags = ControllerUtils.getTagsOnlyInFirstDocument(
+                project,
+                patchedProject
+            );
             database.updateProjectWithConcurrencyControl(
                 patchedProject,
                 toPublic,
-                toPrivate
+                toPrivate,
+                addedTags,
+                removedTags
             );
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
@@ -224,7 +235,7 @@ public class ProjectController {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
             existingProject.setGithubLink(link);
-            database.updateProject(existingProject, false, false);
+            database.updateProject(existingProject, false, false, null, null);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -252,7 +263,7 @@ public class ProjectController {
                 existingProject.setPublicProject(true);
             }
             existingProject.setLookingForMembers(lookingForMembers);
-            database.updateProject(existingProject, false, false);
+            database.updateProject(existingProject, false, false, null, null);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -284,7 +295,9 @@ public class ProjectController {
             database.updateProject(
                 existingProject,
                 publicProject,
-                !publicProject
+                !publicProject,
+                null,
+                null
             );
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
@@ -338,7 +351,7 @@ public class ProjectController {
             project
                 .getUsersRequestingToJoin()
                 .add(new ProjectJoinRequest(user, request.getRequestMessage()));
-            database.updateProject(project, false, false);
+            database.updateProject(project, false, false, null, null);
             database.sendGroupAdminMessage(
                 projectId,
                 user.getUsername() +
@@ -416,7 +429,7 @@ public class ProjectController {
                 );
             }
 
-            database.updateProject(project, false, false);
+            database.updateProject(project, false, false, null, null);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -458,7 +471,7 @@ public class ProjectController {
                 project.getName()
             );
 
-            database.updateProject(project, false, false);
+            database.updateProject(project, false, false, null, null);
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         } catch (EmptySingleDocumentQueryException e) {
@@ -489,7 +502,7 @@ public class ProjectController {
             if (project.getTeamMembers().size() == 0) {
                 database.deleteProject(projectId);
             } else {
-                database.updateProject(project, false, false);
+                database.updateProject(project, false, false, null, null);
             }
 
             database.leaveProjectForUser(userId, projectId);
