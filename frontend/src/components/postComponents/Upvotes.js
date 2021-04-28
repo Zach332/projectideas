@@ -54,7 +54,7 @@ export default function Upvotes({ post, postType }) {
 
     return (
         <button
-            className="btn d-flex flex-column align-items-center py-0 border-0"
+            className="btn d-flex flex-column align-items-center p-0 border-0"
             style={{ width: 50, boxShadow: "none" }}
             onClick={toggleUpvote}
             disabled={!user.loggedIn}

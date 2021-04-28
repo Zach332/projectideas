@@ -1,5 +1,9 @@
 package com.herokuapp.projectideas.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.DocumentPage;
 import com.herokuapp.projectideas.database.document.message.ReceivedGroupMessage;
@@ -22,12 +26,10 @@ import com.herokuapp.projectideas.dto.message.ViewSentIndividualMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessagePageDTO;
 import com.herokuapp.projectideas.dto.post.PostCommentDTO;
-import com.herokuapp.projectideas.dto.post.PostIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.post.ViewCommentDTO;
 import com.herokuapp.projectideas.dto.post.ViewIdeaDTO;
-import com.herokuapp.projectideas.dto.project.CreateProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
@@ -42,9 +44,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class DTOMapper {
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     // Document -> DTO
 
@@ -205,10 +211,6 @@ public abstract class DTOMapper {
         source = "project",
         qualifiedByName = "userHasUpvotedProject"
     )
-    @Mapping(
-        target = "timeSent",
-        expression = "java( java.time.Instant.now().getEpochSecond() )"
-    )
     public abstract ViewProjectDTO viewProjectDTO(
         Project project,
         @Context String userId,
@@ -229,10 +231,6 @@ public abstract class DTOMapper {
         target = "userHasUpvoted",
         source = "project",
         qualifiedByName = "userHasUpvotedProject"
-    )
-    @Mapping(
-        target = "timeSent",
-        expression = "java( java.time.Instant.now().getEpochSecond() )"
     )
     @Mapping(target = "joinRequests", source = "usersRequestingToJoin")
     public abstract ViewProjectAsTeamMemberDTO viewProjectAsTeamMemberDTO(
@@ -306,18 +304,29 @@ public abstract class DTOMapper {
         CreateUserDTO createUserDTO
     );
 
-    public abstract void updateIdeaFromDTO(
-        @MappingTarget Idea idea,
-        PostIdeaDTO postIdeaDTO
-    );
+    public Idea getIdeaFromPatch(Idea idea, JsonPatch patch)
+        throws IllegalArgumentException, JsonPatchException {
+        return patchDocument(patch, idea, Idea.class);
+    }
 
     public abstract void updateCommentFromDTO(
         @MappingTarget Comment comment,
         PostCommentDTO postCommentDTO
     );
 
-    public abstract void updateProjectFromDTO(
-        @MappingTarget Project project,
-        CreateProjectDTO createProjectDTO
-    );
+    public Project getProjectFromPatch(Project project, JsonPatch patch)
+        throws IllegalArgumentException, JsonPatchException {
+        return patchDocument(patch, project, Project.class);
+    }
+
+    private <T> T patchDocument(
+        JsonPatch patch,
+        T targetDocument,
+        Class<T> targetClass
+    ) throws IllegalArgumentException, JsonPatchException {
+        JsonNode patchedDocument = patch.apply(
+            objectMapper.convertValue(targetDocument, JsonNode.class)
+        );
+        return objectMapper.convertValue(patchedDocument, targetClass);
+    }
 }

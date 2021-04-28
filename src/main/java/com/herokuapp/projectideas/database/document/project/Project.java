@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.Authorization;
 import com.herokuapp.projectideas.database.document.RootDocument;
+import com.herokuapp.projectideas.database.document.Tagged;
 import com.herokuapp.projectideas.database.document.user.UsernameIdPair;
 import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.time.Instant;
@@ -16,7 +17,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Project implements RootDocument, Votable, Authorization {
+public class Project implements RootDocument, Votable, Authorization, Tagged {
 
     protected String id;
     protected String type;

@@ -122,7 +122,7 @@ export default function Idea() {
     }
 
     if (status === Status.NotSubmitted) {
-        return <EditIdea originalIdea={idea} setStatus={setStatus} />;
+        return <EditIdea idea={idea} setStatus={setStatus} />;
     }
 
     let more;
@@ -179,7 +179,6 @@ export default function Idea() {
                                     <div
                                         className="me-auto"
                                         style={{
-                                            wordBreak: "break-word",
                                             minWidth: 75,
                                         }}
                                     >

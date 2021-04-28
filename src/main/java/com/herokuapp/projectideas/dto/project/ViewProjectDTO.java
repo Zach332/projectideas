@@ -13,5 +13,4 @@ public class ViewProjectDTO extends PreviewProjectDTO {
     private boolean publicProject;
     private boolean lookingForMembers;
     private List<String> tags;
-    private long timeSent;
 }

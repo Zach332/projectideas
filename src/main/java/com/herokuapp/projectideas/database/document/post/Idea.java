@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.database.document.post;
 
 import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.document.Tagged;
 import com.herokuapp.projectideas.database.document.vote.Votable;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Idea extends Post implements Votable {
+public class Idea extends Post implements Votable, Tagged {
 
     protected String title;
     protected List<String> tags;
