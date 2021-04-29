@@ -10,6 +10,7 @@ import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import MyProjects from "./MyProjects";
 import { toQuery } from "../utils/Routing";
+import Spinner from "../general/Spinner";
 
 export default function Profile() {
     const { addToast } = useToasts();
@@ -19,6 +20,7 @@ export default function Profile() {
     const [myIdeas, setMyIdeas] = useState([]);
     const [rerender, setRerender] = useState(0);
     const [changingUsername, setChangingUsername] = useState(false);
+    const [usernameLoading, setUsernameLoading] = useState(false);
     const [status, setStatus] = useState({
         userData: Status.Loading,
         savedIdeas: Status.Loading,
@@ -110,6 +112,7 @@ export default function Profile() {
         }));
     };
     const handleSubmit = (event) => {
+        setUsernameLoading(true);
         axios
             .put("/api/users/" + user.id, {
                 username: userData.username,
@@ -122,6 +125,7 @@ export default function Profile() {
                     autoDismiss: true,
                 });
                 setChangingUsername(false);
+                setUsernameLoading(false);
             })
             .catch((err) => {
                 console.log("Error changing username: " + err);
@@ -252,7 +256,9 @@ export default function Profile() {
                                     readOnly={!changingUsername}
                                 />
                             </div>
-                            {changingUsername ? (
+                            {usernameLoading ? (
+                                <Spinner />
+                            ) : changingUsername ? (
                                 <div className="col-12">
                                     <button
                                         type="submit"
