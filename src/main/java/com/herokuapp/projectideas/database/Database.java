@@ -28,6 +28,7 @@ import com.herokuapp.projectideas.database.document.project.Project;
 import com.herokuapp.projectideas.database.document.tag.IdeaTag;
 import com.herokuapp.projectideas.database.document.tag.ProjectTag;
 import com.herokuapp.projectideas.database.document.tag.Tag;
+import com.herokuapp.projectideas.database.document.user.NotificationPreference;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.document.user.UserJoinedProject;
 import com.herokuapp.projectideas.database.document.user.UserPostedIdea;
@@ -619,6 +620,29 @@ public class Database {
 
     public boolean isUserAdmin(String userId) throws EmptyPointReadException {
         return getUser(userId).isAdmin();
+    }
+
+    public void unsubscribeFromEmailNotifications(String unsubscribeId)
+        throws EmptySingleDocumentQueryException {
+        User user = singleDocumentQuery(
+            GenericQueries
+                .queryByType(User.class)
+                .addRestrictions(
+                    new RestrictionBuilder()
+                    .eq("emailUnsubscribeId", unsubscribeId)
+                ),
+            userContainer,
+            User.class
+        );
+
+        user.setNotificationPreference(NotificationPreference.Unsubscribed);
+
+        userContainer.replaceItem(
+            user,
+            user.getId(),
+            new PartitionKey(user.getUserId()),
+            new CosmosItemRequestOptions()
+        );
     }
 
     public void deleteUser(String id) {

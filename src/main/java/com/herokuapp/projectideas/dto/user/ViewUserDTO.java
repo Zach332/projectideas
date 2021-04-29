@@ -1,5 +1,6 @@
 package com.herokuapp.projectideas.dto.user;
 
+import com.herokuapp.projectideas.database.document.user.NotificationPreference;
 import lombok.*;
 
 @NoArgsConstructor
@@ -11,4 +12,5 @@ public class ViewUserDTO {
     private String email;
     private long timeCreated;
     private boolean admin;
+    private NotificationPreference notificationPreference;
 }
