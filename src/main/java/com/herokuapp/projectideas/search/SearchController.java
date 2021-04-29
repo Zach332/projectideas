@@ -207,15 +207,18 @@ public class SearchController {
             IndexSearcher indexSearcher = tagSearcherManager.acquire();
 
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+            List<String> terms = tokenizeQuery(queryString);
 
+            for (String term : terms) {
+                booleanQuery.add(
+                    new FuzzyQuery(new Term("name", term)),
+                    Occur.MUST
+                );
+            }
             booleanQuery.add(
                 new TermQuery(
                     new Term("type", classType.getSimpleName().toLowerCase())
                 ),
-                Occur.MUST
-            );
-            booleanQuery.add(
-                new FuzzyQuery(new Term("name", queryString)),
                 Occur.MUST
             );
             booleanQuery.add(
