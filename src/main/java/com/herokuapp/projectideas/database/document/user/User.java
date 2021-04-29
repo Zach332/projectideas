@@ -26,14 +26,9 @@ public class User implements RootDocument, Authorization {
      */
     protected String emailUnsubscribeId;
     /**
-     * Time user last contacted an API endpoint
-     * while logged in
-     */
-    protected long timeLastActive;
-    /**
      * Time user last received an email from projectideas
      */
-    protected long timeLastEmailReceipt;
+    protected long timeLastEmailReceived;
 
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
@@ -46,8 +41,7 @@ public class User implements RootDocument, Authorization {
         this.admin = false;
         this.notificationPreference = NotificationPreference.Default;
         this.emailUnsubscribeId = UUID.randomUUID().toString();
-        this.timeLastActive = Instant.now().getEpochSecond();
-        this.timeLastEmailReceipt = 0;
+        this.timeLastEmailReceived = 0;
     }
 
     public String getPartitionKey() {
