@@ -19,6 +19,16 @@ public class User implements RootDocument, Authorization {
     protected long timeCreated;
     protected int unreadMessages;
     protected boolean admin;
+    protected NotificationPreference notificationPreference;
+    /**
+     * UUID used for a unique link allowing user to
+     * unsubscribe from email notifications
+     */
+    protected String emailUnsubscribeId;
+    /**
+     * Time user last received an email from projectideas
+     */
+    protected long timeLastEmailReceived;
 
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
@@ -29,6 +39,9 @@ public class User implements RootDocument, Authorization {
         this.timeCreated = Instant.now().getEpochSecond();
         this.unreadMessages = 0;
         this.admin = false;
+        this.notificationPreference = NotificationPreference.Default;
+        this.emailUnsubscribeId = UUID.randomUUID().toString();
+        this.timeLastEmailReceived = 0;
     }
 
     public String getPartitionKey() {
