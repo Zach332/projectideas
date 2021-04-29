@@ -30,7 +30,7 @@ export default function Home() {
             });
     }, [location, sort]);
 
-    const onCLick = () => {
+    const onClick = () => {
         history.push("/new-idea");
     };
 
@@ -91,7 +91,7 @@ export default function Home() {
                 <div className="p-2">
                     <button
                         type="btn btn-primary"
-                        onClick={onCLick}
+                        onClick={onClick}
                         className="btn btn-outline-primary btn-lg"
                     >
                         <svg
