@@ -12,10 +12,14 @@ import com.herokuapp.projectideas.dto.post.PreviewIdeaDTO;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FeatureField;
 import org.apache.lucene.index.Term;
@@ -53,6 +57,9 @@ public class SearchController {
     private Database database;
 
     @Autowired
+    private Analyzer analyzer;
+
+    @Autowired
     DTOMapper mapper;
 
     public static Query getIdQuery(String id) {
@@ -72,7 +79,7 @@ public class SearchController {
             phraseQueryTitle.setSlop(10);
             phraseQueryContent.setSlop(20);
 
-            String[] terms = queryString.toLowerCase().split("-| ");
+            List<String> terms = tokenizeQuery(queryString);
 
             for (String term : terms) {
                 phraseQueryTitle.add(new Term("title", term));
@@ -137,7 +144,7 @@ public class SearchController {
             phraseQueryName.setSlop(10);
             phraseQueryDescription.setSlop(20);
 
-            String[] terms = queryString.toLowerCase().split("-| ");
+            List<String> terms = tokenizeQuery(queryString);
 
             for (String term : terms) {
                 phraseQueryName.add(new Term("name", term));
@@ -385,6 +392,30 @@ public class SearchController {
             clamp((page - 1) * Database.ITEMS_PER_PAGE, ids.size()),
             clamp(page * Database.ITEMS_PER_PAGE, ids.size())
         );
+    }
+
+    private List<String> tokenizeQuery(String query) {
+        ArrayList<String> tokenizedStrings = new ArrayList<>();
+        TokenStream ts = analyzer.tokenStream(
+            "myfield",
+            new StringReader(query)
+        );
+        try {
+            try {
+                ts.reset();
+                while (ts.incrementToken()) {
+                    tokenizedStrings.add(
+                        ts.getAttribute(CharTermAttribute.class).toString()
+                    );
+                }
+                ts.end();
+            } finally {
+                ts.close();
+            }
+            return tokenizedStrings;
+        } catch (Exception ignored) {
+            return tokenizedStrings;
+        }
     }
 
     private int clamp(int value, int maximum) {
