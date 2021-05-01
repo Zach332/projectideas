@@ -1,7 +1,6 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.document.user.NotificationPreference;
 import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import com.herokuapp.projectideas.dto.email.UpdateNotificationPreferenceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
