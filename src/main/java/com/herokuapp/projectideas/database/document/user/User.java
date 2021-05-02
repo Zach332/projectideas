@@ -24,7 +24,7 @@ public class User implements RootDocument, Authorization {
      * UUID used for a unique link allowing user to
      * unsubscribe from email notifications
      */
-    protected String emailUnsubscribeId;
+    protected String emailSubscriptionId;
     /**
      * Time user last received an email from projectideas
      */
@@ -40,7 +40,7 @@ public class User implements RootDocument, Authorization {
         this.unreadMessages = 0;
         this.admin = false;
         this.notificationPreference = NotificationPreference.Default;
-        this.emailUnsubscribeId = UUID.randomUUID().toString();
+        this.emailSubscriptionId = UUID.randomUUID().toString();
         this.timeLastEmailReceived = 0;
     }
 

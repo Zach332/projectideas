@@ -627,20 +627,22 @@ public class Database {
         return getUser(userId).isAdmin();
     }
 
-    public void unsubscribeFromEmailNotifications(String unsubscribeId)
-        throws EmptySingleDocumentQueryException {
+    public void updateEmailNotificationPreference(
+        String emailSubscriptionId,
+        NotificationPreference notificationPreference
+    ) throws EmptySingleDocumentQueryException {
         User user = singleDocumentQuery(
             GenericQueries
                 .queryByType(User.class)
                 .addRestrictions(
                     new RestrictionBuilder()
-                    .eq("emailUnsubscribeId", unsubscribeId)
+                    .eq("emailSubscriptionId", emailSubscriptionId)
                 ),
             userContainer,
             User.class
         );
 
-        user.setNotificationPreference(NotificationPreference.Unsubscribed);
+        user.setNotificationPreference(notificationPreference);
 
         userContainer.replaceItem(
             user,
