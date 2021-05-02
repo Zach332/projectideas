@@ -7,6 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory, useLocation } from "react-router-dom";
 import IdeaSummaryUpvotes from "../ideaComponents/IdeaSummaryUpvotes";
+import Error from "./../general/Error";
 
 export default function Home() {
     let history = useHistory();
@@ -27,6 +28,10 @@ export default function Home() {
                 setIdeas(response.data.ideaPreviews);
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
+            })
+            .catch((err) => {
+                console.log("Error retrieving homepage: " + err);
+                setStatus(Status.Failure);
             });
     }, [location, sort]);
 
@@ -56,6 +61,16 @@ export default function Home() {
     } else {
         ideaElements = (
             <p className="ms-2">There are no ideas posted here yet.</p>
+        );
+    }
+
+    if (status === Status.Failure) {
+        return (
+            <Error
+                pageTitle="Home"
+                errorMessage="The server encountered an error. Please try reloading the page later."
+                showHome={false}
+            />
         );
     }
 
