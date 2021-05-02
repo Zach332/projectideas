@@ -203,7 +203,7 @@ export default function Profile() {
                         href="#projects"
                         role="tab"
                     >
-                        Projects
+                        My Projects
                     </a>
                 </li>
                 <li className="nav-item" role="presentation">
@@ -214,7 +214,7 @@ export default function Profile() {
                         href="#saved"
                         role="tab"
                     >
-                        Saved
+                        Saved Ideas
                     </a>
                 </li>
                 <li className="nav-item" role="presentation">
