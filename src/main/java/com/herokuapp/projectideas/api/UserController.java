@@ -6,14 +6,12 @@ import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
-import com.herokuapp.projectideas.dto.user.CreateUserDTO;
 import com.herokuapp.projectideas.dto.user.UpdateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,17 +74,6 @@ public class UserController {
             userId,
             database
         );
-    }
-
-    @PostMapping("/api/users")
-    public void createUser(@RequestBody CreateUserDTO user) {
-        if (database.userWithUsernameExists(user.getUsername())) {
-            throw new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "Username " + user.getUsername() + " is already taken."
-            );
-        }
-        database.createUser(new User(user.getUsername(), user.getEmail()));
     }
 
     @PutMapping("/api/users/{id}")
