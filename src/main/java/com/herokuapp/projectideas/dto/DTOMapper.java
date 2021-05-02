@@ -35,7 +35,7 @@ import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectAsTeamMemberDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectDTO;
 import com.herokuapp.projectideas.dto.project.ViewProjectJoinRequestDTO;
-import com.herokuapp.projectideas.dto.user.CreateUserDTO;
+import com.herokuapp.projectideas.dto.user.UpdateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import java.util.List;
 import org.mapstruct.Context;
@@ -301,7 +301,7 @@ public abstract class DTOMapper {
 
     public abstract User updateUserFromDTO(
         @MappingTarget User user,
-        CreateUserDTO createUserDTO
+        UpdateUserDTO createUserDTO
     );
 
     public Idea getIdeaFromPatch(Idea idea, JsonPatch patch)

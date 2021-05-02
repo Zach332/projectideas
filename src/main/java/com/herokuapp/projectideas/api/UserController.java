@@ -7,6 +7,7 @@ import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
 import com.herokuapp.projectideas.dto.user.CreateUserDTO;
+import com.herokuapp.projectideas.dto.user.UpdateUserDTO;
 import com.herokuapp.projectideas.dto.user.ViewUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -91,7 +92,7 @@ public class UserController {
     @PutMapping("/api/users/{id}")
     public void updateUser(
         @PathVariable String id,
-        @RequestBody CreateUserDTO user
+        @RequestBody UpdateUserDTO user
     ) {
         try {
             User existingUser = database.getUser(id);
