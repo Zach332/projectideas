@@ -311,7 +311,7 @@ export default function Profile() {
                     </button>
                 </div>
                 <div className="tab-pane fade" id="projects" role="tabpanel">
-                    <h5 className="mt-4">My projects</h5>
+                    <h5 className="my-4">My projects</h5>
                     <MyProjects noHeading={true} />
                 </div>
                 <div className="tab-pane fade" id="saved" role="tabpanel">
