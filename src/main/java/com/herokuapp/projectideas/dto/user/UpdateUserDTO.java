@@ -6,7 +6,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UpdateUserDTO extends CreateUserDTO {
+public class UpdateUserDTO {
 
+    private String username;
     private NotificationPreference notificationPreference;
 }
