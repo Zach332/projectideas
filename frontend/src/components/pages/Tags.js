@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import IdeaSummary from "../ideaComponents/IdeaSummary";
 import axios from "axios";
 import { Status } from "../../State";
-import Spinner from "../general/Spinner";
 import { toParams, toQuery } from "../utils/Routing";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { useHistory, useLocation } from "react-router-dom";
+import LoadingDiv from "../general/LoadingDiv";
 
 export default function Tags() {
     let history = useHistory();
@@ -62,7 +62,7 @@ export default function Tags() {
     };
 
     let postElements;
-    if (status == Status.Success && posts.length > 0) {
+    if (posts.length > 0) {
         postElements = (
             <div className="container mx-auto">
                 {posts.map((post) =>
@@ -78,8 +78,6 @@ export default function Tags() {
                 )}
             </div>
         );
-    } else if (status == Status.Loading) {
-        postElements = <Spinner />;
     } else {
         postElements = (
             <p className="ms-2">No {params.type}s match this tag.</p>
@@ -100,31 +98,33 @@ export default function Tags() {
                     <h1>Tag: {params.tag}</h1>
                 </div>
             </div>
-            {postElements}
-            <div className="d-flex">
-                <div className="me-auto p-2">
-                    {params.page > 1 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={previous}
-                        >
-                            Previous
-                        </button>
-                    )}
+            <LoadingDiv isLoading={status == Status.Loading}>
+                {postElements}
+                <div className="d-flex">
+                    <div className="me-auto p-2">
+                        {params.page > 1 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={previous}
+                            >
+                                Previous
+                            </button>
+                        )}
+                    </div>
+                    <div className="p-2">
+                        {!lastPage && posts.length > 0 && (
+                            <button
+                                type="btn btn-primary"
+                                className="btn btn-primary btn-md"
+                                onClick={next}
+                            >
+                                Next
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="p-2">
-                    {!lastPage && posts.length > 0 && (
-                        <button
-                            type="btn btn-primary"
-                            className="btn btn-primary btn-md"
-                            onClick={next}
-                        >
-                            Next
-                        </button>
-                    )}
-                </div>
-            </div>
+            </LoadingDiv>
         </div>
     );
 }
