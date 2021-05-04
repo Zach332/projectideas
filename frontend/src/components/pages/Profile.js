@@ -116,7 +116,7 @@ export default function Profile() {
         axios
             .put("/api/users/" + user.id, {
                 username: userData.username,
-                email: userData.email,
+                notificationPreference: userData.notificationPreference,
             })
             .then(() => {
                 login(userData.username, user.id, user.admin);
@@ -155,6 +155,38 @@ export default function Profile() {
             appearance: "success",
             autoDismiss: true,
         });
+    };
+
+    const isPreference = (option) => {
+        return userData.notificationPreference == option;
+    };
+
+    const changeNotificationPreference = (e) => {
+        let newPreference = e.target.id;
+        axios
+            .put("/api/users/" + user.id, {
+                username: userData.username,
+                notificationPreference: newPreference,
+            })
+            .then(() => {
+                setUserData((userData) => ({
+                    ...userData,
+                    notificationPreference: newPreference,
+                }));
+                addToast("Notification preferences changed successfully", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error updating notification preferences: " + err);
+                addToast(
+                    "Error updating username preferences. Please try again.",
+                    {
+                        appearance: "error",
+                    }
+                );
+            });
     };
 
     const nextSaved = () => {
@@ -300,6 +332,47 @@ export default function Profile() {
                             >
                                 Primary email from GitHub/Google
                             </label>
+                        </form>
+                        <h5>Email Notification Preference</h5>
+                        <form className="mb-5">
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="AllNewMessages"
+                                    onChange={changeNotificationPreference}
+                                    checked={isPreference("AllNewMessages")}
+                                />
+                                <label className="form-check-label">
+                                    All new messages
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="Default"
+                                    onChange={changeNotificationPreference}
+                                    checked={isPreference("Default")}
+                                />
+                                <label className="form-check-label">
+                                    Default - We only notify you about new
+                                    messages if we have not recently sent you an
+                                    email
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="Unsubscribed"
+                                    onChange={changeNotificationPreference}
+                                    checked={isPreference("Unsubscribed")}
+                                />
+                                <label className="form-check-label">
+                                    Unsubscribed
+                                </label>
+                            </div>
                         </form>
                     </LoadingDiv>
                     <button
