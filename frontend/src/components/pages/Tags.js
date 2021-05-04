@@ -7,10 +7,11 @@ import { toParams, toQuery } from "../utils/Routing";
 import ProjectSummary from "./../projectComponents/ProjectSummary";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 export default function Tags() {
     let history = useHistory();
+    let location = useLocation();
     const [posts, setPosts] = useState([]);
     const [status, setStatus] = useState(Status.Loading);
     const [lastPage, setLastPage] = useState(true);
@@ -18,6 +19,7 @@ export default function Tags() {
     if (!params.page) params.page = 1;
 
     useEffect(() => {
+        setStatus(Status.Loading);
         axios
             .get(
                 "/api/" +
@@ -35,7 +37,7 @@ export default function Tags() {
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
-    }, []);
+    }, [location]);
 
     const next = () => {
         history.push(
