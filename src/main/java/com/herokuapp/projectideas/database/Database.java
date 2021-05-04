@@ -919,7 +919,6 @@ public class Database {
     ) throws EmptyPointReadException {
         try {
             User sender = getUser(senderId);
-            // TODO: Prevent messaging private projects
             Project recipientProject = getProject(recipientProjectId);
             for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
                 String recipientId = recipient.getUserId();
@@ -1205,7 +1204,11 @@ public class Database {
                         incrementTagUsages(tag, tagType);
                     } catch (EmptyPointReadException e) {}
                 } else {
-                    createTag(new IdeaTag(tag));
+                    if (IdeaTag.class.isAssignableFrom(tagType)) {
+                        createTag(new IdeaTag(tag));
+                    } else if (ProjectTag.class.isAssignableFrom(tagType)) {
+                        createTag(new ProjectTag(tag));
+                    }
                 }
             }
         }

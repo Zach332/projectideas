@@ -516,9 +516,8 @@ public class ProjectController {
         }
     }
 
-    // TODO: Rename function
     @GetMapping("/api/projects/search")
-    public PreviewProjectPageDTO searchIdeas(
+    public PreviewProjectPageDTO searchProjects(
         @RequestHeader(value = "authorization", required = false) String userId,
         @RequestParam("query") String query,
         @RequestParam("page") int page
