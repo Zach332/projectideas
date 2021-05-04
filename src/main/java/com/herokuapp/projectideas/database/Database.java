@@ -1205,7 +1205,11 @@ public class Database {
                         incrementTagUsages(tag, tagType);
                     } catch (EmptyPointReadException e) {}
                 } else {
-                    createTag(new IdeaTag(tag));
+                    if (IdeaTag.class.isAssignableFrom(tagType)) {
+                        createTag(new IdeaTag(tag));
+                    } else if (ProjectTag.class.isAssignableFrom(tagType)) {
+                        createTag(new ProjectTag(tag));
+                    }
                 }
             }
         }
