@@ -919,7 +919,6 @@ public class Database {
     ) throws EmptyPointReadException {
         try {
             User sender = getUser(senderId);
-            // TODO: Prevent messaging private projects
             Project recipientProject = getProject(recipientProjectId);
             for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
                 String recipientId = recipient.getUserId();
