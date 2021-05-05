@@ -161,6 +161,12 @@ export default function UserData() {
                 </form>
                 <SubscriptionPreferences
                     preference={userData.notificationPreference}
+                    setPreference={(newPreference) =>
+                        setUserData((userData) => ({
+                            ...userData,
+                            notificationPreference: newPreference,
+                        }))
+                    }
                     submitPreference={changeNotificationPreference}
                 />
             </LoadingDiv>

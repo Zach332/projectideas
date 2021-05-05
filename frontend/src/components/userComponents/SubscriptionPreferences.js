@@ -1,24 +1,21 @@
-import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
 
 export default function SubscriptionPreferences({
     preference,
+    setPreference,
     submitPreference,
 }) {
     const { addToast } = useToasts();
-    const [notificationPreference, setNotificationPreference] = useState(
-        preference
-    );
 
     const isPreference = (option) => {
-        return notificationPreference == option;
+        return preference == option;
     };
 
     const changeNotificationPreference = (e) => {
         let newPreference = e.target.id;
         submitPreference(newPreference)
             .then(() => {
-                setNotificationPreference(newPreference);
+                setPreference(newPreference);
                 addToast("Notification preferences changed successfully", {
                     appearance: "success",
                     autoDismiss: true,
