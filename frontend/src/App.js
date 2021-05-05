@@ -26,6 +26,7 @@ import { HelmetProvider } from "react-helmet-async";
 import Contact from "./components/pages/Contact";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Invite from "./components/pages/Invite";
+import Unsubscribe from "./components/pages/Unsubscribe";
 
 function App() {
     return (
@@ -129,6 +130,11 @@ function App() {
                                         path="/invite"
                                         exact
                                         component={Invite}
+                                    />
+                                    <Route
+                                        path="/unsubscribe"
+                                        exact
+                                        component={Unsubscribe}
                                     />
                                     <Route
                                         path="/markdown"
