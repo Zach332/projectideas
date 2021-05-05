@@ -1,0 +1,78 @@
+import { useState } from "react";
+import { useToasts } from "react-toast-notifications";
+
+export default function SubscriptionPreferences({
+    preference,
+    submitPreference,
+}) {
+    const { addToast } = useToasts();
+    const [notificationPreference, setNotificationPreference] = useState(
+        preference
+    );
+
+    const isPreference = (option) => {
+        return notificationPreference == option;
+    };
+
+    const changeNotificationPreference = (e) => {
+        let newPreference = e.target.id;
+        submitPreference(newPreference)
+            .then(() => {
+                setNotificationPreference(newPreference);
+                addToast("Notification preferences changed successfully", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error updating notification preferences: " + err);
+                addToast(
+                    "Error updating username preferences. Please try again.",
+                    {
+                        appearance: "error",
+                    }
+                );
+            });
+    };
+
+    return (
+        <div>
+            <h5>Email Notification Preference</h5>
+            <form className="mb-5">
+                <div className="form-check">
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        id="AllNewMessages"
+                        onChange={changeNotificationPreference}
+                        checked={isPreference("AllNewMessages")}
+                    />
+                    <label className="form-check-label">All new messages</label>
+                </div>
+                <div className="form-check">
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        id="Default"
+                        onChange={changeNotificationPreference}
+                        checked={isPreference("Default")}
+                    />
+                    <label className="form-check-label">
+                        Default - We only notify you about new messages if we
+                        have not recently sent you an email
+                    </label>
+                </div>
+                <div className="form-check">
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        id="Unsubscribed"
+                        onChange={changeNotificationPreference}
+                        checked={isPreference("Unsubscribed")}
+                    />
+                    <label className="form-check-label">Unsubscribed</label>
+                </div>
+            </form>
+        </div>
+    );
+}
