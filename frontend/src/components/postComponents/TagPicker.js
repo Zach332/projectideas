@@ -40,7 +40,7 @@ export default function TagPicker({ post, setPost, postType }) {
     };
 
     const updateNewTag = (event) => {
-        setNewTag(event.target.value);
+        setNewTag(event.target.value.toLowerCase());
         setInvalidCharacter(false);
         if (event.target.value === "") {
             axios.get("/api/tags/standard/" + postType).then((response) => {
@@ -64,16 +64,10 @@ export default function TagPicker({ post, setPost, postType }) {
         addTag(newTag);
     };
 
-    const validateTagKeyPress = (event) => {
-        // enter key
+    const submitOnEnter = (event) => {
         if (event.keyCode === 13) {
             createTag();
             event.preventDefault();
-        } else if (
-            (event.key >= "a" && event.key <= "z") ||
-            event.key === "-"
-        ) {
-            return;
         }
     };
 
@@ -114,7 +108,7 @@ export default function TagPicker({ post, setPost, postType }) {
                     <input
                         type="text"
                         className="form-control"
-                        onKeyDown={validateTagKeyPress}
+                        onKeyDown={submitOnEnter}
                         value={newTag}
                         onChange={updateNewTag}
                         placeholder="new tag"
