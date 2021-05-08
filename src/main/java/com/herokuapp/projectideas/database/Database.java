@@ -73,7 +73,7 @@ public class Database {
     EmailService emailService;
 
     public static final int ITEMS_PER_PAGE = 10;
-    private static final int MIN_TIME_BETWEEN_EMAILS = 60 * 60;
+    private static final int MIN_SECONDS_BETWEEN_EMAILS = 60 * 60 * 24;
 
     private static final Logger logger = LoggerFactory.getLogger(
         Database.class
@@ -986,7 +986,7 @@ public class Database {
             boolean sendEmail =
                 switch (user.getNotificationPreference()) {
                     case Default -> Instant.now().getEpochSecond() -
-                    MIN_TIME_BETWEEN_EMAILS >
+                    MIN_SECONDS_BETWEEN_EMAILS >
                     user.getTimeLastEmailReceived();
                     case AllNewMessages -> true;
                     case Unsubscribed -> false;
