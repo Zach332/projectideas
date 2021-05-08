@@ -133,7 +133,7 @@ public class IdeaController {
     }
 
     @PostMapping("/api/ideas")
-    public void createIdea(
+    public String createIdea(
         @RequestHeader("authorization") String userId,
         @RequestBody PostIdeaDTO idea
     ) {
@@ -149,15 +149,15 @@ public class IdeaController {
 
         try {
             User user = database.getUser(userId);
-            database.createIdea(
-                new Idea(
-                    userId,
-                    user.getUsername(),
-                    idea.getTitle(),
-                    idea.getContent(),
-                    idea.getTags()
-                )
+            Idea newIdea = new Idea(
+                userId,
+                user.getUsername(),
+                idea.getTitle(),
+                idea.getContent(),
+                idea.getTags()
             );
+            database.createIdea(newIdea);
+            return newIdea.getId();
             // TODO: Rename database exceptions better for the API perspective
         } catch (EmptyPointReadException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
