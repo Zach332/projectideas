@@ -44,7 +44,12 @@ export default function SubscriptionPreferences({
                         onChange={changeNotificationPreference}
                         checked={isPreference("AllNewMessages")}
                     />
-                    <label className="form-check-label">All new messages</label>
+                    <label
+                        className="form-check-label"
+                        htmlFor="AllNewMessages"
+                    >
+                        All new messages
+                    </label>
                 </div>
                 <div className="form-check">
                     <input
@@ -54,7 +59,7 @@ export default function SubscriptionPreferences({
                         onChange={changeNotificationPreference}
                         checked={isPreference("Default")}
                     />
-                    <label className="form-check-label">
+                    <label className="form-check-label" htmlFor="Default">
                         Default - We only notify you about new messages if we
                         have not recently sent you an email
                     </label>
@@ -67,7 +72,9 @@ export default function SubscriptionPreferences({
                         onChange={changeNotificationPreference}
                         checked={isPreference("Unsubscribed")}
                     />
-                    <label className="form-check-label">Unsubscribed</label>
+                    <label className="form-check-label" htmlFor="Unsubscribed">
+                        Unsubscribed
+                    </label>
                 </div>
             </form>
         </div>
