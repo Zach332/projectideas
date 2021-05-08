@@ -41,7 +41,7 @@ import com.herokuapp.projectideas.database.document.vote.Votable;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import com.herokuapp.projectideas.database.query.GenericQueries;
-import com.herokuapp.projectideas.email.EmailService;
+import com.herokuapp.projectideas.email.EmailInterface;
 import com.herokuapp.projectideas.search.IndexController;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -70,7 +70,7 @@ public class Database {
     IndexController indexController;
 
     @Autowired
-    EmailService emailService;
+    EmailInterface emailInterface;
 
     public static final int ITEMS_PER_PAGE = 10;
     private static final int MIN_SECONDS_BETWEEN_EMAILS = 60 * 60 * 24;
@@ -993,7 +993,7 @@ public class Database {
                 };
 
             if (sendEmail) {
-                emailService.sendUnreadMessagesEmail(
+                emailInterface.sendUnreadMessagesEmail(
                     user,
                     user.getUnreadMessages()
                 );
