@@ -102,15 +102,22 @@ export default function Messages() {
                     </svg>
                 </motion.button>
                 <LoadingDiv isLoading={status === Status.Loading}>
-                    <motion.div layout className="container pt-2 mx-auto">
-                        {messages.map((message) => (
-                            <Message
-                                key={message.id}
-                                message={message}
-                                setRerender={setRerender}
-                            />
-                        ))}
-                    </motion.div>
+                    {messages.length > 0 ? (
+                        <motion.div layout className="container pt-2 mx-auto">
+                            {messages.map((message) => (
+                                <Message
+                                    key={message.id}
+                                    message={message}
+                                    setRerender={setRerender}
+                                />
+                            ))}
+                        </motion.div>
+                    ) : (
+                        <div className="pt-2">
+                            You don&apos;t have any {mode.toLowerCase()}{" "}
+                            messages yet.
+                        </div>
+                    )}
                     <div className="d-flex">
                         <div className="me-auto p-2">
                             {params.page > 1 && (
