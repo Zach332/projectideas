@@ -13,7 +13,7 @@ import TagPicker from "../postComponents/TagPicker";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { Link } from "react-router-dom";
-import HomeSuccess from "./../general/HomeSuccess";
+import Success from "./../general/Success";
 
 export default function CreateIdea() {
     const { addToast } = useToasts();
@@ -42,10 +42,15 @@ export default function CreateIdea() {
                 content: idea.content,
                 tags: idea.tags,
             })
-            .then(() => {
+            .then((response) => {
                 setStatus(Status.Success);
                 post();
-                setIdea({ title: "", content: "", tags: [] });
+                setIdea({
+                    id: response.data,
+                    title: "",
+                    content: "",
+                    tags: [],
+                });
             })
             .catch((err) => {
                 console.log("Error submitting post: " + err);
@@ -114,7 +119,10 @@ export default function CreateIdea() {
     } else if (status === Status.Success) {
         return (
             <div>
-                <HomeSuccess />
+                <Success
+                    link={"/idea/" + idea.id}
+                    message="Go to your new idea"
+                />
             </div>
         );
     }
