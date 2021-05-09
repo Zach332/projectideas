@@ -23,6 +23,7 @@ export default function Idea() {
     const [status, setStatus] = useState(Status.Loading);
     const [idea, setIdea] = useState({ title: "" });
     const [user] = useGlobalState("user");
+    const [rerender, setRerender] = useState(0);
     let params = useParams();
 
     useEffect(() => {
@@ -39,7 +40,7 @@ export default function Idea() {
             .catch(() => {
                 setStatus(Status.NotFound);
             });
-    }, []);
+    }, [rerender]);
 
     const deleteIdea = () => {
         axios
@@ -122,7 +123,13 @@ export default function Idea() {
     }
 
     if (status === Status.NotSubmitted) {
-        return <EditIdea idea={idea} setStatus={setStatus} />;
+        return (
+            <EditIdea
+                idea={idea}
+                setStatus={setStatus}
+                setRerender={setRerender}
+            />
+        );
     }
 
     let more;

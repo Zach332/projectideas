@@ -10,7 +10,7 @@ import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 import { Link, Prompt } from "react-router-dom";
 
-export default function EditIdea({ idea, setStatus }) {
+export default function EditIdea({ idea, setStatus, setRerender }) {
     const { addToast } = useToasts();
     const originalIdea = JSON.parse(JSON.stringify(idea));
     const [editedIdea, setIdea] = useState(idea);
@@ -44,7 +44,8 @@ export default function EditIdea({ idea, setStatus }) {
                     appearance: "success",
                     autoDismiss: true,
                 });
-                setStatus(Status.Success);
+                setStatus(Status.Loaded);
+                setRerender((rerender) => rerender + 1);
             })
             .catch((err) => {
                 console.log("Error updating idea: " + err);
