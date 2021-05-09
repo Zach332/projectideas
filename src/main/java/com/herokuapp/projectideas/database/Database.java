@@ -533,7 +533,11 @@ public class Database {
     public boolean userHasSavedIdea(String ideaId, String userId) {
         return (
             countQuery(
-                GenericQueries.queryByPartitionKey(userId, UserSavedIdea.class),
+                GenericQueries
+                    .queryByPartitionKey(userId, UserSavedIdea.class)
+                    .addRestrictions(
+                        new RestrictionBuilder().eq("ideaId", ideaId)
+                    ),
                 userContainer
             ) >
             0
