@@ -244,7 +244,7 @@ public class Database {
             if (document.isPresent()) {
                 orderedDocuments.add(document.get());
             } else {
-                logger.debug(
+                logger.warn(
                     "getDocumentPageFromPartitionKeyPage encountered a document " +
                     "reference to a document that does not exist: \n" +
                     classType.getSimpleName() +
@@ -509,7 +509,7 @@ public class Database {
 
             userContainer.deleteItem(savedIdea, new CosmosItemRequestOptions());
         } catch (EmptySingleDocumentQueryException e) {
-            logger.debug(e.toString());
+            logger.warn(e.toString());
         }
     }
 
@@ -609,7 +609,7 @@ public class Database {
                 new CosmosItemRequestOptions()
             );
         } catch (EmptySingleDocumentQueryException e) {
-            logger.debug(e.toString());
+            logger.warn(e.toString());
         }
     }
 
@@ -808,7 +808,7 @@ public class Database {
                 new CosmosItemRequestOptions()
             );
         } catch (EmptySingleDocumentQueryException e) {
-            logger.debug(e.toString());
+            logger.warn(e.toString());
         }
 
         idea.delete();
@@ -912,7 +912,7 @@ public class Database {
         try {
             notifyUserOfUnreadMessages(getUser(recipientId));
         } catch (EmptyPointReadException e) {
-            logger.debug(e.toString());
+            logger.warn(e.toString());
         }
     }
 
@@ -942,7 +942,7 @@ public class Database {
                 try {
                     notifyUserOfUnreadMessages(getUser(recipientId));
                 } catch (EmptyPointReadException e) {
-                    logger.debug(e.toString());
+                    logger.warn(e.toString());
                 }
             }
             SentGroupMessage sentGroupMessage = new SentGroupMessage(
@@ -977,7 +977,7 @@ public class Database {
                 try {
                     notifyUserOfUnreadMessages(getUser(recipientId));
                 } catch (EmptyPointReadException e) {
-                    logger.debug(e.toString());
+                    logger.warn(e.toString());
                 }
             }
         } catch (CosmosException e) {
@@ -1222,7 +1222,7 @@ public class Database {
                 try {
                     decrementTagUsages(tag, tagType);
                 } catch (EmptyPointReadException e) {
-                    logger.debug(e.toString());
+                    logger.warn(e.toString());
                 }
             }
         }
