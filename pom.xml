@@ -115,6 +115,12 @@
             <artifactId>json-patch</artifactId>
             <version>1.13</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.31</version>
+        </dependency>
     </dependencies>
 
     <build>
