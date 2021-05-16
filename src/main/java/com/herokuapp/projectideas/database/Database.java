@@ -100,6 +100,14 @@ public class Database {
         Class<T> documentType
     ) {
         try {
+            logger.debug(
+                "documentExists: id = " +
+                id +
+                ", partition key = " +
+                partitionKey +
+                ", container = " +
+                container.getId()
+            );
             return (
                 container
                     .readItem(id, new PartitionKey(partitionKey), documentType)
@@ -118,6 +126,14 @@ public class Database {
         Class<T> documentType
     ) throws EmptyPointReadException {
         try {
+            logger.debug(
+                "readDocument: id = " +
+                id +
+                ", partition key = " +
+                partitionKey +
+                ", container = " +
+                container.getId()
+            );
             return container
                 .readItem(id, new PartitionKey(partitionKey), documentType)
                 .getItem();
@@ -135,6 +151,12 @@ public class Database {
         CosmosContainer container,
         Class<T> classType
     ) throws EmptySingleDocumentQueryException {
+        logger.debug(
+            "singleDocumentQuery: query = " +
+            query.createQuery() +
+            ", container = " +
+            container.getId()
+        );
         return container
             .queryItems(
                 query.createQuery(),
@@ -157,6 +179,12 @@ public class Database {
         CosmosContainer container,
         Class<T> classType
     ) {
+        logger.debug(
+            "multipleDocumentQuery: query = " +
+            query.createQuery() +
+            ", container = " +
+            container.getId()
+        );
         return container
             .queryItems(
                 query.createQuery(),
@@ -197,6 +225,12 @@ public class Database {
     }
 
     private int countQuery(SelectQuery query, CosmosContainer container) {
+        logger.debug(
+            "countQuery: query = " +
+            query.createQuery() +
+            ", container = " +
+            container.getId()
+        );
         return container
             .queryItems(
                 query.count().createQuery(),
