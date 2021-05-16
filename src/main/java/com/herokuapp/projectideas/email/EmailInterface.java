@@ -5,6 +5,7 @@ import freemarker.template.Template;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
@@ -17,10 +18,14 @@ public class EmailInterface {
     @Autowired
     private Template unreadMessagesTemplate;
 
+    @Value("${projectideas.baseurl}")
+    private String baseUrl;
+
     public void sendUnreadMessagesEmail(User user, int unreadMessages) {
         Map<String, String> templateModel = new HashMap<String, String>();
         templateModel.put("username", user.getUsername());
         templateModel.put("numUnread", String.valueOf(unreadMessages));
+        templateModel.put("unsubscribeLink", getUnsubscribeLink(user));
         try {
             String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(
                 unreadMessagesTemplate,
@@ -32,5 +37,9 @@ public class EmailInterface {
                 htmlBody
             );
         } catch (Exception ignored) {}
+    }
+
+    private String getUnsubscribeLink(User user) {
+        return baseUrl + "/unsubscribe?id=" + user.getEmailSubscriptionId();
     }
 }
