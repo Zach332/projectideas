@@ -36,7 +36,7 @@ public class EmailInterface {
             );
             emailService.sendHtmlEmail(
                 user.getEmail(),
-                "New Unread Messages",
+                "New Unread Message",
                 htmlBody
             );
         } catch (Exception ignored) {}
