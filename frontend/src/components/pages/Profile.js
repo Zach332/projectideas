@@ -173,11 +173,11 @@ export default function Profile() {
                     <UserData />
                 </div>
                 <div className="tab-pane fade" id="projects" role="tabpanel">
-                    <h5 className="my-4">My projects</h5>
+                    <div className="my-4"></div>
                     <MyProjects noHeading={true} />
                 </div>
                 <div className="tab-pane fade" id="saved" role="tabpanel">
-                    <h5 className="my-4">My saved ideas</h5>
+                    <div className="my-4"></div>
                     <LoadingDiv
                         isLoading={status.savedIdeas === Status.Loading}
                     >
@@ -248,7 +248,7 @@ export default function Profile() {
                     </LoadingDiv>
                 </div>
                 <div className="tab-pane fade" id="my-ideas" role="tabpanel">
-                    <h5 className="my-4">My posted ideas</h5>
+                    <div className="my-4"></div>
                     <LoadingDiv
                         isLoading={status.savedIdeas === Status.Loading}
                     >
