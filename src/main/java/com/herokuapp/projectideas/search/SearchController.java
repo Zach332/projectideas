@@ -37,6 +37,8 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortedNumericSortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +63,10 @@ public class SearchController {
 
     @Autowired
     DTOMapper mapper;
+
+    private static final Logger logger = LoggerFactory.getLogger(
+        IndexController.class
+    );
 
     public static Query getIdQuery(String id) {
         PhraseQuery.Builder phraseQuery = new PhraseQuery.Builder();
@@ -101,7 +107,7 @@ public class SearchController {
             ideaSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to search idea index", e);
             return null;
         }
     }
@@ -128,7 +134,7 @@ public class SearchController {
             ideaSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to get idea index sorted by " + scoreType, e);
             return null;
         }
     }
@@ -166,7 +172,7 @@ public class SearchController {
             projectSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to search project index", e);
             return null;
         }
     }
@@ -193,7 +199,10 @@ public class SearchController {
             projectSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(
+                "Failed to get project index sorted by " + scoreType,
+                e
+            );
             return null;
         }
     }
@@ -235,7 +244,7 @@ public class SearchController {
             tagSearcherManager.release(indexSearcher);
             return documents;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to search tag index", e);
             return null;
         }
     }
