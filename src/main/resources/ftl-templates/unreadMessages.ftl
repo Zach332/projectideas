@@ -5,7 +5,7 @@
     </head>
     <body>
         <p>Hi ${username},</p>
-        <p>You have ${numUnread} unread <#if numUnread?number gt 1>messages<#else>message</#if> on projectideas. See your unread messages at https://projectideas.herokuapp.com/messages.</p>
+        <p>You have ${numUnread} unread <#if numUnread?number gt 1>messages<#else>message</#if> on projectideas. See your unread messages at <a href="https://projectideas.herokuapp.com/messages" rel="link">projectideas.herokuapp.com/messages</a>.</p>
         <p>Regards,<br />
             projectideas
         </p>
