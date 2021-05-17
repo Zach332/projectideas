@@ -18,6 +18,8 @@ import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.util.NumericUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,27 +39,31 @@ public class IndexController {
     @Autowired
     private Database database;
 
+    private static final Logger logger = LoggerFactory.getLogger(
+        IndexController.class
+    );
+
     @PostConstruct
     private void init() {
         List<Idea> ideaList = database.getAllIdeas();
         try {
             indexIdeas(ideaList);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to index ideas", e);
         }
 
         List<Project> projectList = database.getAllPublicProjects();
         try {
             indexProjects(projectList);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to index projects", e);
         }
 
         List<Tag> tagList = database.getAllTags();
         try {
             indexTags(tagList);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to index tags", e);
         }
     }
 
@@ -216,30 +222,46 @@ public class IndexController {
     public void tryIndexIdea(Idea idea) {
         try {
             indexIdea(idea);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.error("Failed to index idea " + idea.getIdeaId(), e);
+        }
     }
 
     public void tryIndexProject(Project project) {
         try {
             indexProject(project);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.error(
+                "Failed to index project " + project.getProjectId(),
+                e
+            );
+        }
     }
 
     public void tryIndexTag(Tag tag) {
         try {
             indexTag(tag);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.error("Failed to index tag " + tag.getId(), e);
+        }
     }
 
     public void tryDeleteIdea(String ideaId) {
         try {
             deleteIdea(ideaId);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.error("Failed to delete idea " + ideaId + " from index", e);
+        }
     }
 
     public void tryDeleteProject(String projectId) {
         try {
             deleteProject(projectId);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.error(
+                "Failed to delete project " + projectId + " from index",
+                e
+            );
+        }
     }
 }
