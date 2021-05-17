@@ -1117,7 +1117,7 @@ public class Database {
                         message = getReceivedMessage(recipientId, messageId);
                         message.setUnread(false);
                         updateReceivedMessage(message);
-                    } catch (EmptyPointReadException e) {}
+                    } catch (EmptyPointReadException ignored) {}
                 }
             );
     }
@@ -1240,7 +1240,7 @@ public class Database {
                 if (tagExists(tag, tagType)) {
                     try {
                         incrementTagUsages(tag, tagType);
-                    } catch (EmptyPointReadException e) {}
+                    } catch (EmptyPointReadException ignored) {}
                 } else {
                     if (IdeaTag.class.isAssignableFrom(tagType)) {
                         createTag(new IdeaTag(tag));
