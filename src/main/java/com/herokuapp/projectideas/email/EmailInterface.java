@@ -18,6 +18,9 @@ public class EmailInterface {
     @Autowired
     private Template unreadMessagesTemplate;
 
+    @Autowired
+    private Template welcomeTemplate;
+
     @Value("${projectideas.baseurl}")
     private String baseUrl;
 
@@ -34,6 +37,22 @@ public class EmailInterface {
             emailService.sendHtmlEmail(
                 user.getEmail(),
                 "New Unread Messages",
+                htmlBody
+            );
+        } catch (Exception ignored) {}
+    }
+
+    public void sendWelcomeEmail(User user) {
+        Map<String, String> templateModel = new HashMap<String, String>();
+        templateModel.put("unsubscribeLink", getUnsubscribeLink(user));
+        try {
+            String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(
+                welcomeTemplate,
+                templateModel
+            );
+            emailService.sendHtmlEmail(
+                user.getEmail(),
+                "Welcome to projectideas",
                 htmlBody
             );
         } catch (Exception ignored) {}

@@ -405,7 +405,11 @@ public class Database {
     // Users
 
     public User createUser(User user) {
+        emailInterface.sendWelcomeEmail(user);
+        user.setTimeLastEmailReceived(Instant.now().getEpochSecond());
+
         userContainer.createItem(user);
+
         return user;
     }
 

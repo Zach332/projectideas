@@ -37,4 +37,17 @@ public class EmailTemplateLoader {
             return null;
         }
     }
+
+    @Bean
+    public Template welcomeTemplate(
+        FreeMarkerConfigurer freemarkerClassLoaderConfig
+    ) {
+        try {
+            return freemarkerClassLoaderConfig
+                .getConfiguration()
+                .getTemplate("welcome.ftl");
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
 }
