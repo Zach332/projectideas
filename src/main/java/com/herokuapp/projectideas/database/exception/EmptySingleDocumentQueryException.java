@@ -1,8 +1,5 @@
 package com.herokuapp.projectideas.database.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 public class EmptySingleDocumentQueryException
     extends DocumentNotFoundException {
 
@@ -19,10 +16,7 @@ public class EmptySingleDocumentQueryException
     }
 
     @Override
-    public ResponseStatusException toResponseStatusException() {
-        return new ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Single document query '" + query + "' returned no results."
-        );
+    public String toString() {
+        return "Single document query '" + query + "' returned no results.";
     }
 }
