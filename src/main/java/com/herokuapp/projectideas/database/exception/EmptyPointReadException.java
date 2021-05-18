@@ -17,6 +17,7 @@ public class EmptyPointReadException extends DocumentNotFoundException {
         this.documentPartitionKey = documentPartitionKey;
     }
 
+    @Override
     public String toString() {
         return (
             documentType +
