@@ -1,14 +1,12 @@
 package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
-import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
-import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
+import com.herokuapp.projectideas.database.exception.DatabaseException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.message.SendMessageDTO;
 import com.herokuapp.projectideas.dto.message.ViewReceivedMessagePageDTO;
 import com.herokuapp.projectideas.dto.message.ViewSentMessagePageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class MessageController {
@@ -51,12 +48,8 @@ public class MessageController {
     @GetMapping("/api/messages/numunread")
     public int getNumberOfUnreadMessages(
         @RequestHeader("authorization") String userId
-    ) {
-        try {
-            return database.getNumberOfUnreadMessages(userId);
-        } catch (EmptyPointReadException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+    ) throws DatabaseException {
+        return database.getNumberOfUnreadMessages(userId);
     }
 
     @PostMapping("/api/messages/{recipientUsername}")
@@ -64,21 +57,12 @@ public class MessageController {
         @RequestHeader("authorization") String userId,
         @PathVariable("recipientUsername") String recipientUsername,
         @RequestBody SendMessageDTO message
-    ) {
-        try {
-            database.sendIndividualMessage(
-                userId,
-                recipientUsername,
-                message.getContent()
-            );
-        } catch (EmptyPointReadException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        } catch (EmptySingleDocumentQueryException e) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User " + recipientUsername + " does not exist."
-            );
-        }
+    ) throws DatabaseException {
+        database.sendIndividualMessage(
+            userId,
+            recipientUsername,
+            message.getContent()
+        );
     }
 
     @PostMapping("/api/messages/projects/{recipientProjectId}")
@@ -86,34 +70,19 @@ public class MessageController {
         @RequestHeader("authorization") String userId,
         @PathVariable("recipientProjectId") String recipientProjectId,
         @RequestBody SendMessageDTO message
-    ) {
-        try {
-            database.sendGroupMessage(
-                userId,
-                recipientProjectId,
-                message.getContent()
-            );
-        } catch (EmptyPointReadException e) {
-            if (e.getDocumentType().equals("User")) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            } else {
-                throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Project " + recipientProjectId + " does not exist."
-                );
-            }
-        }
+    ) throws DatabaseException {
+        database.sendGroupMessage(
+            userId,
+            recipientProjectId,
+            message.getContent()
+        );
     }
 
     @PostMapping("/api/messages/received/markallasread")
     public void markAllMessagesAsRead(
         @RequestHeader("authorization") String userId
-    ) {
-        try {
-            database.markAllReceivedMessagesAsRead(userId);
-        } catch (EmptyPointReadException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+    ) throws DatabaseException {
+        database.markAllReceivedMessagesAsRead(userId);
     }
 
     @DeleteMapping("/api/messages/received/{messageId}")
