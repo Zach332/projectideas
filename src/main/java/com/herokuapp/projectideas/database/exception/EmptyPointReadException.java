@@ -1,5 +1,8 @@
 package com.herokuapp.projectideas.database.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 public class EmptyPointReadException extends DocumentNotFoundException {
 
     private static final long serialVersionUID = 5003988241317271418L;
@@ -17,8 +20,10 @@ public class EmptyPointReadException extends DocumentNotFoundException {
         this.documentPartitionKey = documentPartitionKey;
     }
 
-    public String toString() {
-        return (
+    @Override
+    public ResponseStatusException toResponseStatusException() {
+        return new ResponseStatusException(
+            HttpStatus.NOT_FOUND,
             documentType +
             " with id '" +
             documentId +
