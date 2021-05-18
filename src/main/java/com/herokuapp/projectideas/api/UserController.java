@@ -2,7 +2,7 @@ package com.herokuapp.projectideas.api;
 
 import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.user.User;
-import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
+import com.herokuapp.projectideas.database.exception.DatabaseException;
 import com.herokuapp.projectideas.dto.DTOMapper;
 import com.herokuapp.projectideas.dto.post.PreviewIdeaPageDTO;
 import com.herokuapp.projectideas.dto.project.PreviewProjectPageDTO;
@@ -28,16 +28,10 @@ public class UserController {
     DTOMapper mapper;
 
     @GetMapping("/api/users/{id}")
-    public ViewUserDTO getUser(@PathVariable String id) {
-        try {
-            User user = database.getUser(id);
-            return mapper.viewUserDTO(user);
-        } catch (EmptyPointReadException e) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User " + id + " does not exist."
-            );
-        }
+    public ViewUserDTO getUser(@PathVariable String id)
+        throws DatabaseException {
+        User user = database.getUser(id);
+        return mapper.viewUserDTO(user);
     }
 
     @GetMapping("/api/users/{userId}/postedideas")
@@ -80,36 +74,29 @@ public class UserController {
     public void updateUser(
         @PathVariable String id,
         @RequestBody UpdateUserDTO user
-    ) {
-        try {
-            User existingUser = database.getUser(id);
-            if (!existingUser.getUsername().equals(user.getUsername())) {
-                if (
-                    user.getUsername().length() < 3 ||
-                    user.getUsername().length() > 30
-                ) {
-                    throw new ResponseStatusException(
-                        HttpStatus.UNPROCESSABLE_ENTITY,
-                        "Username " +
-                        user.getUsername() +
-                        " is too long or too short. " +
-                        "Usernames must be between 3 and 30 characters (inclusive)."
-                    );
-                }
-                if (database.userWithUsernameExists(user.getUsername())) {
-                    throw new ResponseStatusException(
-                        HttpStatus.UNPROCESSABLE_ENTITY,
-                        "Username " + user.getUsername() + " is already taken."
-                    );
-                }
+    ) throws DatabaseException {
+        User existingUser = database.getUser(id);
+        if (!existingUser.getUsername().equals(user.getUsername())) {
+            if (
+                user.getUsername().length() < 3 ||
+                user.getUsername().length() > 30
+            ) {
+                throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Username " +
+                    user.getUsername() +
+                    " is too long or too short. " +
+                    "Usernames must be between 3 and 30 characters (inclusive)."
+                );
             }
-            mapper.updateUserFromDTO(existingUser, user);
-            database.updateUser(id, existingUser);
-        } catch (EmptyPointReadException e) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User " + id + " does not exist."
-            );
+            if (database.userWithUsernameExists(user.getUsername())) {
+                throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Username " + user.getUsername() + " is already taken."
+                );
+            }
         }
+        mapper.updateUserFromDTO(existingUser, user);
+        database.updateUser(id, existingUser);
     }
 }

@@ -15,7 +15,8 @@ public class EmptySingleDocumentQueryException
         this.query = query;
     }
 
+    @Override
     public String toString() {
-        return "Single document query '" + query + "'' returned no results.";
+        return "Single document query '" + query + "' returned no results.";
     }
 }
