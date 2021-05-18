@@ -2,7 +2,7 @@ import ReactMarkdown from "react-markdown";
 import { Helmet } from "react-helmet-async";
 import { Globals } from "../../GlobalData";
 
-export default function Home() {
+export default function About() {
     return (
         <div>
             <Helmet>
