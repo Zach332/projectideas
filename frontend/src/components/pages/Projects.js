@@ -12,7 +12,6 @@ export default function Projects() {
     let location = useLocation();
     let history = useHistory();
     const [user] = useGlobalState("user");
-    const [rerender, setRerender] = useState(0);
     const [projects, setProjects] = useState([]);
     const [status, setStatus] = useState(Status.Loading);
     const [lastPage, setLastPage] = useState(true);
@@ -29,7 +28,7 @@ export default function Projects() {
                 setLastPage(response.data.lastPage);
                 setStatus(Status.Success);
             });
-    }, [location, rerender, sort]);
+    }, [location, sort]);
 
     const goToMyProjects = () => {
         history.push("/my-projects");
@@ -102,10 +101,7 @@ export default function Projects() {
                 <div className="container mx-auto">
                     {projects.map((project) => (
                         <div className="my-2" key={project.id}>
-                            <ProjectSummaryUpvotes
-                                project={project}
-                                setRerender={setRerender}
-                            />
+                            <ProjectSummaryUpvotes project={project} />
                         </div>
                     ))}
                 </div>
