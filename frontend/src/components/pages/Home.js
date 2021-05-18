@@ -67,7 +67,7 @@ export default function Home() {
     if (status === Status.Failure) {
         return (
             <Error
-                pageTitle="Home"
+                pageTitle="Ideas"
                 errorMessage="The server encountered an error. Please try reloading the page later."
                 showHome={false}
             />
@@ -77,7 +77,7 @@ export default function Home() {
     return (
         <div>
             <Helmet>
-                <title>Home | {Globals.Title}</title>
+                <title>Ideas | {Globals.Title}</title>
             </Helmet>
             {!user.loggedIn && (
                 <div className="bg-light p-3">
@@ -91,7 +91,7 @@ export default function Home() {
             )}
             <div className="d-flex align-items-center">
                 <div className="p-2 me-3">
-                    <h1>Home</h1>
+                    <h1>Ideas</h1>
                 </div>
                 <select
                     className="form-select w-auto me-auto"
