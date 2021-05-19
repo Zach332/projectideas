@@ -8,6 +8,7 @@ import lombok.*;
 @Setter
 public class ViewProjectDTO extends PreviewProjectDTO {
 
+    private String ideaId;
     private String githubLink;
     private List<String> teamMemberUsernames;
     private boolean publicProject;
