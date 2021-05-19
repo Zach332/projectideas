@@ -19,6 +19,7 @@ import { Globals } from "../../GlobalData";
 import { useHistory } from "react-router-dom";
 import Upvotes from "./../postComponents/Upvotes";
 import HomeSuccess from "./../general/HomeSuccess";
+import BasedOnIdea from "../projectComponents/BasedOnIdea";
 
 export default function Project() {
     let history = useHistory();
@@ -437,6 +438,7 @@ export default function Project() {
                     </div>
                 </div>
             )}
+            <BasedOnIdea ideaId={project.ideaId} />
             {project.userIsTeamMember && (
                 <button
                     type="button"
