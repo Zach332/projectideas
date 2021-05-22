@@ -16,10 +16,12 @@ export default function UserData() {
     const [usernameLoading, setUsernameLoading] = useState(false);
 
     useEffect(() => {
-        axios.get("/api/users/" + user.id).then((response) => {
-            setUserData(response.data);
-            setStatus(Status.Loaded);
-        });
+        axios
+            .get("https://projectideas.herokuapp.com/api/users/" + user.id)
+            .then((response) => {
+                setUserData(response.data);
+                setStatus(Status.Loaded);
+            });
     }, []);
 
     const handleUsernameChange = (event) => {
@@ -33,7 +35,7 @@ export default function UserData() {
     const handleUsernameSubmit = (event) => {
         setUsernameLoading(true);
         axios
-            .put("/api/users/" + user.id, {
+            .put("https://projectideas.herokuapp.com/api/users/" + user.id, {
                 username: userData.username,
                 notificationPreference: userData.notificationPreference,
             })
@@ -79,10 +81,13 @@ export default function UserData() {
     const changeNotificationPreference = (newPreference) => {
         return new Promise((resolve, reject) => {
             axios
-                .put("/api/users/" + user.id, {
-                    username: userData.username,
-                    notificationPreference: newPreference,
-                })
+                .put(
+                    "https://projectideas.herokuapp.com/api/users/" + user.id,
+                    {
+                        username: userData.username,
+                        notificationPreference: newPreference,
+                    }
+                )
                 .then(() => {
                     resolve();
                 })

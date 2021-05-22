@@ -20,16 +20,18 @@ export default function JoinProject() {
     let params = useParams();
 
     useEffect(() => {
-        axios.get("/api/ideas/" + params.id).then((response) => {
-            if (!response.data) {
-                setStatus(Status.NotFound);
-            } else {
-                setIdea(response.data);
-            }
-        });
+        axios
+            .get("https://projectideas.herokuapp.com/api/ideas/" + params.id)
+            .then((response) => {
+                if (!response.data) {
+                    setStatus(Status.NotFound);
+                } else {
+                    setIdea(response.data);
+                }
+            });
         axios
             .get(
-                "/api/ideas/" +
+                "https://projectideas.herokuapp.com/api/ideas/" +
                     params.id +
                     "/projects?lookingForMembersOnly=true"
             )

@@ -28,7 +28,7 @@ export default function Idea() {
 
     useEffect(() => {
         axios
-            .get("/api/ideas/" + params.id)
+            .get("https://projectideas.herokuapp.com/api/ideas/" + params.id)
             .then((response) => {
                 if (!response.data) {
                     setStatus(Status.NotFound);
@@ -44,7 +44,7 @@ export default function Idea() {
 
     const deleteIdea = () => {
         axios
-            .delete("/api/ideas/" + params.id)
+            .delete("https://projectideas.herokuapp.com/api/ideas/" + params.id)
             .then(() => {
                 setStatus(Status.Success);
                 addToast("Your idea was deleted.", {
@@ -66,7 +66,12 @@ export default function Idea() {
 
     const saveIdea = () => {
         axios
-            .post("/api/ideas/" + idea.id + "/save", {})
+            .post(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    idea.id +
+                    "/save",
+                {}
+            )
             .then(() => {
                 addToast("Idea saved to Saved Ideas on your Profile.", {
                     appearance: "success",
@@ -87,7 +92,12 @@ export default function Idea() {
 
     const unsaveIdea = () => {
         axios
-            .post("/api/ideas/" + idea.id + "/unsave", {})
+            .post(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    idea.id +
+                    "/unsave",
+                {}
+            )
             .then(() => {
                 addToast("Idea unsaved.", {
                     appearance: "success",

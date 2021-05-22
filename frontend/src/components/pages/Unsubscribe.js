@@ -17,9 +17,13 @@ export default function Unsubscribe() {
 
     useEffect(() => {
         axios
-            .post("/api/email/notificationPreference/" + params.id, {
-                notificationPreference: "Unsubscribed",
-            })
+            .post(
+                "https://projectideas.herokuapp.com/api/email/notificationPreference/" +
+                    params.id,
+                {
+                    notificationPreference: "Unsubscribed",
+                }
+            )
             .then(() => {
                 setStatus(Status.Success);
                 setMessage(
@@ -44,9 +48,13 @@ export default function Unsubscribe() {
     const submitNewPreference = (newPreference) => {
         return new Promise((resolve, reject) => {
             axios
-                .post("/api/email/notificationPreference/" + params.id, {
-                    notificationPreference: newPreference,
-                })
+                .post(
+                    "https://projectideas.herokuapp.com/api/email/notificationPreference/" +
+                        params.id,
+                    {
+                        notificationPreference: newPreference,
+                    }
+                )
                 .then(() => {
                     setMessage(
                         "Notification preferences changed successfully."

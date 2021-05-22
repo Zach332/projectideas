@@ -50,7 +50,7 @@ export default function Project() {
 
     useEffect(() => {
         axios
-            .get("/api/projects/" + params.id)
+            .get("https://projectideas.herokuapp.com/api/projects/" + params.id)
             .then((response) => {
                 if (!response.data) {
                     setStatus(Status.NotFound);
@@ -68,7 +68,7 @@ export default function Project() {
     const flipLookingForMembers = () => {
         axios
             .put(
-                "/api/projects/" +
+                "https://projectideas.herokuapp.com/api/projects/" +
                     project.id +
                     "/updatelookingformembers?lookingForMembers=" +
                     !project.lookingForMembers
@@ -95,7 +95,7 @@ export default function Project() {
     const flipPublicProject = () => {
         axios
             .put(
-                "/api/projects/" +
+                "https://projectideas.herokuapp.com/api/projects/" +
                     project.id +
                     "/updatepublicstatus?publicProject=" +
                     !project.publicProject
@@ -148,7 +148,7 @@ export default function Project() {
     const submitLink = () => {
         axios
             .put(
-                "/api/projects/" +
+                "https://projectideas.herokuapp.com/apis://projectideas.herokuapp.com/api/projects/" +
                     project.id +
                     "/updatelink?link=" +
                     newGithubLink
@@ -185,7 +185,11 @@ export default function Project() {
 
     const leave = () => {
         axios
-            .post("/api/projects/" + project.id + "/leave")
+            .post(
+                "https://projectideas.herokuapp.com/api/projects/" +
+                    project.id +
+                    "/leave"
+            )
             .then(() => {
                 addToast("You have left this team successfully.", {
                     appearance: "success",

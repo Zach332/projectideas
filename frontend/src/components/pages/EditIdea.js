@@ -31,7 +31,8 @@ export default function EditIdea({ idea, setStatus, setRerender }) {
     const handleSubmit = (event) => {
         axios
             .patch(
-                "/api/ideas/" + originalIdea.id,
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    originalIdea.id,
                 createPatch(originalIdea, editedIdea),
                 {
                     headers: {

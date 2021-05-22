@@ -18,9 +18,13 @@ export default function Navbar() {
         if (location.pathname === "/messages") {
             setUnreadMessages(0);
         } else if (user.loggedIn) {
-            axios.get("/api/messages/numunread").then((response) => {
-                setUnreadMessages(response.data);
-            });
+            axios
+                .get(
+                    "https://projectideas.herokuapp.com/api/messages/numunread"
+                )
+                .then((response) => {
+                    setUnreadMessages(response.data);
+                });
         }
     }, [location]);
 

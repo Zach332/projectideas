@@ -46,9 +46,15 @@ export default function Comments({ ideaId }) {
     }, [comment]);
 
     useEffect(() => {
-        axios.get("/api/ideas/" + ideaId + "/comments").then((response) => {
-            setComments(response.data);
-        });
+        axios
+            .get(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    ideaId +
+                    "/comments"
+            )
+            .then((response) => {
+                setComments(response.data);
+            });
     }, [rerender]);
 
     const handleInputChange = (event) => {
@@ -56,9 +62,14 @@ export default function Comments({ ideaId }) {
     };
     const handleSubmit = (event) => {
         axios
-            .post("/api/ideas/" + ideaId + "/comments", {
-                content: comment,
-            })
+            .post(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    ideaId +
+                    "/comments",
+                {
+                    content: comment,
+                }
+            )
             .then(() => {
                 setComment("");
                 setRows(1);

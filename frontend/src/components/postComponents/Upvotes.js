@@ -15,10 +15,22 @@ export default function Upvotes({ post, postType }) {
     const toggleUpvote = () => {
         if (userHasUpvoted) {
             setUpvotes((prev) => prev - 1);
-            axios.post("/api/" + postType + "s/" + post.id + "/unupvote");
+            axios.post(
+                "https://projectideas.herokuapp.com/api/" +
+                    postType +
+                    "s/" +
+                    post.id +
+                    "/unupvote"
+            );
         } else {
             setUpvotes((prev) => prev + 1);
-            axios.post("/api/" + postType + "s/" + post.id + "/upvote");
+            axios.post(
+                "https://projectideas.herokuapp.com/api/" +
+                    postType +
+                    "s/" +
+                    post.id +
+                    "/upvote"
+            );
         }
         setUserHasUpvoted((prev) => !prev);
     };

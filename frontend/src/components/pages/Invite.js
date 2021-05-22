@@ -14,7 +14,11 @@ export default function Invite() {
 
     useEffect(() => {
         axios
-            .post("/api/projects/invites/" + params.id + "/accept")
+            .post(
+                "https://projectideas.herokuapp.com/api/projects/invites/" +
+                    params.id +
+                    "/accept"
+            )
             .then((response) => {
                 setProjectId(response.data);
                 setStatus(Status.Success);

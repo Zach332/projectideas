@@ -44,7 +44,12 @@ export default function Comment({
 
     const deleteComment = () => {
         axios
-            .delete("/api/ideas/" + parentId + "/comments/" + comment.id)
+            .delete(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    parentId +
+                    "/comments/" +
+                    comment.id
+            )
             .then(() => {
                 addToast("Your comment was deleted.", {
                     appearance: "success",

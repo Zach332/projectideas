@@ -37,7 +37,7 @@ export default function Search() {
     const executeSearch = () => {
         axios
             .get(
-                "/api/" +
+                "https://projectideas.herokuapp.com/api/" +
                     type +
                     "/search?" +
                     toQuery({ query: params.query, page: params.page })

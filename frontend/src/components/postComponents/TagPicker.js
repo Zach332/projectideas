@@ -8,9 +8,14 @@ export default function TagPicker({ post, setPost, postType }) {
     const [invalidCharacter, setInvalidCharacter] = useState(false);
 
     useEffect(() => {
-        axios.get("/api/tags/standard/" + postType).then((response) => {
-            setTagSuggestions(response.data);
-        });
+        axios
+            .get(
+                "https://projectideas.herokuapp.com/api/tags/standard/" +
+                    postType
+            )
+            .then((response) => {
+                setTagSuggestions(response.data);
+            });
     }, []);
 
     const filterTagSuggestions = (suggestions) => {
@@ -26,9 +31,14 @@ export default function TagPicker({ post, setPost, postType }) {
                     : post.tags.concat(tagName),
             }));
             setNewTag("");
-            axios.get("/api/tags/standard/" + postType).then((response) => {
-                setTagSuggestions(response.data);
-            });
+            axios
+                .get(
+                    "https://projectideas.herokuapp.com/api/tags/standard/" +
+                        postType
+                )
+                .then((response) => {
+                    setTagSuggestions(response.data);
+                });
         }
     };
 
@@ -43,13 +53,18 @@ export default function TagPicker({ post, setPost, postType }) {
         setNewTag(event.target.value.toLowerCase());
         setInvalidCharacter(false);
         if (event.target.value === "") {
-            axios.get("/api/tags/standard/" + postType).then((response) => {
-                setTagSuggestions(response.data);
-            });
+            axios
+                .get(
+                    "https://projectideas.herokuapp.com/api/tags/standard/" +
+                        postType
+                )
+                .then((response) => {
+                    setTagSuggestions(response.data);
+                });
         } else {
             axios
                 .get(
-                    "/api/tags/suggested/" +
+                    "https://projectideas.herokuapp.com/api/tags/suggested/" +
                         postType +
                         "?" +
                         toQuery({ search: event.target.value })

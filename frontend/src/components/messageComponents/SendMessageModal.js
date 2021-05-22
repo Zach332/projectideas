@@ -43,9 +43,13 @@ export default function SendMessageModal({
     const sendMessage = () => {
         let api;
         if (isProject) {
-            api = "/api/messages/projects/" + encodeURIComponent(recipientId);
+            api =
+                "https://projectideas.herokuapp.com/api/messages/projects/" +
+                encodeURIComponent(recipientId);
         } else {
-            api = "/api/messages/" + encodeURIComponent(recipient);
+            api =
+                "https://projectideas.herokuapp.com/api/messages/" +
+                encodeURIComponent(recipient);
         }
         axios
             .post(api, {
