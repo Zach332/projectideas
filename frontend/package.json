@@ -1,7 +1,7 @@
 {
   "name": "client",
   "version": "0.1.0",
-  "homepage": "http://Zach332.github.io/projectideas",
+  "homepage": "https://projectideas.tech",
   "private": true,
   "dependencies": {
     "axios": "^0.21.1",
