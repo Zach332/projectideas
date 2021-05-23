@@ -33,7 +33,7 @@ function App() {
         <StyleDiv>
             <ToastProvider>
                 <HelmetProvider>
-                    <Router>
+                    <Router basename="/projectideas">
                         <div
                             className="App"
                             style={{
