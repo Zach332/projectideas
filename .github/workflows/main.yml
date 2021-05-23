@@ -1,6 +1,5 @@
 name: Build and Deploy
 
-# Controls when the action will run. 
 on:
   push:
     branches: [ master ]
