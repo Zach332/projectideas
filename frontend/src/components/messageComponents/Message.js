@@ -11,7 +11,10 @@ export default function Message({ message, setRerender }) {
 
     const deleteMessage = () => {
         axios
-            .delete("/api/messages/received/" + message.id)
+            .delete(
+                "https://projectideas.herokuapp.com/api/messages/received/" +
+                    message.id
+            )
             .then(() => {
                 addToast("The message was deleted.", {
                     appearance: "success",

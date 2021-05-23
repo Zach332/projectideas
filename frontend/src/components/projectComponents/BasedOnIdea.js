@@ -6,12 +6,14 @@ export default function BasedOnIdea({ ideaId }) {
     const [idea, setIdea] = useState(null);
 
     useEffect(() => {
-        axios.get("/api/ideas/" + ideaId).then((response) => {
-            console.log(response);
-            if (response.data && !response.data.deleted) {
-                setIdea(response.data);
-            }
-        });
+        axios
+            .get("https://projectideas.herokuapp.com/api/ideas/" + ideaId)
+            .then((response) => {
+                console.log(response);
+                if (response.data && !response.data.deleted) {
+                    setIdea(response.data);
+                }
+            });
     }, []);
 
     return (

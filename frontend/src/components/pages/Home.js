@@ -23,7 +23,10 @@ export default function Home() {
     useEffect(() => {
         setStatus(Status.Loading);
         axios
-            .get("/api/ideas?" + toQuery({ page: params.page, sort: sort }))
+            .get(
+                "https://projectideas.herokuapp.com/api/ideas?" +
+                    toQuery({ page: params.page, sort: sort })
+            )
             .then((response) => {
                 setIdeas(response.data.ideaPreviews);
                 setLastPage(response.data.lastPage);

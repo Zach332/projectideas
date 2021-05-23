@@ -13,7 +13,7 @@ export default function ProjectJoinRequestPreview({
     const respondToJoinRequest = (accept) => {
         axios
             .post(
-                "/api/projects/" +
+                "https://projectideas.herokuapp.com/api/projects/" +
                     project.id +
                     "/joinrequests/" +
                     encodeURIComponent(request.username) +

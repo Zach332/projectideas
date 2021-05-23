@@ -30,16 +30,24 @@ export default function Messages() {
         setStatus(Status.Loading);
         if (mode === "Received") {
             axios
-                .get("/api/messages/received?" + toQuery({ page: params.page }))
+                .get(
+                    "https://projectideas.herokuapp.com/api/messages/received?" +
+                        toQuery({ page: params.page })
+                )
                 .then((response) => {
                     setMessages(response.data.receivedMessages);
                     setStatus(Status.Loaded);
                     setLastPage(response.data.lastPage);
-                    axios.post("/api/messages/received/markallasread");
+                    axios.post(
+                        "https://projectideas.herokuapp.com/api/messages/received/markallasread"
+                    );
                 });
         } else {
             axios
-                .get("/api/messages/sent?" + toQuery({ page: params.page }))
+                .get(
+                    "https://projectideas.herokuapp.com/api/messages/sent?" +
+                        toQuery({ page: params.page })
+                )
                 .then((response) => {
                     setMessages(response.data.sentMessages);
                     setStatus(Status.Loaded);

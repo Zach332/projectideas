@@ -29,24 +29,31 @@ export default function CreateProject() {
     useLeavePageWarning(project.name != "" || project.description != "");
 
     useEffect(() => {
-        axios.get("/api/ideas/" + params.id).then((response) => {
-            if (!response.data) {
-                setStatus(Status.NotFound);
-            } else {
-                setIdea(response.data);
-            }
-        });
+        axios
+            .get("https://projectideas.herokuapp.com/api/ideas/" + params.id)
+            .then((response) => {
+                if (!response.data) {
+                    setStatus(Status.NotFound);
+                } else {
+                    setIdea(response.data);
+                }
+            });
     }, []);
 
     const handleSubmit = (event) => {
         axios
-            .post("/api/ideas/" + idea.id + "/projects", {
-                name: project.name,
-                description: project.description,
-                lookingForMembers: project.lookingForMembers,
-                publicProject: project.publicProject,
-                tags: project.tags,
-            })
+            .post(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    idea.id +
+                    "/projects",
+                {
+                    name: project.name,
+                    description: project.description,
+                    lookingForMembers: project.lookingForMembers,
+                    publicProject: project.publicProject,
+                    tags: project.tags,
+                }
+            )
             .then((response) => {
                 setStatus(Status.Success);
                 setProject({

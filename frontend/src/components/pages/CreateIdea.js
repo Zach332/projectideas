@@ -37,7 +37,7 @@ export default function CreateIdea() {
 
     const handleSubmit = (event) => {
         axios
-            .post("/api/ideas", {
+            .post("https://projectideas.herokuapp.com/api/ideas", {
                 title: idea.title,
                 content: idea.content,
                 tags: idea.tags,

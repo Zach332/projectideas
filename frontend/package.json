@@ -1,12 +1,14 @@
 {
   "name": "client",
   "version": "0.1.0",
+  "homepage": "https://projectideas.tech",
   "private": true,
   "dependencies": {
     "axios": "^0.21.1",
     "bootstrap": "^5.0.0-beta1",
     "fibers": "^5.0.0",
     "framer-motion": "^2.9.5",
+    "gh-pages": "^3.1.0",
     "jquery": "^3.6.0",
     "node-sass": "^4.14.1",
     "react": "^17.0.0",
@@ -28,7 +30,9 @@
     "start-linux": "export PORT=5000 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "proxy": "http://localhost:8443",
   "browserslist": {

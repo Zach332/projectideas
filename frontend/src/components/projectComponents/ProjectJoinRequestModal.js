@@ -13,9 +13,14 @@ export default function ProjectJoinRequestModal({ project, submitRequest }) {
 
     const sendJoinRequest = (event) => {
         axios
-            .post("/api/projects/" + project.id + "/joinrequests", {
-                requestMessage: joinRequestMessage,
-            })
+            .post(
+                "https://projectideas.herokuapp.com/api/projects/" +
+                    project.id +
+                    "/joinrequests",
+                {
+                    requestMessage: joinRequestMessage,
+                }
+            )
             .then(() => {
                 setJoinRequestMessage("");
                 submitRequest();

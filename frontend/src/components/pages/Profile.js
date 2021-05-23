@@ -39,7 +39,7 @@ export default function Profile() {
             });
             axios
                 .get(
-                    "/api/users/" +
+                    "https://projectideas.herokuapp.com/api/users/" +
                         user.id +
                         "/savedIdeas?" +
                         toQuery({ page: page.savedIdeas })
@@ -56,7 +56,7 @@ export default function Profile() {
                 });
             axios
                 .get(
-                    "/api/users/" +
+                    "https://projectideas.herokuapp.com/api/users/" +
                         user.id +
                         "/postedideas?" +
                         toQuery({ page: page.myIdeas })
@@ -76,7 +76,12 @@ export default function Profile() {
 
     const removeIdeaFromSaved = (ideaId) => {
         axios
-            .post("/api/ideas/" + ideaId + "/unsave", {})
+            .post(
+                "https://projectideas.herokuapp.com/api/ideas/" +
+                    ideaId +
+                    "/unsave",
+                {}
+            )
             .then(() => {
                 addToast("Idea removed from Saved Projects.", {
                     appearance: "success",

@@ -22,7 +22,10 @@ export default function Projects() {
     useEffect(() => {
         setStatus(Status.Loading);
         axios
-            .get("/api/projects?" + toQuery({ page: params.page, sort: sort }))
+            .get(
+                "https://projectideas.herokuapp.com/api/projects?" +
+                    toQuery({ page: params.page, sort: sort })
+            )
             .then((response) => {
                 setProjects(response.data.projectPreviews);
                 setLastPage(response.data.lastPage);
