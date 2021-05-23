@@ -1,0 +1,14 @@
+{
+  "short_name": "projectideas",
+  "name": "projectideas",
+  "icons": [
+    {
+      "src": "pifavicon.svg",
+      "type": "image/svg"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

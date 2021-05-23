@@ -1,0 +1,11 @@
+.idea
+*.iml
+target
+.settings
+.project
+.classpath
+.factorypath
+.vscode
+node_modules
+lucene
+logfile.txt
