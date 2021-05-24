@@ -45,7 +45,8 @@ export default function Comment({
     const deleteComment = () => {
         axios
             .delete(
-                "https://projectideas.herokuapp.com/api/ideas/" +
+                process.env.REACT_APP_API +
+                    "ideas/" +
                     parentId +
                     "/comments/" +
                     comment.id

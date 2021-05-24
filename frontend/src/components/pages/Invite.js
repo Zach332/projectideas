@@ -15,7 +15,8 @@ export default function Invite() {
     useEffect(() => {
         axios
             .post(
-                "https://projectideas.herokuapp.com/api/projects/invites/" +
+                process.env.REACT_APP_API +
+                    "projects/invites/" +
                     params.id +
                     "/accept"
             )

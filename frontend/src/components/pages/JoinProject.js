@@ -21,7 +21,7 @@ export default function JoinProject() {
 
     useEffect(() => {
         axios
-            .get("https://projectideas.herokuapp.com/api/ideas/" + params.id)
+            .get(process.env.REACT_APP_API + "ideas/" + params.id)
             .then((response) => {
                 if (!response.data) {
                     setStatus(Status.NotFound);
@@ -31,7 +31,8 @@ export default function JoinProject() {
             });
         axios
             .get(
-                "https://projectideas.herokuapp.com/api/ideas/" +
+                process.env.REACT_APP_API +
+                    "ideas/" +
                     params.id +
                     "/projects?lookingForMembersOnly=true"
             )

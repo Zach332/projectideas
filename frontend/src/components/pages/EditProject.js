@@ -24,8 +24,7 @@ export default function EditProject({
     const handleSubmit = (event) => {
         axios
             .patch(
-                "https://projectideas.herokuapp.com/api/projects/" +
-                    originalProject.id,
+                process.env.REACT_APP_API + "projects/" + originalProject.id,
                 createPatch(originalProject, editedProject),
                 {
                     headers: {

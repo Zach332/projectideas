@@ -16,7 +16,8 @@ export default function Upvotes({ post, postType }) {
         if (userHasUpvoted) {
             setUpvotes((prev) => prev - 1);
             axios.post(
-                "https://projectideas.herokuapp.com/api/" +
+                process.env.REACT_APP_API +
+                    "" +
                     postType +
                     "s/" +
                     post.id +
@@ -25,7 +26,8 @@ export default function Upvotes({ post, postType }) {
         } else {
             setUpvotes((prev) => prev + 1);
             axios.post(
-                "https://projectideas.herokuapp.com/api/" +
+                process.env.REACT_APP_API +
+                    "" +
                     postType +
                     "s/" +
                     post.id +

@@ -31,7 +31,8 @@ export default function Messages() {
         if (mode === "Received") {
             axios
                 .get(
-                    "https://projectideas.herokuapp.com/api/messages/received?" +
+                    process.env.REACT_APP_API +
+                        "messages/received?" +
                         toQuery({ page: params.page })
                 )
                 .then((response) => {
@@ -39,13 +40,15 @@ export default function Messages() {
                     setStatus(Status.Loaded);
                     setLastPage(response.data.lastPage);
                     axios.post(
-                        "https://projectideas.herokuapp.com/api/messages/received/markallasread"
+                        process.env.REACT_APP_API +
+                            "messages/received/markallasread"
                     );
                 });
         } else {
             axios
                 .get(
-                    "https://projectideas.herokuapp.com/api/messages/sent?" +
+                    process.env.REACT_APP_API +
+                        "messages/sent?" +
                         toQuery({ page: params.page })
                 )
                 .then((response) => {

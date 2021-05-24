@@ -44,11 +44,13 @@ export default function SendMessageModal({
         let api;
         if (isProject) {
             api =
-                "https://projectideas.herokuapp.com/api/messages/projects/" +
+                process.env.REACT_APP_API +
+                "messages/projects/" +
                 encodeURIComponent(recipientId);
         } else {
             api =
-                "https://projectideas.herokuapp.com/api/messages/" +
+                process.env.REACT_APP_API +
+                "messages/" +
                 encodeURIComponent(recipient);
         }
         axios

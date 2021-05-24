@@ -7,7 +7,7 @@ export default function BasedOnIdea({ ideaId }) {
 
     useEffect(() => {
         axios
-            .get("https://projectideas.herokuapp.com/api/ideas/" + ideaId)
+            .get(process.env.REACT_APP_API + "ideas/" + ideaId)
             .then((response) => {
                 console.log(response);
                 if (response.data && !response.data.deleted) {

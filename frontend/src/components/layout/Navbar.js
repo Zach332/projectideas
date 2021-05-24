@@ -19,9 +19,7 @@ export default function Navbar() {
             setUnreadMessages(0);
         } else if (user.loggedIn) {
             axios
-                .get(
-                    "https://projectideas.herokuapp.com/api/messages/numunread"
-                )
+                .get(process.env.REACT_APP_API + "messages/numunread")
                 .then((response) => {
                     setUnreadMessages(response.data);
                 });

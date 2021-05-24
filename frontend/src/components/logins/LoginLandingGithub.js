@@ -21,7 +21,7 @@ export default function LoginLandingGithub() {
             onFailure(new Error("'code' not found"));
         }
         axios
-            .post("https://projectideas.herokuapp.com/api/login/github", {
+            .post(process.env.REACT_APP_API + "login/github", {
                 code: data.code,
             })
             .then((response) => {

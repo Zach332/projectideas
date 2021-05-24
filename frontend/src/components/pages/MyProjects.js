@@ -20,7 +20,8 @@ export default function MyProjects({ noHeading }) {
         setStatus(Status.Loading);
         axios
             .get(
-                "https://projectideas.herokuapp.com/api/users/" +
+                process.env.REACT_APP_API +
+                    "users/" +
                     user.id +
                     "/projects?" +
                     toQuery({ page: page })

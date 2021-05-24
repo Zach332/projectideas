@@ -22,7 +22,8 @@ export default function Tags() {
         setStatus(Status.Loading);
         axios
             .get(
-                "https://projectideas.herokuapp.com/api/" +
+                process.env.REACT_APP_API +
+                    "" +
                     params.type +
                     "s/tags?" +
                     toQuery({ tag: params.tag, page: params.page })

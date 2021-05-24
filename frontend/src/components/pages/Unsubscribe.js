@@ -18,7 +18,8 @@ export default function Unsubscribe() {
     useEffect(() => {
         axios
             .post(
-                "https://projectideas.herokuapp.com/api/email/notificationPreference/" +
+                process.env.REACT_APP_API +
+                    "email/notificationPreference/" +
                     params.id,
                 {
                     notificationPreference: "Unsubscribed",
@@ -49,7 +50,8 @@ export default function Unsubscribe() {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "https://projectideas.herokuapp.com/api/email/notificationPreference/" +
+                    process.env.REACT_APP_API +
+                        "email/notificationPreference/" +
                         params.id,
                     {
                         notificationPreference: newPreference,

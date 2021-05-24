@@ -47,11 +47,7 @@ export default function Comments({ ideaId }) {
 
     useEffect(() => {
         axios
-            .get(
-                "https://projectideas.herokuapp.com/api/ideas/" +
-                    ideaId +
-                    "/comments"
-            )
+            .get(process.env.REACT_APP_API + "ideas/" + ideaId + "/comments")
             .then((response) => {
                 setComments(response.data);
             });
@@ -62,14 +58,9 @@ export default function Comments({ ideaId }) {
     };
     const handleSubmit = (event) => {
         axios
-            .post(
-                "https://projectideas.herokuapp.com/api/ideas/" +
-                    ideaId +
-                    "/comments",
-                {
-                    content: comment,
-                }
-            )
+            .post(process.env.REACT_APP_API + "ideas/" + ideaId + "/comments", {
+                content: comment,
+            })
             .then(() => {
                 setComment("");
                 setRows(1);

@@ -21,7 +21,7 @@ export default function LoginLandingGoogle() {
             onFailure(new Error("Access token not found"));
         }
         axios
-            .post("https://projectideas.herokuapp.com/api/login/google", {
+            .post(process.env.REACT_APP_API + "login/google", {
                 token: data.access_token,
             })
             .then((response) => {

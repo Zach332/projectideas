@@ -9,10 +9,7 @@ export default function TagPicker({ post, setPost, postType }) {
 
     useEffect(() => {
         axios
-            .get(
-                "https://projectideas.herokuapp.com/api/tags/standard/" +
-                    postType
-            )
+            .get(process.env.REACT_APP_API + "tags/standard/" + postType)
             .then((response) => {
                 setTagSuggestions(response.data);
             });
@@ -32,10 +29,7 @@ export default function TagPicker({ post, setPost, postType }) {
             }));
             setNewTag("");
             axios
-                .get(
-                    "https://projectideas.herokuapp.com/api/tags/standard/" +
-                        postType
-                )
+                .get(process.env.REACT_APP_API + "tags/standard/" + postType)
                 .then((response) => {
                     setTagSuggestions(response.data);
                 });
@@ -54,17 +48,15 @@ export default function TagPicker({ post, setPost, postType }) {
         setInvalidCharacter(false);
         if (event.target.value === "") {
             axios
-                .get(
-                    "https://projectideas.herokuapp.com/api/tags/standard/" +
-                        postType
-                )
+                .get(process.env.REACT_APP_API + "tags/standard/" + postType)
                 .then((response) => {
                     setTagSuggestions(response.data);
                 });
         } else {
             axios
                 .get(
-                    "https://projectideas.herokuapp.com/api/tags/suggested/" +
+                    process.env.REACT_APP_API +
+                        "tags/suggested/" +
                         postType +
                         "?" +
                         toQuery({ search: event.target.value })

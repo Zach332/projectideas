@@ -14,7 +14,8 @@ export default function ProjectJoinRequestModal({ project, submitRequest }) {
     const sendJoinRequest = (event) => {
         axios
             .post(
-                "https://projectideas.herokuapp.com/api/projects/" +
+                process.env.REACT_APP_API +
+                    "projects/" +
                     project.id +
                     "/joinrequests",
                 {

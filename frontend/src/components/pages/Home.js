@@ -24,7 +24,8 @@ export default function Home() {
         setStatus(Status.Loading);
         axios
             .get(
-                "https://projectideas.herokuapp.com/api/ideas?" +
+                process.env.REACT_APP_API +
+                    "ideas?" +
                     toQuery({ page: params.page, sort: sort })
             )
             .then((response) => {

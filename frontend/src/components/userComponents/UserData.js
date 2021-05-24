@@ -17,7 +17,7 @@ export default function UserData() {
 
     useEffect(() => {
         axios
-            .get("https://projectideas.herokuapp.com/api/users/" + user.id)
+            .get(process.env.REACT_APP_API + "users/" + user.id)
             .then((response) => {
                 setUserData(response.data);
                 setStatus(Status.Loaded);
@@ -35,7 +35,7 @@ export default function UserData() {
     const handleUsernameSubmit = (event) => {
         setUsernameLoading(true);
         axios
-            .put("https://projectideas.herokuapp.com/api/users/" + user.id, {
+            .put(process.env.REACT_APP_API + "users/" + user.id, {
                 username: userData.username,
                 notificationPreference: userData.notificationPreference,
             })
@@ -81,13 +81,10 @@ export default function UserData() {
     const changeNotificationPreference = (newPreference) => {
         return new Promise((resolve, reject) => {
             axios
-                .put(
-                    "https://projectideas.herokuapp.com/api/users/" + user.id,
-                    {
-                        username: userData.username,
-                        notificationPreference: newPreference,
-                    }
-                )
+                .put(process.env.REACT_APP_API + "users/" + user.id, {
+                    username: userData.username,
+                    notificationPreference: newPreference,
+                })
                 .then(() => {
                     resolve();
                 })

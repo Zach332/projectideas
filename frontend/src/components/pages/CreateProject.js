@@ -30,7 +30,7 @@ export default function CreateProject() {
 
     useEffect(() => {
         axios
-            .get("https://projectideas.herokuapp.com/api/ideas/" + params.id)
+            .get(process.env.REACT_APP_API + "ideas/" + params.id)
             .then((response) => {
                 if (!response.data) {
                     setStatus(Status.NotFound);
@@ -43,9 +43,7 @@ export default function CreateProject() {
     const handleSubmit = (event) => {
         axios
             .post(
-                "https://projectideas.herokuapp.com/api/ideas/" +
-                    idea.id +
-                    "/projects",
+                process.env.REACT_APP_API + "ideas/" + idea.id + "/projects",
                 {
                     name: project.name,
                     description: project.description,
