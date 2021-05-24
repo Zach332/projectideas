@@ -13,6 +13,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
             .addMapping("/api/**")
+            .allowCredentials(true)
             .allowedOrigins("https://projectideas.tech");
     }
 }
