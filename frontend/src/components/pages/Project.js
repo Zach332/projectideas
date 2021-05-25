@@ -150,7 +150,8 @@ export default function Project() {
     const submitLink = () => {
         axios
             .put(
-                "https://projectideas.herokuapp.com/apis://projectideas.herokuapp.com/api/projects/" +
+                process.env.REACT_APP_API +
+                    "/projects/" +
                     project.id +
                     "/updatelink?link=" +
                     newGithubLink

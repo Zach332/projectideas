@@ -13,8 +13,8 @@ export default function Privacy() {
                 Your privacy is important to us. It is projectideas&apos; policy
                 to respect your privacy regarding any information we may collect
                 from you across our website,{" "}
-                <Link to="http://projectideas.herokuapp.com">
-                    http://projectideas.herokuapp.com
+                <Link to="http://projectideas.tech">
+                    http://projectideas.tech
                 </Link>
                 , and other sites we own and operate.
             </p>
