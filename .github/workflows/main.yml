@@ -21,6 +21,7 @@ jobs:
         env:
           REACT_APP_GITHUB_CLIENT_ID: ${{ secrets.REACT_APP_GITHUB_CLIENT_ID }}
           REACT_APP_GITHUB_REDIRECT_URI: ${{ secrets.REACT_APP_GITHUB_REDIRECT_URI }}
+          REACT_APP_API: ${{ secrets.REACT_APP_API }}
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.3
