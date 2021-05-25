@@ -3,6 +3,8 @@ name: Build and Deploy
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'frontend/**'
 
   workflow_dispatch:
 
