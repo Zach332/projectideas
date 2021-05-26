@@ -404,7 +404,7 @@ public class Database {
         CosmosContainer container,
         Class<T> upvoteType
     ) {
-        return documentExists(userId, partitionKey, postContainer, upvoteType);
+        return documentExists(userId, partitionKey, container, upvoteType);
     }
 
     // Users
