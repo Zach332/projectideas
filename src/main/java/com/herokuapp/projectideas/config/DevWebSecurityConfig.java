@@ -32,7 +32,11 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedHeaders(
-            Arrays.asList("Authorization", "Content-Type")
+            Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "If-Unmodified-Since"
+            )
         );
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
