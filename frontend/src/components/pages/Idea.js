@@ -197,7 +197,7 @@ export default function Idea() {
                                         {formatTime(idea.timeCreated)}
                                     </div>
                                     {user.loggedIn && (
-                                        <div className="d-flex align-items-center">
+                                        <div className="d-flex align-items-center p-1">
                                             {idea.savedByUser ? (
                                                 <button
                                                     type="button"
@@ -211,6 +211,7 @@ export default function Idea() {
                                                     type="button"
                                                     className="btn btn-primary btn-md"
                                                     onClick={saveIdea}
+                                                    style={{ minWidth: "79px" }}
                                                 >
                                                     Save
                                                 </button>
