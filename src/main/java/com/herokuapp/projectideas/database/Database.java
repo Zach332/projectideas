@@ -409,10 +409,8 @@ public class Database {
 
     public User createUser(User user) {
         emailInterface.sendWelcomeEmail(user);
-        user.setTimeLastEmailReceived(Instant.now().getEpochSecond());
 
         userContainer.createItem(user);
-
         return user;
     }
 

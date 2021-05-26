@@ -4,7 +4,6 @@ import com.herokuapp.projectideas.database.Database;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.email.EmailInterface;
-import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -46,14 +45,12 @@ public class NotificationService {
                 }
                 user = database.getUser(user.getUserId());
                 numUnreadMessages = user.getUnreadMessages();
-                if (numUnreadMessages == 0) {
-                    return;
+                if (numUnreadMessages > 0) {
+                    emailInterface.sendUnreadMessagesEmail(
+                        user,
+                        numUnreadMessages
+                    );
                 }
-
-                emailInterface.sendUnreadMessagesEmail(user, numUnreadMessages);
-
-                user.setTimeLastEmailReceived(Instant.now().getEpochSecond());
-                database.updateUser(user.getUserId(), user);
             }
         }
     }
