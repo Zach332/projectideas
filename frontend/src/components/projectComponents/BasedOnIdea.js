@@ -9,7 +9,6 @@ export default function BasedOnIdea({ ideaId }) {
         axios
             .get(process.env.REACT_APP_API + "ideas/" + ideaId)
             .then((response) => {
-                console.log(response);
                 if (response.data && !response.data.deleted) {
                     setIdea(response.data);
                 }
