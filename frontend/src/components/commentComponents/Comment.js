@@ -17,7 +17,7 @@ export default function Comment({
             text.startsWith(">") ? (
                 <div
                     key={Math.floor(Math.random() * 1000000000)}
-                    className="mx-5 ps-2 bg-light"
+                    className="ms-2 ps-2 bg-light"
                     style={{
                         wordBreak: "break-word",
                     }}
@@ -74,7 +74,7 @@ export default function Comment({
             {user.loggedIn && (
                 <div className="dropdown">
                     <button
-                        className="btn btn-sm btn-outline-secondary float-end"
+                        className="btn btn-sm btn-secondary float-end"
                         type="button"
                         id="dropdownMenuButton"
                         data-bs-toggle="dropdown"
