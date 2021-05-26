@@ -50,6 +50,7 @@ export default function UserData() {
             })
             .catch((err) => {
                 console.log("Error changing username: " + err);
+                setUsernameLoading(false);
                 if (err.response.status == 422) {
                     addToast(
                         "This username is already in use by another user. Please choose another.",
