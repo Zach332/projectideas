@@ -107,11 +107,11 @@ export default function TagPicker({ post, setPost, postType }) {
             <div className="mt-1">
                 <br></br>
             </div>
-            <div className="row g-3">
-                <div className="col-auto">
+            <div className="d-flex align-items-center mb-3">
+                <div className="me-4">
                     <span>Add tag</span>
                 </div>
-                <div className="col-auto">
+                <div className="me-3">
                     <input
                         type="text"
                         className="form-control"
@@ -121,13 +121,15 @@ export default function TagPicker({ post, setPost, postType }) {
                         placeholder="new tag"
                     />
                 </div>
-                <div className="col-auto">
-                    <div className="btn btn-primary mb-3" onClick={createTag}>
-                        Add
-                    </div>
-                </div>
+                <button
+                    className="btn btn-primary"
+                    onClick={createTag}
+                    onKeyDown={submitOnEnter}
+                >
+                    Add
+                </button>
                 {(newTag.length > 29 || invalidCharacter) && (
-                    <div className="col-auto text-red">
+                    <div className="text-red">
                         Tags must be less than 30 characters
                     </div>
                 )}
