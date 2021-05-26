@@ -5,6 +5,7 @@ import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.email.EmailInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     @Autowired
+    @Lazy
     Database database;
 
     @Autowired
