@@ -60,8 +60,7 @@ export default function SubscriptionPreferences({
                         checked={isPreference("Default")}
                     />
                     <label className="form-check-label" htmlFor="Default">
-                        Default - We only notify you about new messages if we
-                        have not recently sent you an email
+                        Default
                     </label>
                 </div>
                 <div className="form-check">

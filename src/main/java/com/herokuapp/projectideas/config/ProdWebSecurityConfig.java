@@ -34,7 +34,11 @@ public class ProdWebSecurityConfig extends WebSecurityConfigurerAdapter {
             Arrays.asList("https://projectideas.tech")
         );
         configuration.setAllowedHeaders(
-            Arrays.asList("Authorization", "Content-Type")
+            Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "If-Unmodified-Since"
+            )
         );
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);

@@ -25,10 +25,6 @@ public class User implements RootDocument, Authorization {
      * unsubscribe from email notifications
      */
     protected String emailSubscriptionId;
-    /**
-     * Time user last received an email from projectideas
-     */
-    protected long timeLastEmailReceived;
 
     public User(String username, String email) {
         this.id = UUID.randomUUID().toString();
@@ -41,7 +37,6 @@ public class User implements RootDocument, Authorization {
         this.admin = false;
         this.notificationPreference = NotificationPreference.Default;
         this.emailSubscriptionId = UUID.randomUUID().toString();
-        this.timeLastEmailReceived = 0;
     }
 
     public String getPartitionKey() {

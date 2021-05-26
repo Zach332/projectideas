@@ -5,8 +5,9 @@ package com.herokuapp.projectideas.database.document.user;
  */
 public enum NotificationPreference {
     /**
-     * Send emails when user receives a message only if
-     * the user was not recently sent an email
+     * Send emails when user receives a message after a
+     * short minute wait, assuming they have not read the
+     * message since
      */
     Default,
     /**

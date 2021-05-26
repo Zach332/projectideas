@@ -42,6 +42,7 @@ import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.database.exception.EmptySingleDocumentQueryException;
 import com.herokuapp.projectideas.database.query.GenericQueries;
 import com.herokuapp.projectideas.email.EmailInterface;
+import com.herokuapp.projectideas.notification.NotificationService;
 import com.herokuapp.projectideas.search.IndexController;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -72,8 +73,10 @@ public class Database {
     @Autowired
     EmailInterface emailInterface;
 
+    @Autowired
+    NotificationService notificationService;
+
     public static final int ITEMS_PER_PAGE = 10;
-    private static final int MIN_SECONDS_BETWEEN_EMAILS = 60 * 60 * 24;
 
     private static final Logger logger = LoggerFactory.getLogger(
         Database.class
@@ -406,10 +409,8 @@ public class Database {
 
     public User createUser(User user) {
         emailInterface.sendWelcomeEmail(user);
-        user.setTimeLastEmailReceived(Instant.now().getEpochSecond());
 
         userContainer.createItem(user);
-
         return user;
     }
 
@@ -935,7 +936,7 @@ public class Database {
             logger.error("Individual message failed to send.", e);
         }
 
-        notifyUserOfUnreadMessages(recipient);
+        notificationService.notifyUserOfUnreadMessages(recipient);
     }
 
     public void sendIndividualAdminMessage(String recipientId, String content) {
@@ -948,7 +949,9 @@ public class Database {
         userContainer.createItem(receivedMessage);
 
         try {
-            notifyUserOfUnreadMessages(getUser(recipientId));
+            notificationService.notifyUserOfUnreadMessages(
+                getUser(recipientId)
+            );
         } catch (EmptyPointReadException e) {
             logger.warn(e.toString());
         }
@@ -978,7 +981,9 @@ public class Database {
                 userContainer.createItem(receivedGroupMessage);
 
                 try {
-                    notifyUserOfUnreadMessages(getUser(recipientId));
+                    notificationService.notifyUserOfUnreadMessages(
+                        getUser(recipientId)
+                    );
                 } catch (EmptyPointReadException e) {
                     logger.warn(e.toString());
                 }
@@ -1013,41 +1018,15 @@ public class Database {
                 userContainer.createItem(receivedGroupMessage);
 
                 try {
-                    notifyUserOfUnreadMessages(getUser(recipientId));
+                    notificationService.notifyUserOfUnreadMessages(
+                        getUser(recipientId)
+                    );
                 } catch (EmptyPointReadException e) {
                     logger.warn(e.toString());
                 }
             }
         } catch (CosmosException e) {
             logger.error("Group admin message failed to send.", e);
-        }
-    }
-
-    private void notifyUserOfUnreadMessages(User user) {
-        if (user.getUnreadMessages() > 0) {
-            boolean sendEmail =
-                switch (user.getNotificationPreference()) {
-                    case Default -> Instant.now().getEpochSecond() -
-                    MIN_SECONDS_BETWEEN_EMAILS >
-                    user.getTimeLastEmailReceived();
-                    case AllNewMessages -> true;
-                    case Unsubscribed -> false;
-                };
-
-            if (sendEmail) {
-                emailInterface.sendUnreadMessagesEmail(
-                    user,
-                    user.getUnreadMessages()
-                );
-
-                user.setTimeLastEmailReceived(Instant.now().getEpochSecond());
-                userContainer.replaceItem(
-                    user,
-                    user.getId(),
-                    new PartitionKey(user.getUserId()),
-                    new CosmosItemRequestOptions()
-                );
-            }
         }
     }
 
