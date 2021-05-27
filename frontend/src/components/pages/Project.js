@@ -234,7 +234,7 @@ export default function Project() {
                     data-bs-target="#gitHubLink"
                     className="btn btn-outline-secondary btn-md my-2"
                 >
-                    Add GitHub link
+                    Add repo link
                 </button>
             );
         } else {
