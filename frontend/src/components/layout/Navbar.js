@@ -4,6 +4,7 @@ import NameLogo from "../../namelogo.svg";
 import { userPersistenceKey, useGlobalState } from "../../State";
 import { NavLink, Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { toQuery } from "../utils/Routing";
 
 export default function Navbar() {
     let location = useLocation();
@@ -105,7 +106,9 @@ export default function Navbar() {
                 </NavLink>
                 <li className="navbar-btn">
                     <Link
-                        to="/login"
+                        to={
+                            "/login?" + toQuery({ redirect: location.pathname })
+                        }
                         className="btn btn-outline-success my-2 my-sm-0"
                     >
                         Login
