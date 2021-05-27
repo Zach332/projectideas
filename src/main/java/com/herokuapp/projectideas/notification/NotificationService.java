@@ -1,6 +1,7 @@
 package com.herokuapp.projectideas.notification;
 
 import com.herokuapp.projectideas.database.Database;
+import com.herokuapp.projectideas.database.document.user.NotificationPreference;
 import com.herokuapp.projectideas.database.document.user.User;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import com.herokuapp.projectideas.email.EmailInterface;
@@ -47,7 +48,11 @@ public class NotificationService {
                 }
                 user = database.getUser(user.getUserId());
                 numUnreadMessages = user.getUnreadMessages();
-                if (numUnreadMessages > 0) {
+                if (
+                    numUnreadMessages > 0 &&
+                    user.getNotificationPreference() !=
+                    NotificationPreference.Unsubscribed
+                ) {
                     emailInterface.sendUnreadMessagesEmail(
                         user,
                         numUnreadMessages
