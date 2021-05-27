@@ -151,7 +151,7 @@ export default function Project() {
         axios
             .put(
                 process.env.REACT_APP_API +
-                    "/projects/" +
+                    "projects/" +
                     project.id +
                     "/updatelink?link=" +
                     newGithubLink
