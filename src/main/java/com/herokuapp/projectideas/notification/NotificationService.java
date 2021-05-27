@@ -30,34 +30,39 @@ public class NotificationService {
         throws EmptyPointReadException {
         int numUnreadMessages = user.getUnreadMessages();
         if (numUnreadMessages > 0) {
-            boolean sendEmail =
-                switch (user.getNotificationPreference()) {
+            switch (user.getNotificationPreference()) {
+                case Default -> {
                     // Only send an email if the user is up-to-date with reading messages
-                    case Default -> numUnreadMessages == 1;
-                    case AllNewMessages -> true;
-                    case Unsubscribed -> false;
-                };
-
-            if (sendEmail) {
-                // Wait before sending email in case the user has checked their messages
-                // since the start of this method
-                try {
-                    Thread.sleep(MILLISECONDS_BEFORE_SENDING_EMAIL);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    // (only the newly received message is unread)
+                    if (numUnreadMessages == 1) {
+                        // Wait before sending email in case the user has checked their messages
+                        // since the start of this method
+                        try {
+                            Thread.sleep(MILLISECONDS_BEFORE_SENDING_EMAIL);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                        user = database.getUser(user.getUserId());
+                        numUnreadMessages = user.getUnreadMessages();
+                        if (
+                            numUnreadMessages > 0 &&
+                            user.getNotificationPreference() !=
+                            NotificationPreference.Unsubscribed
+                        ) {
+                            emailInterface.sendUnreadMessagesEmail(
+                                user,
+                                numUnreadMessages
+                            );
+                        }
+                    }
                 }
-                user = database.getUser(user.getUserId());
-                numUnreadMessages = user.getUnreadMessages();
-                if (
-                    numUnreadMessages > 0 &&
-                    user.getNotificationPreference() !=
-                    NotificationPreference.Unsubscribed
-                ) {
+                case AllNewMessages -> {
                     emailInterface.sendUnreadMessagesEmail(
                         user,
                         numUnreadMessages
                     );
                 }
+                case Unsubscribed -> {}
             }
         }
     }
