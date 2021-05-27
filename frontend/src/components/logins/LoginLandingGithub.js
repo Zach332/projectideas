@@ -6,10 +6,12 @@ import { login, Status } from "../../State";
 import Spinner from "../general/Spinner";
 import { Link, useHistory } from "react-router-dom";
 import HomeSuccess from "./../general/HomeSuccess";
+import { useToasts } from "react-toast-notifications";
 
 export default function LoginLandingGithub() {
     const history = useHistory();
     const [status, setStatus] = useState(Status.Loading);
+    const { addToast } = useToasts();
 
     useEffect(() => {
         const params = toParams(window.location.search.replace(/^\?/, ""));
@@ -31,7 +33,15 @@ export default function LoginLandingGithub() {
                     response.data.admin
                 );
                 setStatus(Status.Success);
-                history.push("/login/oauth2/code/github");
+                if (data.state != undefined) {
+                    addToast("You have logged in successfully.", {
+                        appearance: "success",
+                        autoDismiss: true,
+                    });
+                    history.push(data.state);
+                } else {
+                    history.push("/login/oauth2/code/github");
+                }
             })
             .catch((err) => {
                 onFailure(err);

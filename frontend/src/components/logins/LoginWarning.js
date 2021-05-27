@@ -1,10 +1,12 @@
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import { toQuery } from "../utils/Routing";
 
 export default function LoginWarning() {
     let history = useHistory();
+    let location = useLocation();
 
     const onClick = () => {
-        history.push("/login");
+        history.push("/login?" + toQuery({ redirect: location.pathname }));
     };
 
     return (

@@ -1,4 +1,4 @@
-import { toQuery } from "../utils/Routing";
+import { toQuery, toParams } from "../utils/Routing";
 import GitHubSymbol from "../../GitHub-Mark.png";
 import GitHubSymbolLight from "../../GitHub-Mark-Light.png";
 import GoogleLogo from "../../GoogleLogo.svg";
@@ -6,11 +6,13 @@ import { useGlobalState } from "../../State";
 
 export default function Login() {
     const [theme] = useGlobalState("theme");
+    const params = toParams(location.search.replace(/^\?/, ""));
 
     const githubParams = toQuery({
         client_id: process.env.REACT_APP_GITHUB_CLIENT_ID,
         scope: "user:email",
         redirect_uri: process.env.REACT_APP_GITHUB_REDIRECT_URI,
+        state: params.redirect,
     });
 
     const googleParams = toQuery({
@@ -18,7 +20,8 @@ export default function Login() {
             "449086482050-t6e9tflhou1r9b905s42pvjtbvac23hl.apps.googleusercontent.com",
         scope: "https://www.googleapis.com/auth/userinfo.email",
         response_type: "token",
-        redirect_uri: window.location.href + "/oauth2/code/google",
+        redirect_uri: process.env.REACT_APP_URL + "/login/oauth2/code/google",
+        state: params.redirect,
     });
 
     const onClickGithub = () => {
