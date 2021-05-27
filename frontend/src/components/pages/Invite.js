@@ -1,15 +1,17 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Status } from "../../State";
+import { Status, useGlobalState } from "../../State";
 import Spinner from "../general/Spinner";
 import Success from "../general/Success";
 import XMark from "../../x.svg";
 import { toParams } from "../utils/Routing";
+import LoginWarning from "./../logins/LoginWarning";
 
 export default function Invite() {
     const [status, setStatus] = useState(Status.Loading);
     const [message, setMessage] = useState("");
     const [projectId, setProjectId] = useState("");
+    const [user] = useGlobalState("user");
     const params = toParams(location.search.replace(/^\?/, ""));
 
     useEffect(() => {
@@ -36,11 +38,15 @@ export default function Invite() {
                 } else {
                     setStatus(Status.Failure);
                     setMessage(
-                        "We were unable to add you to the project. Please ensure that you are logged in and not already a member of the project."
+                        "We were unable to add you to the project. Please ensure that you are not already a member of the project."
                     );
                 }
             });
     }, []);
+
+    if (!user.loggedIn) {
+        return <LoginWarning />;
+    }
 
     if (status === Status.Success) {
         return (
