@@ -404,7 +404,12 @@ public class Database {
         CosmosContainer container,
         Class<T> upvoteType
     ) {
+        if (invalidUserId(userId)) return false;
         return documentExists(userId, partitionKey, container, upvoteType);
+    }
+
+    private boolean invalidUserId(String userId) {
+        return userId == null || userId.equals("null");
     }
 
     // Users
@@ -573,6 +578,7 @@ public class Database {
     }
 
     public boolean userHasSavedIdea(String ideaId, String userId) {
+        if (invalidUserId(userId)) return false;
         return (
             countQuery(
                 GenericQueries
