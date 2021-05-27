@@ -55,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -74,6 +75,7 @@ public class Database {
     EmailInterface emailInterface;
 
     @Autowired
+    @Lazy
     NotificationService notificationService;
 
     public static final int ITEMS_PER_PAGE = 10;
@@ -402,7 +404,7 @@ public class Database {
         CosmosContainer container,
         Class<T> upvoteType
     ) {
-        return documentExists(userId, partitionKey, postContainer, upvoteType);
+        return documentExists(userId, partitionKey, container, upvoteType);
     }
 
     // Users
