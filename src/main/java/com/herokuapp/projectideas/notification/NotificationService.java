@@ -23,7 +23,7 @@ public class NotificationService {
     @Autowired
     EmailInterface emailInterface;
 
-    private static final int MILLISECONDS_BEFORE_SENDING_EMAIL = 60 * 5;
+    private static final int MILLISECONDS_BEFORE_SENDING_EMAIL = 1000 * 60 * 5;
 
     @Async
     public void notifyUserOfUnreadMessages(User user)
