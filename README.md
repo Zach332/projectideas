@@ -24,4 +24,4 @@ projectideas is a solution that enables developers to work on projects that solv
 
 ## Architecture
 
-We use Java Spring as our backend and Azure Cosmos DB for data storage. The frontend uses the React framework and Bootstrap for design. Logins use OAuth 2.0. projectideas is hosted on Heroku.
+We use Java Spring as our backend and Azure Cosmos DB for data storage. Logins use OAuth 2.0. The projectideas API is hosted on Heroku. Our frontend is hosted on GitHub Pages, and uses the React framework and Bootstrap for design.
