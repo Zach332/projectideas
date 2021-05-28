@@ -916,6 +916,23 @@ public class Database {
 
     // Messages
 
+    private <T extends ReceivedMessage> void createReceivedMessage(
+        User recipient,
+        T message
+    ) throws EmptyPointReadException, CosmosException {
+        userContainer.createItem(message);
+
+        recipient.setUnreadMessages(recipient.getUnreadMessages() + 1);
+        updateUser(recipient.getUserId(), recipient);
+
+        notificationService.notifyUserOfUnreadMessages(recipient);
+    }
+
+    private <T extends SentMessage> void createSentMessage(T message)
+        throws CosmosException {
+        userContainer.createItem(message);
+    }
+
     public void sendIndividualMessage(
         String senderId,
         String recipientUsername,
@@ -923,9 +940,6 @@ public class Database {
     ) throws EmptyPointReadException, EmptySingleDocumentQueryException {
         User sender = getUser(senderId);
         User recipient = getUserByUsername(recipientUsername);
-
-        recipient.setUnreadMessages(recipient.getUnreadMessages() + 1);
-        updateUser(recipient.getUserId(), recipient);
 
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipient.getId(),
@@ -939,31 +953,23 @@ public class Database {
         );
 
         try {
-            userContainer.createItem(receivedMessage);
-            userContainer.createItem(sentMessage);
+            createReceivedMessage(recipient, receivedMessage);
+            createSentMessage(sentMessage);
         } catch (CosmosException e) {
             logger.error("Individual message failed to send.", e);
         }
-
-        notificationService.notifyUserOfUnreadMessages(recipient);
     }
 
-    public void sendIndividualAdminMessage(String recipientId, String content) {
+    public void sendIndividualAdminMessage(String recipientId, String content)
+        throws EmptyPointReadException {
+        User recipient = getUser(recipientId);
         ReceivedIndividualMessage receivedMessage = new ReceivedIndividualMessage(
             recipientId,
             "projectideas",
             content
         );
 
-        userContainer.createItem(receivedMessage);
-
-        try {
-            notificationService.notifyUserOfUnreadMessages(
-                getUser(recipientId)
-            );
-        } catch (EmptyPointReadException e) {
-            logger.warn(e.toString());
-        }
+        createReceivedMessage(recipient, receivedMessage);
     }
 
     public void sendGroupMessage(
@@ -974,36 +980,30 @@ public class Database {
         try {
             User sender = getUser(senderId);
             Project recipientProject = getProject(recipientProjectId);
-            for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
-                String recipientId = recipient.getUserId();
+
+            for (UsernameIdPair recipientUsernameIdPair : recipientProject.getTeamMembers()) {
+                User recipient = getUser(recipientUsernameIdPair.getUserId());
                 // Skip the user sending the message
-                if (recipientId.equals(senderId)) {
+                if (recipient.getUserId().equals(senderId)) {
                     continue;
                 }
                 ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
-                    recipientId,
+                    recipient.getUserId(),
                     sender.getUsername(),
                     content,
                     recipientProjectId,
                     recipientProject.getName()
                 );
-                userContainer.createItem(receivedGroupMessage);
-
-                try {
-                    notificationService.notifyUserOfUnreadMessages(
-                        getUser(recipientId)
-                    );
-                } catch (EmptyPointReadException e) {
-                    logger.warn(e.toString());
-                }
+                createReceivedMessage(recipient, receivedGroupMessage);
             }
+
             SentGroupMessage sentGroupMessage = new SentGroupMessage(
                 senderId,
                 recipientProjectId,
                 recipientProject.getName(),
                 content
             );
-            userContainer.createItem(sentGroupMessage);
+            createSentMessage(sentGroupMessage);
         } catch (CosmosException e) {
             logger.error("Group message failed to send.", e);
         }
@@ -1015,24 +1015,16 @@ public class Database {
     ) throws EmptyPointReadException {
         try {
             Project recipientProject = getProject(recipientProjectId);
-            for (UsernameIdPair recipient : recipientProject.getTeamMembers()) {
-                String recipientId = recipient.getUserId();
+            for (UsernameIdPair recipientUsernameIdPair : recipientProject.getTeamMembers()) {
+                User recipient = getUser(recipientUsernameIdPair.getUserId());
                 ReceivedGroupMessage receivedGroupMessage = new ReceivedGroupMessage(
-                    recipientId,
+                    recipient.getUserId(),
                     "projectideas",
                     content,
                     recipientProjectId,
                     recipientProject.getName()
                 );
-                userContainer.createItem(receivedGroupMessage);
-
-                try {
-                    notificationService.notifyUserOfUnreadMessages(
-                        getUser(recipientId)
-                    );
-                } catch (EmptyPointReadException e) {
-                    logger.warn(e.toString());
-                }
+                createReceivedMessage(recipient, receivedGroupMessage);
             }
         } catch (CosmosException e) {
             logger.error("Group admin message failed to send.", e);
