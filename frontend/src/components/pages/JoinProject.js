@@ -66,7 +66,7 @@ export default function JoinProject() {
                 </div>
             </div>
         ) : (
-            <div>
+            <div className="mt-4">
                 No teams are looking for new members right now. Create a new
                 one!
             </div>
