@@ -27,13 +27,15 @@ export function toParams(query) {
 
 export function toRedirect(params, delimiter = "&") {
     let query = toQuery(params, delimiter);
-    //Preserve equal signs by replacing them with colons
-    return query.replace("%3D", "%3A");
+    //Preserve equal/and signs by replacing them with colons/plusses
+    return query.replaceAll("%3D", "%3A").replaceAll("%26", "%2B");
 }
 
 export function toParamsRedirect(query) {
     let parsedQuery = toParams(query);
-    //Get original equal signs by replacing the placeholder colons
-    parsedQuery["state"] = parsedQuery["state"].replace(":", "=");
+    //Get original equal/and signs by replacing the placeholder colons/plusses
+    parsedQuery["state"] = parsedQuery["state"]
+        .replaceAll(":", "=")
+        .replaceAll("+", "&");
     return parsedQuery;
 }
