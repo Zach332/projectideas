@@ -6,7 +6,7 @@ import Modal from "../layout/Modal";
 import { useToasts } from "react-toast-notifications";
 import { Link } from "react-router-dom";
 
-export default function Message({ message, setRerender }) {
+export default function Message({ message, sent = false, setRerender }) {
     const { addToast } = useToasts();
 
     const deleteMessage = () => {
@@ -93,13 +93,15 @@ export default function Message({ message, setRerender }) {
                     className="dropdown-menu"
                     aria-labelledby="dropdownMenuButton"
                 >
-                    <a
-                        className="dropdown-item"
-                        data-bs-toggle="modal"
-                        data-bs-target={"#sendMessage" + message.id}
-                    >
-                        Reply
-                    </a>
+                    {!sent && (
+                        <a
+                            className="dropdown-item"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#sendMessage" + message.id}
+                        >
+                            Reply
+                        </a>
+                    )}
                     {message.groupMessage && (
                         <a
                             className="dropdown-item"

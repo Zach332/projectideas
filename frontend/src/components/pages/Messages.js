@@ -120,6 +120,7 @@ export default function Messages() {
                                     key={message.id}
                                     message={message}
                                     setRerender={setRerender}
+                                    sent={mode === "Sent"}
                                 />
                             ))}
                         </motion.div>
