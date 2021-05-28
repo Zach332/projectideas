@@ -90,7 +90,7 @@ export default function Home() {
                     apps, and more—that real people will use. If there is a
                     technology that you wish existed, post the idea here. And if
                     you want to develop a solution based on an idea, you can
-                    message the idea poster or even join a team.
+                    create or join a project based on that idea.
                 </div>
             )}
             <div className="d-flex align-items-center">
