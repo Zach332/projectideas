@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import XMark from "../../x.svg";
-import { toParams } from "../utils/Routing";
+import { toParamsRedirect } from "../utils/Routing";
 import axios from "axios";
 import { login, Status } from "../../State";
 import Spinner from "../general/Spinner";
@@ -14,7 +14,9 @@ export default function LoginLandingGithub() {
     const { addToast } = useToasts();
 
     useEffect(() => {
-        const params = toParams(window.location.search.replace(/^\?/, ""));
+        const params = toParamsRedirect(
+            window.location.search.replace(/^\?/, "")
+        );
         onSuccess(params);
     }, []);
 
@@ -38,7 +40,13 @@ export default function LoginLandingGithub() {
                         appearance: "success",
                         autoDismiss: true,
                     });
-                    history.push(data.state);
+                    let redirectUrl = new URL(
+                        process.env.REACT_APP_URL + data.state
+                    );
+                    history.push({
+                        pathname: redirectUrl.pathname,
+                        search: redirectUrl.search,
+                    });
                 } else {
                     history.push("/login/oauth2/code/github");
                 }

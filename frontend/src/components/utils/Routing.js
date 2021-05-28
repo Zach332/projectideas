@@ -24,3 +24,16 @@ export function toParams(query) {
         return values;
     }, {});
 }
+
+export function toRedirect(params, delimiter = "&") {
+    let query = toQuery(params, delimiter);
+    //Preserve equal signs by replacing them with colons
+    return query.replace("%3D", "%3A");
+}
+
+export function toParamsRedirect(query) {
+    let parsedQuery = toParams(query);
+    //Get original equal signs by replacing the placeholder colons
+    parsedQuery["state"] = parsedQuery["state"].replace(":", "=");
+    return parsedQuery;
+}
