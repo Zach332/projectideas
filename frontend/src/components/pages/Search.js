@@ -132,6 +132,10 @@ export default function Search() {
                         : "Search " + type + " for " + query + " "}
                     | {Globals.Title}
                 </title>
+                <meta
+                    name="description"
+                    content="Search for project ideas or projects to find inspiration for your next programming project, or request to join a team!"
+                ></meta>
             </Helmet>
             <div className="row w-75 mx-auto">
                 <select

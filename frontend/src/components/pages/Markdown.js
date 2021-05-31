@@ -20,6 +20,10 @@ export default function Markdown() {
         <div>
             <Helmet>
                 <title>Markdown | {Globals.Title}</title>
+                <meta
+                    name="description"
+                    content="This is a guide to basic Markdown syntax, including a live editor to try Markdown online."
+                ></meta>
             </Helmet>
             <h1 className="pb-3">Guide to basic Markdown syntax</h1>
             <button onClick={onCLick} className="btn btn-link btn-lg mb-4">
