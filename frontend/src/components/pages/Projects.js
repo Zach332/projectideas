@@ -54,6 +54,10 @@ export default function Projects() {
         <div>
             <Helmet>
                 <title>Projects | {Globals.Title}</title>
+                <meta
+                    name="description"
+                    content="Here, you can explore and join projects that have been created based on user-created ideas."
+                ></meta>
             </Helmet>
             {!user.loggedIn && (
                 <div className="bg-light p-3">

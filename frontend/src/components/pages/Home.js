@@ -82,6 +82,10 @@ export default function Home() {
         <div>
             <Helmet>
                 <title>Ideas | {Globals.Title}</title>
+                <meta
+                    name="description"
+                    content="Here, you can post and find ideas for websites, apps, and more."
+                ></meta>
             </Helmet>
             {!user.loggedIn && (
                 <div className="bg-light p-3">

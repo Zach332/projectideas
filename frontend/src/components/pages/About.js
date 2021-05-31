@@ -7,6 +7,10 @@ export default function About() {
         <div>
             <Helmet>
                 <title>About | {Globals.Title}</title>
+                <meta
+                    name="description"
+                    content="projectideas is a platform that brings together software engineers with the people their products serve."
+                ></meta>
             </Helmet>
             <h1>About</h1>
             <ReactMarkdown>{markdown}</ReactMarkdown>
