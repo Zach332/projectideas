@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import { Globals } from "../../GlobalData";
 
 export default function Privacy() {
@@ -46,7 +47,7 @@ export default function Privacy() {
                 Your continued use of our website will be regarded as acceptance
                 of our practices around privacy and personal information. If you
                 have any questions about how we handle user data and personal
-                information, feel free to <a href="contact">contact us</a>.
+                information, feel free to <Link to="contact">contact us</Link>.
             </p>
             <p>This policy is effective as of 24 September 2020.</p>
         </div>
