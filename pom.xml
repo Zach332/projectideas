@@ -5,7 +5,7 @@
 
     <groupId>com.herokuapp.projectideas</groupId>
     <artifactId>projectideas</artifactId>
-    <version>0.0.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>projectideas</name>
