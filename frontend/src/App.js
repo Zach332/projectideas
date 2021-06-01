@@ -15,7 +15,7 @@ import Search from "./components/pages/Search";
 import Tags from "./components/pages/Tags";
 import JoinProject from "./components/pages/JoinProject";
 import CreateProject from "./components/pages/CreateProject";
-import GitHubLogin from "./components/logins/Login";
+import GitHubLogin from "./components/pages/Login";
 import LoginLandingGithub from "./components/logins/LoginLandingGithub";
 import LoginLandingGoogle from "./components/logins/LoginLandingGoogle";
 import MyProjects from "./components/pages/MyProjects";

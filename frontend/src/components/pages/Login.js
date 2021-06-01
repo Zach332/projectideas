@@ -3,6 +3,8 @@ import GitHubSymbol from "../../GitHub-Mark.png";
 import GitHubSymbolLight from "../../GitHub-Mark-Light.png";
 import GoogleLogo from "../../GoogleLogo.svg";
 import { useGlobalState } from "../../State";
+import { Helmet } from "react-helmet-async";
+import { Globals } from "../../GlobalData";
 
 export default function Login() {
     const [theme] = useGlobalState("theme");
@@ -36,6 +38,13 @@ export default function Login() {
 
     return (
         <div className="container">
+            <Helmet>
+                <title>Login | {Globals.Title}</title>
+                <meta
+                    name="description"
+                    content="Login to projectideas to post project ideas, join project teams, comment, upvote and more."
+                ></meta>
+            </Helmet>
             <img
                 src={GoogleLogo}
                 className="mx-auto d-block m-4"
