@@ -78,12 +78,14 @@ public class ProjectController {
     ) throws DatabaseException {
         Project project = database.getProject(projectId);
 
-        if (!ControllerUtils.userIsAuthorizedToView(project, userId)) {
+        if (
+            !ControllerUtils.userIsAuthorizedToView(project, userId, database)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         ViewProjectDTO viewProjectDTO;
-        if (ControllerUtils.userIsAuthorizedToView(project, userId)) {
+        if (ControllerUtils.userIsAuthorizedToView(project, userId, database)) {
             viewProjectDTO =
                 mapper.viewProjectAsTeamMemberDTO(project, userId, database);
         } else if (project.userHasRequestedToJoin(userId)) {
@@ -126,7 +128,13 @@ public class ProjectController {
         try {
             Project project = database.getProject(projectId);
 
-            if (!ControllerUtils.userIsAuthorizedToEdit(project, userId)) {
+            if (
+                !ControllerUtils.userIsAuthorizedToEdit(
+                    project,
+                    userId,
+                    database
+                )
+            ) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
 
@@ -209,7 +217,13 @@ public class ProjectController {
         @RequestParam("link") String link
     ) throws DatabaseException {
         Project existingProject = database.getProject(projectId);
-        if (!ControllerUtils.userIsAuthorizedToEdit(existingProject, userId)) {
+        if (
+            !ControllerUtils.userIsAuthorizedToEdit(
+                existingProject,
+                userId,
+                database
+            )
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         existingProject.setGithubLink(link);
@@ -224,7 +238,13 @@ public class ProjectController {
     ) throws DatabaseException {
         Project existingProject = database.getProject(projectId);
 
-        if (!ControllerUtils.userIsAuthorizedToEdit(existingProject, userId)) {
+        if (
+            !ControllerUtils.userIsAuthorizedToEdit(
+                existingProject,
+                userId,
+                database
+            )
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -248,7 +268,13 @@ public class ProjectController {
                 "A project cannot be private while looking for members."
             );
         }
-        if (!ControllerUtils.userIsAuthorizedToEdit(existingProject, userId)) {
+        if (
+            !ControllerUtils.userIsAuthorizedToEdit(
+                existingProject,
+                userId,
+                database
+            )
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         existingProject.setPublicProject(publicProject);
@@ -325,7 +351,9 @@ public class ProjectController {
         User newTeamMember = database.getUserByUsername(newTeamMemberUsername);
         Project project = database.getProject(projectId);
 
-        if (!ControllerUtils.userIsAuthorizedToEdit(project, userId)) {
+        if (
+            !ControllerUtils.userIsAuthorizedToEdit(project, userId, database)
+        ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 

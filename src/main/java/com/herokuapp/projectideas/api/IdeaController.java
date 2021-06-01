@@ -226,7 +226,9 @@ public class IdeaController {
         try {
             Idea idea = database.getIdea(id);
 
-            if (!ControllerUtils.userIsAuthorizedToEdit(idea, userId)) {
+            if (
+                !ControllerUtils.userIsAuthorizedToEdit(idea, userId, database)
+            ) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
 
@@ -267,7 +269,13 @@ public class IdeaController {
         @RequestBody PostCommentDTO comment
     ) throws DatabaseException {
         Comment existingComment = database.getCommentOnIdea(ideaId, commentId);
-        if (ControllerUtils.userIsAuthorizedToEdit(existingComment, userId)) {
+        if (
+            ControllerUtils.userIsAuthorizedToEdit(
+                existingComment,
+                userId,
+                database
+            )
+        ) {
             mapper.updateCommentFromDTO(existingComment, comment);
             database.updateComment(existingComment);
         } else {
@@ -313,7 +321,13 @@ public class IdeaController {
         @PathVariable String id
     ) throws DatabaseException {
         Idea ideaToDelete = database.getIdea(id);
-        if (ControllerUtils.userIsAuthorizedToEdit(ideaToDelete, userId)) {
+        if (
+            ControllerUtils.userIsAuthorizedToEdit(
+                ideaToDelete,
+                userId,
+                database
+            )
+        ) {
             database.deleteIdea(ideaToDelete);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -327,7 +341,13 @@ public class IdeaController {
         @PathVariable String commentId
     ) throws DatabaseException {
         Comment commentToDelete = database.getCommentOnIdea(ideaId, commentId);
-        if (ControllerUtils.userIsAuthorizedToEdit(commentToDelete, userId)) {
+        if (
+            ControllerUtils.userIsAuthorizedToEdit(
+                commentToDelete,
+                userId,
+                database
+            )
+        ) {
             database.deleteComment(commentId, ideaId);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
