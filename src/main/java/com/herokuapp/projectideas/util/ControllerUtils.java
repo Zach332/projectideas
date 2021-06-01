@@ -6,16 +6,13 @@ import com.herokuapp.projectideas.database.document.Tagged;
 import com.herokuapp.projectideas.database.exception.EmptyPointReadException;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ControllerUtils {
 
-    @Autowired
-    private static Database database;
-
     public static <T extends Authorization> boolean userIsAuthorizedToView(
         T document,
-        String userId
+        String userId,
+        Database database
     ) {
         try {
             return (
@@ -29,7 +26,8 @@ public class ControllerUtils {
 
     public static <T extends Authorization> boolean userIsAuthorizedToEdit(
         T document,
-        String userId
+        String userId,
+        Database database
     ) {
         try {
             return (
