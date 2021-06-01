@@ -1,8 +1,13 @@
 import SendMessageModal from "./../messageComponents/SendMessageModal";
+import { Helmet } from "react-helmet-async";
+import { Globals } from "../../GlobalData";
 
 export default function Contact() {
     return (
         <div>
+            <Helmet>
+                <title>Contact | {Globals.Title}</title>
+            </Helmet>
             <h1>Contact Us</h1>
             <p>
                 We&apos;d love to hear your thoughts on the website. Feel free
