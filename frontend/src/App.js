@@ -22,7 +22,8 @@ import MyProjects from "./components/pages/MyProjects";
 import Projects from "./components/pages/Projects";
 import StyleDiv from "./components/general/StyleDiv";
 import Footer from "./components/layout/Footer";
-import { HelmetProvider } from "react-helmet-async";
+import { Globals } from "./GlobalData";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import Contact from "./components/pages/Contact";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Invite from "./components/pages/Invite";
@@ -42,6 +43,13 @@ function App() {
                                 flexDirection: "column",
                             }}
                         >
+                            <Helmet>
+                                <title>{Globals.Title}</title>
+                                <meta
+                                    name="description"
+                                    content="Find and propose impactful tech projects on projectideas. Collaborate by joining project teams, commenting on ideas, or messaging idea posters."
+                                ></meta>
+                            </Helmet>
                             <Navbar />
                             <div className="container mx-auto">
                                 <Switch>
