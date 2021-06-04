@@ -36,6 +36,10 @@ export default function TagPicker({ post, setPost, postType }) {
         }
     };
 
+    const addCurrentTag = () => {
+        addTag(newTag);
+    };
+
     const removeTag = (tagName) => {
         setPost((post) => ({
             ...post,
@@ -67,13 +71,14 @@ export default function TagPicker({ post, setPost, postType }) {
         }
     };
 
-    const createTag = () => {
-        addTag(newTag);
+    const createTag = (event) => {
+        addCurrentTag();
+        event.preventDefault();
     };
 
     const submitOnEnter = (event) => {
         if (event.keyCode === 13) {
-            createTag();
+            addCurrentTag();
             event.preventDefault();
         }
     };
