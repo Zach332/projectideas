@@ -216,7 +216,9 @@ public class IndexController {
 
     public void tryUpdateProject(Project newPoject) {
         tryDeleteProject(newPoject.getId());
-        tryIndexProject(newPoject);
+        if (newPoject.isPublicProject()) {
+            tryIndexProject(newPoject);
+        }
     }
 
     public void tryIndexIdea(Idea idea) {
