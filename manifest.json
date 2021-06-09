@@ -7,7 +7,15 @@
       "type": "image/svg"
     },
     {
-      "src": "favicon.ico",
+      "src": "16x16.ico",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "32x32.ico",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "48x48.ico",
       "type": "image/x-icon"
     },
     {
