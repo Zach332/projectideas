@@ -214,9 +214,11 @@ public class IndexController {
         tryIndexIdea(newIdea);
     }
 
-    public void tryUpdateProject(Project newPoject) {
-        tryDeleteProject(newPoject.getId());
-        tryIndexProject(newPoject);
+    public void tryUpdateProject(Project newProject) {
+        tryDeleteProject(newProject.getId());
+        if (newProject.isPublicProject()) {
+            tryIndexProject(newProject);
+        }
     }
 
     public void tryIndexIdea(Idea idea) {
