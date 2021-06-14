@@ -128,7 +128,7 @@ export default function Navbar() {
                     <img src={NameLogo} height="35" alt="projectideas" />
                 </Link>
                 <button
-                    className="navbar-toggler me-auto"
+                    className="navbar-toggler"
                     type="button"
                     data-bs-toggle="collapse"
                     data-bs-target="#navbarNav"
