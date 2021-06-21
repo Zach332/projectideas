@@ -1,7 +1,7 @@
 https://projectideas.tech/
-https://projectideas.tech/login
-https://projectideas.tech/projects
-https://projectideas.tech/search
-https://projectideas.tech/about
-https://projectideas.tech/markdown
-https://projectideas.tech/contact
+https://projectideas.tech/?/login
+https://projectideas.tech/?/projects
+https://projectideas.tech/?/search
+https://projectideas.tech/?/about
+https://projectideas.tech/?/markdown
+https://projectideas.tech/?/contact
