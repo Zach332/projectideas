@@ -31,7 +31,7 @@ public class ProdWebSecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedOrigins(
-            Arrays.asList("https://projectideas.tech")
+            Arrays.asList("https://zach332.github.io/projectideas")
         );
         configuration.setAllowedHeaders(
             Arrays.asList(

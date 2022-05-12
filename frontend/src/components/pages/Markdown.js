@@ -127,5 +127,5 @@ const horizontalRule = `A horizontal rule is below
 ---
 
 Another section`;
-const link = "[a link](https://projectideas.tech)";
+const link = "[a link](https://zach332.github.io/projectideas)";
 const image = "![cool logo](https://bit.ly/3rxWQUR)";
