@@ -1,7 +1,7 @@
-https://projectideas.tech/
-https://projectideas.tech/?/login
-https://projectideas.tech/?/projects
-https://projectideas.tech/?/search
-https://projectideas.tech/?/about
-https://projectideas.tech/?/markdown
-https://projectideas.tech/?/contact
+https://zach332.github.io/projectideas/
+https://zach332.github.io/projectideas/?/login
+https://zach332.github.io/projectideas/?/projects
+https://zach332.github.io/projectideas/?/search
+https://zach332.github.io/projectideas/?/about
+https://zach332.github.io/projectideas/?/markdown
+https://zach332.github.io/projectideas/?/contact
