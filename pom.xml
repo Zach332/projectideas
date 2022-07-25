@@ -21,7 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>15</java.version>
+        <java.version>17</java.version>
         <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.20</org.projectlombok.version>
     </properties>
@@ -124,6 +124,8 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
+        
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
