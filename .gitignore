@@ -9,3 +9,5 @@ target
 node_modules
 lucene
 logfile.txt
+# Local Netlify folder
+.netlify
