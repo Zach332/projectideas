@@ -1,1 +1,1 @@
-Sitemap: https://zach332.github.io/projectideas/sitemap.txt
+Sitemap: https://projectideastech.netlify.app/sitemap.txt
